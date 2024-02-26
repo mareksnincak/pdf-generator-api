@@ -1,3 +1,4 @@
 export enum Lambda {
-  uploadTemplate = 'upload-template',
+  getUrlForTemplateUpload = 'get-url-for-template-upload',
+  createTemplate = 'create-template',
 }

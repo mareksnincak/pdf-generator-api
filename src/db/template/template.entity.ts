@@ -6,17 +6,19 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { type Template, type StoredTemplate } from './template.type';
 import { type TemplateType } from './template.enum';
 import { randomUUID } from 'crypto';
+import { type Optional } from 'utility-types';
 
 export class TemplateEntity extends BaseEntity {
-  constructor({ id, name, type }: Omit<Template, 'id'> & { id?: string }) {
+  constructor({ id = randomUUID(), name, type, s3Key }: Optional<Template, 'id'>) {
     super({
       PK: `TEMPLATE#${id}`,
       SK: '#',
     });
 
-    this.id = id ?? randomUUID();
+    this.id = id;
     this.name = name;
     this.type = type;
+    this.s3Key = s3Key;
   }
 
   public id: string;
@@ -25,12 +27,15 @@ export class TemplateEntity extends BaseEntity {
 
   public type: TemplateType;
 
+  public s3Key: string;
+
   async toDynamoDbItem(): Promise<Record<string, AttributeValue>> {
     const item: StoredTemplate = {
       ...this.primaryKey,
       id: this.id,
       name: this.name,
       type: this.type,
+      s3Key: this.s3Key,
     };
 
     const result = marshall(item, {
