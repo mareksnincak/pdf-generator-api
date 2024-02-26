@@ -1,32 +1,22 @@
-import { type PutRequest } from '@aws-sdk/client-dynamodb';
+import { PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { logger } from '../../helpers/logger.helper';
 import { TemplateEntity } from './template.entity';
-import { writeBatch } from '../common/helpers/batch.helper';
 import { type Template } from './template.type';
 import { type Optional } from 'utility-types';
+import { getDynamoDbClient, getTableName } from '../common/helpers/connection.helper';
 
-export async function createOrReplaceMany(templates: Optional<Template, 'id'>[]) {
-  logger.info('templateRepository.createOrReplaceMany.start');
+export async function createOrReplace(template: Optional<Template, 'id'>) {
+  logger.info('templateRepository.createOrReplace.start');
 
-  const templateIds: string[] = [];
-  const putTemplatesBatch: { PutRequest: PutRequest }[] = await Promise.all(
-    templates.map(async (template) => {
-      const templateEntity = new TemplateEntity(template);
-      templateIds.push(templateEntity.id);
+  const templateEntity = new TemplateEntity(template);
+  const item = await templateEntity.toDynamoDbItem();
+  const command = new PutItemCommand({
+    TableName: getTableName(),
+    Item: item,
+  });
 
-      const item = await templateEntity.toDynamoDbItem();
-      return {
-        PutRequest: {
-          Item: item,
-        },
-      };
-    }),
-  );
+  await getDynamoDbClient().send(command);
 
-  logger.info({ templateIds }, 'templateRepository.createOrReplaceMany.templateIds');
-
-  await writeBatch(putTemplatesBatch);
-
-  logger.info('templateRepository.createOrReplaceMany.success', { templateIds });
-  return { templateIds };
+  logger.info('templateRepository.createOrReplace.success');
+  return templateEntity;
 }
