@@ -6,6 +6,23 @@ import { randomUUID } from 'crypto';
 
 const s3Client = new S3Client();
 
+async function createPresignedUrl({
+  fileSizeBytes,
+  uploadId,
+}: {
+  fileSizeBytes: number;
+  uploadId: string;
+}) {
+  const command = new PutObjectCommand({
+    Bucket: process.env.S3_BUCKET,
+    Key: `templates/uploads/${uploadId}`,
+    ContentLength: fileSizeBytes,
+  });
+
+  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  return url;
+}
+
 export async function getUrlForTemplateUpload(
   event: APIGatewayProxyEvent,
   context: Context,
@@ -25,14 +42,7 @@ export async function getUrlForTemplateUpload(
   }
 
   const uploadId = randomUUID();
-
-  const command = new PutObjectCommand({
-    Bucket: process.env.S3_BUCKET,
-    Key: `templates/uploads/${uploadId}`,
-    ContentLength: fileSizeBytes,
-  });
-
-  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+  const url = await createPresignedUrl({ fileSizeBytes, uploadId });
 
   const response = {
     uploadId,

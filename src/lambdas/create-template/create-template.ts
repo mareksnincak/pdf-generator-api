@@ -12,6 +12,30 @@ import { S3ExceptionName } from '../../enums/s3.enum';
 
 const s3Client = new S3Client();
 
+async function moveTemplateDataToPermanentLocation(uploadId: string) {
+  // TODO validate html
+  const bucket = process.env.S3_BUCKET;
+  const uploadedDataS3Key = `templates/uploads/${uploadId}`;
+  const storedDataS3Key = `/templates/data/${uploadId}`;
+
+  await s3Client.send(
+    new CopyObjectCommand({
+      CopySource: `${bucket}/${uploadedDataS3Key}`,
+      Bucket: bucket,
+      Key: storedDataS3Key,
+    }),
+  );
+
+  await s3Client.send(
+    new DeleteObjectCommand({
+      Bucket: bucket,
+      Key: uploadedDataS3Key,
+    }),
+  );
+
+  return storedDataS3Key;
+}
+
 export async function createTemplate(
   event: APIGatewayProxyEvent,
   context: Context,
@@ -28,27 +52,8 @@ export async function createTemplate(
       type: TemplateType;
     };
 
-    // TODO validate html
-    const bucket = process.env.S3_BUCKET;
-    const uploadKey = `templates/uploads/${uploadId}`;
-    const dataKey = `/templates/data/${uploadId}`;
-
-    await s3Client.send(
-      new CopyObjectCommand({
-        CopySource: `${bucket}/${uploadKey}`,
-        Bucket: bucket,
-        Key: dataKey,
-      }),
-    );
-
-    await s3Client.send(
-      new DeleteObjectCommand({
-        Bucket: bucket,
-        Key: uploadKey,
-      }),
-    );
-
-    const { templateIds } = await createOrReplaceMany([{ id, name, type, s3Key: dataKey }]);
+    const s3Key = await moveTemplateDataToPermanentLocation(uploadId);
+    const { templateIds } = await createOrReplaceMany([{ id, name, type, s3Key }]);
     const templateId = templateIds[0];
 
     const response = {
