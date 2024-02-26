@@ -4,7 +4,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
 
-const client = new S3Client();
+const s3Client = new S3Client();
 
 export async function getUrlForTemplateUpload(
   event: APIGatewayProxyEvent,
@@ -32,7 +32,7 @@ export async function getUrlForTemplateUpload(
     ContentLength: fileSizeBytes,
   });
 
-  const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
 
   const response = {
     uploadId,

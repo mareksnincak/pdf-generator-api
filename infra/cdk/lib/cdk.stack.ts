@@ -20,7 +20,6 @@ function getCommonNodeJsFunctionProps(lambda: Lambda) {
   return {
     runtime: Runtime.NODEJS_20_X,
     architecture: Architecture.ARM_64,
-    handler: 'uploadTemplate',
     entry: getLambdaEntryPath(lambda),
     bundling: {
       assetHash: lambda,
@@ -38,31 +37,35 @@ export class CdkStack extends Stack {
       enforceSSL: true,
     });
 
+    const s3BucketName = 'test-local-pdf-generator-api' ?? s3Bucket.bucketName;
+
     const getUrlForTemplateUpload = new NodejsFunction(this, Lambda.getUrlForTemplateUpload, {
       ...getCommonNodeJsFunctionProps(Lambda.getUrlForTemplateUpload),
       handler: 'getUrlForTemplateUpload',
       environment: {
-        S3_BUCKET: 'test-local-pdf-generator-api' ?? s3Bucket.bucketName,
+        S3_BUCKET: s3BucketName,
       },
     });
 
-    const uploadTemplate = new NodejsFunction(this, Lambda.uploadTemplate, {
-      ...getCommonNodeJsFunctionProps(Lambda.uploadTemplate),
-      handler: 'uploadTemplate',
+    const createTemplate = new NodejsFunction(this, Lambda.createTemplate, {
+      ...getCommonNodeJsFunctionProps(Lambda.createTemplate),
+      handler: 'createTemplate',
       environment: {
         DYNAMODB_ENDPOINT: 'http://host.docker.internal:8000',
         DYNAMODB_TABLE_NAME: 'PdfGenerator',
+        S3_BUCKET: s3BucketName,
       },
     });
 
-    s3Bucket.grantWrite(uploadTemplate);
+    s3Bucket.grantWrite(createTemplate);
+    s3Bucket.grantDelete(createTemplate);
 
     const api = new RestApi(this, 'api', {
       cloudWatchRole: false,
     });
 
     const templatesResource = api.root.addResource('templates');
-    templatesResource.addMethod('POST', new LambdaIntegration(uploadTemplate));
+    templatesResource.addMethod('POST', new LambdaIntegration(createTemplate));
     templatesResource
       .addResource('upload-url')
       .addMethod('GET', new LambdaIntegration(getUrlForTemplateUpload));
