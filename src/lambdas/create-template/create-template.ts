@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { createOrReplaceMany } from '../../db/template/template.repository';
+import { createOrReplace } from '../../db/template/template.repository';
 import { type TemplateType } from '../../db/template/template.enum';
 import {
   CopyObjectCommand,
@@ -53,11 +53,10 @@ export async function createTemplate(
     };
 
     const s3Key = await moveTemplateDataToPermanentLocation(uploadId);
-    const { templateIds } = await createOrReplaceMany([{ id, name, type, s3Key }]);
-    const templateId = templateIds[0];
+    const template = await createOrReplace({ id, name, type, s3Key });
 
     const response = {
-      templateId,
+      templateId: template.id,
     };
     logger.info({ response }, 'createTemplate.response');
     return {
@@ -65,6 +64,7 @@ export async function createTemplate(
       statusCode: 200,
     };
   } catch (error) {
+    // TODO cleanup error handling
     if (error instanceof S3ServiceException && error.name === S3ExceptionName.noSuchKey) {
       return {
         body: JSON.stringify({ message: 'Template data not found' }),
