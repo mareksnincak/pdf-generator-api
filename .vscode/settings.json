@@ -1,5 +1,5 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "cSpell.words": ["linebreak", "pino", "presynth", "trpc", "unmarshall"]
+  "cSpell.words": ["linebreak", "pino", "presigner", "presynth", "trpc", "unmarshall"]
 }
