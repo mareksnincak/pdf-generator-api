@@ -69,7 +69,7 @@ export async function createTemplate(
     const response: CreateTemplateResponseDto = {
       templateId: template.id,
     };
-    logger.info({ response }, 'createTemplate.response');
+    logger.info(response, 'createTemplate.response');
     return {
       body: JSON.stringify(response),
       statusCode: 200,
