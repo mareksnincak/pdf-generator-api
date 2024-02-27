@@ -37,7 +37,7 @@ export class CdkStack extends Stack {
       enforceSSL: true,
     });
 
-    const s3BucketName = 'test-local-pdf-generator-api' ?? s3Bucket.bucketName;
+    const s3BucketName = s3Bucket.bucketName;
 
     const getUrlForTemplateUpload = new NodejsFunction(this, Lambda.getUrlForTemplateUpload, {
       ...getCommonNodeJsFunctionProps(Lambda.getUrlForTemplateUpload),
@@ -57,7 +57,8 @@ export class CdkStack extends Stack {
       },
     });
 
-    s3Bucket.grantWrite(createTemplate);
+    s3Bucket.grantWrite(getUrlForTemplateUpload);
+    s3Bucket.grantReadWrite(createTemplate);
     s3Bucket.grantDelete(createTemplate);
 
     const api = new RestApi(this, 'api', {
