@@ -8,13 +8,18 @@ let openApiDocument: ReturnType<typeof generateOpenApi>;
 const ssmClient = new SSMClient();
 
 async function getOpenApiDocument() {
+  const ssmParamName = process.env.API_URL_SSM_PARAM_NAME;
+
+  logger.debug(ssmParamName, 'getOpenApi.getOpenApiDocument.ssmParamName');
   const apiUrlSsmParam = await ssmClient.send(
     new GetParameterCommand({
-      Name: process.env.API_URL_SSM_PARAM_NAME,
+      Name: ssmParamName,
     }),
   );
 
-  return generateOpenApi(apiUrlSsmParam.Parameter?.Value);
+  const apiUrl = apiUrlSsmParam.Parameter?.Value;
+  logger.debug(apiUrl, 'getOpenApi.getOpenApiDocument.apiUrl');
+  return generateOpenApi(apiUrl);
 }
 
 export async function getOpenApi(

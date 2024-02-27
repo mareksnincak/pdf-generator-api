@@ -86,6 +86,9 @@ export class CdkStack extends Stack {
       .addResource('upload-url')
       .addMethod('GET', new LambdaIntegration(getUrlForTemplateUpload));
 
-    new StringParameter(this, 'api-url', { stringValue: api.url });
+    new StringParameter(this, 'api-url', {
+      parameterName: apiUrlSsmParamName,
+      stringValue: api.url,
+    });
   }
 }
