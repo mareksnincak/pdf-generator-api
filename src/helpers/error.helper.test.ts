@@ -1,0 +1,39 @@
+import { BadRequestError } from '../errors/bad-request.error';
+import { mockLogger } from './test.helper';
+import { handleError } from './error.helper';
+import { NotFoundError } from '../errors/not-found.error';
+
+describe('handleError', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it.each([
+    [400, BadRequestError],
+    [404, NotFoundError],
+  ])('should return %i response on HttpError', (statusCode, HttpError) => {
+    mockLogger();
+    const error = new HttpError({
+      message: 'Custom error message',
+    });
+
+    const result = handleError({ error, logPrefix: 'test' });
+
+    expect(result).toEqual({
+      body: '{"message":"Custom error message"}',
+      statusCode,
+    });
+  });
+
+  it('should return 500 response on unknown error', () => {
+    mockLogger();
+    const error = new Error('Custom error message');
+
+    const result = handleError({ error, logPrefix: 'test' });
+
+    expect(result).toEqual({
+      body: '{"message":"Internal server error"}',
+      statusCode: 500,
+    });
+  });
+});
