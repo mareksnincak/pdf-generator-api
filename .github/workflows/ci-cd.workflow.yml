@@ -7,16 +7,16 @@ jobs:
   audit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
       - run: npm audit
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
       - run: npm ci
@@ -24,8 +24,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
       - run: npm ci
@@ -35,12 +35,12 @@ jobs:
     # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
       - run: npm ci
-      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-qemu-action@v3
         with:
           platforms: 'arm64,arm'
       - uses: aws-actions/configure-aws-credentials@v4
