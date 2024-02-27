@@ -18,7 +18,7 @@ export function generateOpenApi() {
       title: 'PDF generator API',
       description: packageJson.description,
     },
-    servers: [{ url: '/' }],
+    servers: [{ url: '/' }, { url: '/api' }],
   });
 
   return openApiDocument;

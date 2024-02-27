@@ -68,6 +68,9 @@ export class CdkStack extends Stack {
 
     const api = new RestApi(this, 'api', {
       cloudWatchRole: false,
+      deployOptions: {
+        stageName: 'api',
+      },
     });
 
     api.root.addResource('open-api').addMethod('GET', new LambdaIntegration(getOpenApi));
