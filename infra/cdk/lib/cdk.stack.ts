@@ -73,7 +73,7 @@ export class CdkStack extends Stack {
       },
     });
 
-    api.root.addResource('open-api').addMethod('GET', new LambdaIntegration(getOpenApi));
+    api.root.addMethod('GET', new LambdaIntegration(getOpenApi));
 
     const templatesResource = api.root.addResource('templates');
     templatesResource.addMethod('POST', new LambdaIntegration(createTemplate));
