@@ -39,9 +39,19 @@ export class CdkStack extends Stack {
 
     const s3BucketName = s3Bucket.bucketName;
 
+    const api = new RestApi(this, 'api', {
+      cloudWatchRole: false,
+      deployOptions: {
+        stageName: 'api',
+      },
+    });
+
     const getOpenApi = new NodejsFunction(this, Lambda.getOpenApi, {
       ...getCommonNodeJsFunctionProps(Lambda.getOpenApi),
       handler: 'getOpenApi',
+      environment: {
+        API_URL: process.env.CI ? api.url : '/',
+      },
     });
 
     const getUrlForTemplateUpload = new NodejsFunction(this, Lambda.getUrlForTemplateUpload, {
@@ -65,13 +75,6 @@ export class CdkStack extends Stack {
     s3Bucket.grantWrite(getUrlForTemplateUpload);
     s3Bucket.grantReadWrite(createTemplate);
     s3Bucket.grantDelete(createTemplate);
-
-    const api = new RestApi(this, 'api', {
-      cloudWatchRole: false,
-      deployOptions: {
-        stageName: 'api',
-      },
-    });
 
     api.root.addMethod('GET', new LambdaIntegration(getOpenApi));
 

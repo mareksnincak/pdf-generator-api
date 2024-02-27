@@ -14,7 +14,7 @@ export async function getOpenApi(
     logger.info('getOpenApi.starting');
 
     if (!openApiDocument) {
-      openApiDocument = generateOpenApi();
+      openApiDocument = generateOpenApi(process.env.API_URL);
     }
 
     logger.info('getOpenApi.success');

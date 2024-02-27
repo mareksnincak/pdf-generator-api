@@ -3,7 +3,7 @@ import { createTemplateRoute } from '../lambdas/create-template/open-api/create-
 import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/get-url-for-template-upload.open-api';
 import * as packageJson from '../../package.json';
 
-export function generateOpenApi() {
+export function generateOpenApi(apiUrl = '/') {
   const registry = new OpenAPIRegistry();
 
   registry.registerPath(createTemplateRoute);
@@ -18,7 +18,7 @@ export function generateOpenApi() {
       title: 'PDF generator API',
       description: packageJson.description,
     },
-    servers: [{ url: '/' }, { url: '/api' }],
+    servers: [{ url: apiUrl }],
   });
 
   return openApiDocument;
