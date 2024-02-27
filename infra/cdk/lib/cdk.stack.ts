@@ -11,6 +11,7 @@ import type { Construct } from 'constructs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 
 function getLambdaEntryPath(lambda: Lambda) {
   return path.join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, `${lambda}.ts`);
@@ -38,12 +39,13 @@ export class CdkStack extends Stack {
     });
 
     const s3BucketName = s3Bucket.bucketName;
+    const apiUrlSsmParamName = `${id}-api-url`;
 
     const getOpenApi = new NodejsFunction(this, Lambda.getOpenApi, {
       ...getCommonNodeJsFunctionProps(Lambda.getOpenApi),
       handler: 'getOpenApi',
       environment: {
-        // API_URL: it is set after creating API GW as otherwise it would create circular dependency
+        API_URL_SSM_PARAM_NAME: apiUrlSsmParamName,
       },
     });
 
@@ -84,6 +86,6 @@ export class CdkStack extends Stack {
       .addResource('upload-url')
       .addMethod('GET', new LambdaIntegration(getUrlForTemplateUpload));
 
-    getOpenApi.addEnvironment('API_URL', process.env.CI ? api.url : '/');
+    new StringParameter(this, 'api-url', { stringValue: api.url });
   }
 }
