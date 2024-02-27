@@ -5,6 +5,7 @@ import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gatewa
 import { NoSuchKey, S3Client } from '@aws-sdk/client-s3';
 import * as templateRepository from '../../db/template/template.repository';
 import { TemplateEntityMockFactory } from '../../db/template/template.mock-factory';
+import { mockLogger } from '../../helpers/test.helper';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
@@ -34,6 +35,7 @@ describe('createTemplate', () => {
   });
 
   it('should return 404 when template data do not exist', async () => {
+    mockLogger();
     jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
       throw new NoSuchKey({ message: 'No such key', $metadata: {} });
     });
