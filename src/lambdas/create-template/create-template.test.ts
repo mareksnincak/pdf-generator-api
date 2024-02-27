@@ -49,7 +49,7 @@ describe('createTemplate', () => {
 
     expect(result.statusCode).toEqual(404);
     expect(JSON.parse(result.body)).toEqual({
-      message: 'Template data not found',
+      message: 'Template data not found.',
     });
   });
 });
