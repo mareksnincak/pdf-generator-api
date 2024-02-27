@@ -5,6 +5,7 @@
     "asteasolutions",
     "dtos",
     "linebreak",
+    "nvmrc",
     "openapi",
     "pino",
     "presigner",
