@@ -39,18 +39,11 @@ export class CdkStack extends Stack {
 
     const s3BucketName = s3Bucket.bucketName;
 
-    const api = new RestApi(this, 'api', {
-      cloudWatchRole: false,
-      deployOptions: {
-        stageName: 'api',
-      },
-    });
-
     const getOpenApi = new NodejsFunction(this, Lambda.getOpenApi, {
       ...getCommonNodeJsFunctionProps(Lambda.getOpenApi),
       handler: 'getOpenApi',
       environment: {
-        API_URL: process.env.CI ? api.url : '/',
+        // API_URL: it is set after creating API GW as otherwise it would create circular dependency
       },
     });
 
@@ -76,6 +69,13 @@ export class CdkStack extends Stack {
     s3Bucket.grantReadWrite(createTemplate);
     s3Bucket.grantDelete(createTemplate);
 
+    const api = new RestApi(this, 'api', {
+      cloudWatchRole: false,
+      deployOptions: {
+        stageName: 'api',
+      },
+    });
+
     api.root.addMethod('GET', new LambdaIntegration(getOpenApi));
 
     const templatesResource = api.root.addResource('templates');
@@ -83,5 +83,7 @@ export class CdkStack extends Stack {
     templatesResource
       .addResource('upload-url')
       .addMethod('GET', new LambdaIntegration(getUrlForTemplateUpload));
+
+    getOpenApi.addEnvironment('API_URL', process.env.CI ? api.url : '/');
   }
 }
