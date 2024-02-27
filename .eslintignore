@@ -1,4 +1,4 @@
 dist
-cdk/cdk.out
+cdk.out
 node_modules
 .eslintrc.js
