@@ -4,7 +4,7 @@
   "private": true,
   "description": "API for generating dynamic PDF documents.",
   "scripts": {
-    "deploy": "npm run synth && cd ./infra/cdk && cdk deploy",
+    "deploy": "npm run synth && cd ./infra/cdk && cdk deploy --require-approval ${REQUIRE_APPROVAL:-broadening}",
     "infra:down": "cd ./infra/local && docker compose down",
     "infra:up": "cd ./infra/local && docker compose up -d && npx ts-node init-db.script.ts",
     "invoke": "npm run synth && sam local invoke -t ./infra/cdk/cdk.out/pdf-generator-api.template.json",
