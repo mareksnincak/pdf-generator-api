@@ -3,11 +3,11 @@ import { mockLogger } from './test.helper';
 import { handleError } from './error.helper';
 import { NotFoundError } from '../errors/not-found.error';
 
-describe('handleError', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+beforeEach(() => {
+  jest.clearAllMocks();
+});
 
+describe('handleError', () => {
   it.each([
     [400, BadRequestError],
     [404, NotFoundError],
