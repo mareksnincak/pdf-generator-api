@@ -3,6 +3,7 @@ import { writeFileSync } from 'fs';
 import { join } from 'path';
 import { createTemplateRoute } from '../lambdas/create-template/open-api/create-template.open-api';
 import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/get-url-for-template-upload.open-api';
+import * as packageJson from '../../package.json';
 
 const registry = new OpenAPIRegistry();
 
@@ -14,9 +15,9 @@ const generator = new OpenApiGeneratorV3(registry.definitions);
 const openApiDocument = generator.generateDocument({
   openapi: '3.0.0',
   info: {
-    version: '1.0.0',
-    title: 'PDF Generator API',
-    description: 'API for generating dynamic PDF documents.',
+    version: packageJson.version,
+    title: 'PDF generator API',
+    description: packageJson.description,
   },
   servers: [{ url: '/' }],
 });
