@@ -1,35 +1,13 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
-import { createTemplateRequestDto } from '../lambdas/create-template/dtos/create-template-request.dto';
-import { createTemplateResponseDto } from '../lambdas/create-template/dtos/create-template-response.dto';
 import { writeFileSync } from 'fs';
 import { join } from 'path';
+import { createTemplateRoute } from '../lambdas/create-template/open-api/create-template.open-api';
+import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/get-url-for-template-upload.open-api';
 
 const registry = new OpenAPIRegistry();
 
-registry.registerPath({
-  method: 'post',
-  path: '/templates',
-  summary: 'Create template',
-  request: {
-    body: {
-      content: {
-        'application/json': {
-          schema: createTemplateRequestDto,
-        },
-      },
-    },
-  },
-  responses: {
-    200: {
-      description: 'Template successfully created.',
-      content: {
-        'application/json': {
-          schema: createTemplateResponseDto,
-        },
-      },
-    },
-  },
-});
+registry.registerPath(createTemplateRoute);
+registry.registerPath(getUrlForTemplateUploadRoute);
 
 const generator = new OpenApiGeneratorV3(registry.definitions);
 
@@ -45,3 +23,5 @@ const openApiDocument = generator.generateDocument({
 
 const outputPath = join(__dirname, 'open-api.json');
 writeFileSync(outputPath, JSON.stringify(openApiDocument));
+
+console.log('Open API spec: ', outputPath);
