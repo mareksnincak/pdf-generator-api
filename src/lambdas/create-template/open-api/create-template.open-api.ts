@@ -1,6 +1,8 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
 import { createTemplateRequestDto } from '../dtos/create-template-request.dto';
 import { createTemplateResponseDto } from '../dtos/create-template-response.dto';
+import { ErrorMessage } from '../../../enums/error.enum';
+import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
 
 export const createTemplateRoute: RouteConfig = {
   method: 'post',
@@ -22,6 +24,14 @@ export const createTemplateRoute: RouteConfig = {
       content: {
         'application/json': {
           schema: createTemplateResponseDto,
+        },
+      },
+    },
+    404: {
+      description: ErrorMessage.templateDataNotFound,
+      content: {
+        'application/json': {
+          schema: httpErrorDto,
         },
       },
     },
