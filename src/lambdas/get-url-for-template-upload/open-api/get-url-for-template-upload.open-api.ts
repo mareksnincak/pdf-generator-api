@@ -1,5 +1,6 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
 import { getUrlForTemplateUploadRequestDto } from '../dtos/get-url-for-template-upload-request.dto';
+import { getUrlForTemplateUploadResponseDto } from '../dtos/get-url-for-template-upload-response.dto';
 
 export const getUrlForTemplateUploadRoute: RouteConfig = {
   method: 'get',
@@ -14,7 +15,7 @@ export const getUrlForTemplateUploadRoute: RouteConfig = {
       description: 'Data for template upload.',
       content: {
         'application/json': {
-          schema: getUrlForTemplateUploadRequestDto,
+          schema: getUrlForTemplateUploadResponseDto,
         },
       },
     },
