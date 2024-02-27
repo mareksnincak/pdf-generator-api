@@ -3,7 +3,6 @@ on:
   pull_request:
   push:
     branches: main
-# TODO read node version from nvmrc https://github.com/actions/setup-node/issues/32#issuecomment-525791142
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -11,7 +10,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '20.9.0'
+          node-version-file: '.nvmrc'
       - run: npm ci
       - run: npm run lint
   test:
@@ -20,6 +19,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: '20.9.0'
+          node-version-file: '.nvmrc'
       - run: npm ci
       - run: npm run test
