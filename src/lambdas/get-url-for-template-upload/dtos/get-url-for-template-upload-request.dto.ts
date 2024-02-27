@@ -13,6 +13,7 @@ export const getUrlForTemplateUploadRequestDto = z.object({
     .openapi({
       description:
         'File size in bytes of file that will be uploaded. Allows file size up to 10 MB.',
+      example: 1024,
     }),
 });
 

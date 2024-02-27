@@ -4,5 +4,5 @@ import z from 'zod';
 extendZodWithOpenApi(z);
 
 export const httpErrorDto = z.object({
-  message: z.string().openapi({ description: 'Error message.' }),
+  message: z.string().openapi({ description: 'Error message.', example: 'Error message.' }),
 });
