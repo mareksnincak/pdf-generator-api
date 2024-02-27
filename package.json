@@ -2,7 +2,7 @@
   "name": "pdf-generator-api",
   "version": "0.0.1",
   "private": true,
-  "description": "API to generate dynamic PDF documents",
+  "description": "API for generating dynamic PDF documents.",
   "scripts": {
     "deploy": "npm run synth && cd ./infra/cdk && cdk deploy",
     "infra:down": "cd ./infra/local && docker compose down",
@@ -16,9 +16,11 @@
     "start:watch": "concurrently --kill-others \"chokidar 'src/**' -c 'npm run synth'\" \"npm run start\"",
     "presynth": "shx rm -rf ./infra/cdk/cdk.out",
     "synth": "cd ./infra/cdk && cdk synth",
-    "test": "jest"
+    "test": "jest",
+    "open-api:generate": "npx ts-node ./src/open-api/generate-open-api.script.ts"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^6.3.1",
     "@aws-sdk/client-dynamodb": "^3.474.0",
     "@aws-sdk/client-s3": "^3.521.0",
     "@aws-sdk/s3-request-presigner": "^3.521.0",
