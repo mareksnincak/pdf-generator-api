@@ -1,5 +1,15 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "cSpell.words": ["dtos", "linebreak", "pino", "presigner", "presynth", "trpc", "unmarshall"]
+  "cSpell.words": [
+    "asteasolutions",
+    "dtos",
+    "linebreak",
+    "openapi",
+    "pino",
+    "presigner",
+    "presynth",
+    "trpc",
+    "unmarshall"
+  ]
 }

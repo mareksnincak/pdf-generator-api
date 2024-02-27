@@ -3,3 +3,4 @@ node_modules
 dist
 cdk.out
 infra/local/volumes
+src/open-api/open-api.json

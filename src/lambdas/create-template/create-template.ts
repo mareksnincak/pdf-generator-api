@@ -13,6 +13,7 @@ import { type CreateTemplateResponseDto } from './dtos/create-template-response.
 import { handleError } from '../../helpers/error.helper';
 import { validateBody } from '../../helpers/validation.helper';
 import { NotFoundError } from '../../errors/not-found.error';
+import { ErrorMessage } from '../../enums/error.enum';
 
 const s3Client = new S3Client();
 
@@ -42,7 +43,7 @@ async function moveTemplateDataToPermanentLocation(uploadId: string) {
   } catch (error) {
     if (error instanceof S3ServiceException && error.name === S3ExceptionName.noSuchKey) {
       throw new NotFoundError({
-        message: 'Template data not found',
+        message: ErrorMessage.templateDataNotFound,
       });
     }
 
