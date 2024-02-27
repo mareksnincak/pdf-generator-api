@@ -4,7 +4,7 @@ import { handleError } from './error.helper';
 import { NotFoundError } from '../errors/not-found.error';
 
 beforeEach(() => {
-  jest.clearAllMocks();
+  jest.resetAllMocks();
 });
 
 describe('handleError', () => {
