@@ -1,5 +1,5 @@
 name: CI
-on: [push, pull_request]
+on: pull_request
 # TODO read node version from nvmrc https://github.com/actions/setup-node/issues/32#issuecomment-525791142
 jobs:
   lint:
@@ -9,6 +9,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '20.9.0'
+      - run: npm ci
       - run: npm run lint
   test:
     runs-on: ubuntu-latest
@@ -17,4 +18,5 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '20.9.0'
+      - run: npm ci
       - run: npm run test
