@@ -8,7 +8,9 @@ export const createTemplateRoute: RouteConfig = {
   method: 'post',
   path: '/templates',
   tags: ['templates'],
-  summary: 'Create template',
+  summary: 'Create template.',
+  description:
+    'Before calling this endpoint `GET /templates/upload-url` should be called and file should be uploaded to returned url.',
   request: {
     body: {
       content: {
