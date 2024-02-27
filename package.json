@@ -9,7 +9,7 @@
     "infra:up": "cd ./infra/local && docker compose up -d && npx ts-node init-db.script.ts",
     "invoke": "npm run synth && sam local invoke -t ./infra/cdk/cdk.out/pdf-generator-api.template.json",
     "invoke:debug": "npm run invoke -- -d 9229",
-    "lint": "eslint --config ./.eslintrc.json . && npx sort-package-json --check",
+    "lint": "npx tsc --noEmit && npx sort-package-json --check && eslint --config ./.eslintrc.json .",
     "open-api:generate": "npx ts-node ./src/open-api/generate-open-api.script.ts",
     "sort-package-json": "npx sort-package-json",
     "start": "npm run synth && sam local start-api -t ./infra/cdk/cdk.out/pdf-generator-api.template.json",
