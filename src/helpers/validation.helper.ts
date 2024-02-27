@@ -15,14 +15,14 @@ function validate<T extends ZodRawShape>(data: unknown, dto: ZodObject<T>) {
 }
 
 export function validateQueryParams<T extends ZodRawShape>(
-  event: APIGatewayProxyEvent,
+  event: Pick<APIGatewayProxyEvent, 'queryStringParameters'>,
   dto: ZodObject<T>,
 ) {
   return validate(event.queryStringParameters, dto);
 }
 
 export function validateBody<T extends ZodRawShape>(
-  event: APIGatewayProxyEvent,
+  event: Pick<APIGatewayProxyEvent, 'body'>,
   dto: ZodObject<T>,
 ) {
   try {
