@@ -25,7 +25,7 @@ afterEach(() => {
 
 describe('createTemplate', () => {
   it('should create template', async () => {
-    jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
 
     const requestBody = requestMockFactory.create({
       name: 'sample template',
@@ -41,6 +41,11 @@ describe('createTemplate', () => {
     const body = JSON.parse(result.body) as CreateTemplateResponseDto;
     expect(body).toEqual({
       templateId: expect.any(String),
+    });
+
+    expect(s3ClientSpy.mock.lastCall?.[0].input).toEqual({
+      Bucket: 'pdf-generator-api-it-test',
+      Key: `templates/uploads/${requestBody.uploadId}`,
     });
 
     const { templateId } = body;
