@@ -31,7 +31,7 @@ jobs:
           node-version-file: '.nvmrc'
       - run: npm ci
       - run: npm run test
-  test:it:
+  test-it:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
