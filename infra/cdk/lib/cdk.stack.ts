@@ -12,6 +12,7 @@ import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 function getLambdaEntryPath(lambda: Lambda) {
   return path.join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, `${lambda}.ts`);
@@ -97,5 +98,13 @@ export class CdkStack extends Stack {
       parameterName: apiUrlSsmParamName,
       stringValue: api.url,
     });
+
+    // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
+    getOpenApi.addToRolePolicy(
+      new PolicyStatement({
+        resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/${apiUrlSsmParamName}`],
+        actions: ['ssm:GetParameter'],
+      }),
+    );
   }
 }
