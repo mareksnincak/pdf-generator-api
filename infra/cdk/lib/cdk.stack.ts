@@ -12,18 +12,26 @@ import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 function getLambdaEntryPath(lambda: Lambda) {
   return path.join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, `${lambda}.ts`);
 }
 
 function getCommonNodeJsFunctionProps(lambda: Lambda) {
+  /**
+   * We are using static hash to be able to use local watch.
+   * We need dynamic hash for deploy as otherwise cdk won't pick
+   * up new lambda changes
+   */
+  const forceStaticHash = process.env.FORCE_STATIC_HASH === 'true';
+
   return {
     runtime: Runtime.NODEJS_20_X,
     architecture: Architecture.ARM_64,
     entry: getLambdaEntryPath(lambda),
     bundling: {
-      assetHash: lambda,
+      assetHash: forceStaticHash ? lambda : undefined,
     },
     logRetention: RetentionDays.ONE_YEAR,
     timeout: Duration.seconds(30),
@@ -86,6 +94,17 @@ export class CdkStack extends Stack {
       .addResource('upload-url')
       .addMethod('GET', new LambdaIntegration(getUrlForTemplateUpload));
 
-    new StringParameter(this, 'api-url', { stringValue: api.url });
+    new StringParameter(this, 'api-url', {
+      parameterName: apiUrlSsmParamName,
+      stringValue: api.url,
+    });
+
+    // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
+    getOpenApi.addToRolePolicy(
+      new PolicyStatement({
+        resources: [`arn:aws:ssm:${this.region}:${this.account}:parameter/${apiUrlSsmParamName}`],
+        actions: ['ssm:GetParameter'],
+      }),
+    );
   }
 }
