@@ -1,0 +1,17 @@
+version: '3.8'
+name: pdf-generator-api-it
+services:
+  dynamodb-local-it:
+    command: '-jar DynamoDBLocal.jar -sharedDb'
+    image: 'amazon/dynamodb-local:latest'
+    ports:
+      - '7999:8000'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'if [ "$(curl -s -o /dev/null -I -w ''%{http_code}'' http://localhost:8000)" == "400" ]; then exit 0; else exit 1; fi',
+        ]
+      interval: 1s
+      timeout: 3s
+      retries: 10

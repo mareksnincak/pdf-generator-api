@@ -24,7 +24,5 @@ export abstract class BaseEntity {
     throw new Error('BaseEntity.fromDynamoDbItem.notImplemented');
   }
 
-  abstract toDynamoDbItem():
-    | Record<string, AttributeValue>
-    | Promise<Record<string, AttributeValue>>;
+  abstract toDynamoItem(): Record<string, AttributeValue> | Promise<Record<string, AttributeValue>>;
 }

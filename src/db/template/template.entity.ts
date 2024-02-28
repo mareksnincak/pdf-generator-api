@@ -29,7 +29,7 @@ export class TemplateEntity extends BaseEntity {
 
   public s3Key: string;
 
-  async toDynamoDbItem(): Promise<Record<string, AttributeValue>> {
+  async toDynamoItem(): Promise<Record<string, AttributeValue>> {
     const item: StoredTemplate = {
       ...this.primaryKey,
       id: this.id,
@@ -45,9 +45,16 @@ export class TemplateEntity extends BaseEntity {
     return result;
   }
 
-  static async fromDynamoDbItem(item: Record<string, AttributeValue>): Promise<TemplateEntity> {
+  static async fromDynamoItem(item: Record<string, AttributeValue>): Promise<TemplateEntity> {
     const rawTemplate = unmarshall(item) as StoredTemplate;
 
     return new TemplateEntity(rawTemplate);
+  }
+
+  public static getDynamoPartitionKey({ id }: { id: string }) {
+    return marshall({
+      PK: `TEMPLATE#${id}`,
+      SK: '#',
+    });
   }
 }

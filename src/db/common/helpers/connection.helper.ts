@@ -14,6 +14,10 @@ export function getDynamoDbClient() {
     config.endpoint = process.env.DYNAMODB_ENDPOINT;
   }
 
+  if (process.env.DYNAMODB_REGION) {
+    config.region = process.env.DYNAMODB_REGION;
+  }
+
   client = new DynamoDBClient(config);
   return client;
 }
