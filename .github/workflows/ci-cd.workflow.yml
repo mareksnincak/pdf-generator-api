@@ -31,6 +31,15 @@ jobs:
           node-version-file: '.nvmrc'
       - run: npm ci
       - run: npm run test
+  test:it:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+      - run: npm ci
+      - run: npm run test:it
   deploy:
     # TODO use OIDC provider https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
