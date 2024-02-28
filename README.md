@@ -2,6 +2,10 @@
 
 ## How to run
 
+1. install dependencies
+   ```bash
+   npm i
+   ```
 1. run Docker
 1. set local config
    ```bash
