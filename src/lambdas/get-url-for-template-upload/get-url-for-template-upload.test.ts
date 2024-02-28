@@ -24,7 +24,7 @@ const requestMockFactory = new GetUrlForTemplateUploadRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const context = new ContextMockFactory().create();
 
-beforeEach(() => {
+afterEach(() => {
   jest.resetAllMocks();
 });
 

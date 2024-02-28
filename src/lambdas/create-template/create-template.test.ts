@@ -12,7 +12,7 @@ const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const templateEntity = new TemplateEntityMockFactory().create();
 const context = new ContextMockFactory().create();
 
-beforeEach(() => {
+afterEach(() => {
   jest.resetAllMocks();
 });
 
