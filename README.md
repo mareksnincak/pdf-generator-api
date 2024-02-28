@@ -1,5 +1,7 @@
 # PDF generator API
 
+API for generating dynamic PDF documents.
+
 ## How to run
 
 1. install dependencies
