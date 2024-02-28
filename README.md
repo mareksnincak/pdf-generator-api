@@ -1,15 +1,23 @@
 # PDF generator API
 
-## Prerequisites
+API for generating dynamic PDF documents.
 
+## How to run
+
+1. install dependencies
+   ```bash
+   npm i
+   ```
 1. run Docker
+1. set local config
+   ```bash
+   cp config/values/local.config.example.json config/values/local.config.json
+   # update values in config/values/local.config.json
+   ```
 1. expose AWS credentials in CLI:
    ```bash
    aws-vault exec dev
    ```
-
-## How to run
-
 1. run infrastructure
    ```bash
    npm run infra:up

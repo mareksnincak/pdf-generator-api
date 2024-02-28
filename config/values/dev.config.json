@@ -1,0 +1,10 @@
+{
+  "global": {
+    "LOG_LEVEL": "info"
+  },
+  "lambda": {
+    "create-template": {},
+    "get-open-api": {},
+    "get-url-for-template-upload": {}
+  }
+}

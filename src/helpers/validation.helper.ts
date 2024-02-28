@@ -3,7 +3,7 @@ import { type ZodObject, type ZodRawShape } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { BadRequestError } from '../errors/bad-request.error';
 
-function validate<T extends ZodRawShape>(data: unknown, dto: ZodObject<T>) {
+export function validate<T extends ZodRawShape>(data: unknown, dto: ZodObject<T>) {
   const parsedData = dto.safeParse(data ?? {});
 
   if (!parsedData.success) {

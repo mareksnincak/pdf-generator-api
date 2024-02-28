@@ -1,6 +1,51 @@
 import z from 'zod';
-import { validateBody, validateQueryParams } from './validation.helper';
+import { validate, validateBody, validateQueryParams } from './validation.helper';
 import { BadRequestError } from '../errors/bad-request.error';
+
+describe('validate', () => {
+  it('should pass when data is valid', () => {
+    const dto = z.object({
+      foo: z.string(),
+    });
+
+    const data = { foo: 'bar' };
+
+    const result = validate(data, dto);
+
+    expect(result).toEqual(data);
+  });
+
+  it('should transform data when coerce option is used', () => {
+    const dto = z.object({
+      foo: z.coerce.date(),
+    });
+
+    const date = new Date();
+    const data = { foo: date.toISOString() };
+
+    const result = validate(data, dto);
+
+    expect(result.foo).toEqual(date);
+  });
+
+  it('should throw error when data is not valid', () => {
+    const dto = z.object({
+      foo: z.number(),
+    });
+
+    const data = { foo: 'bar' };
+
+    try {
+      validate(data, dto);
+      expect(true).toEqual(false);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestError);
+      expect((error as BadRequestError).message).toEqual(
+        'Expected number, received string at "foo"',
+      );
+    }
+  });
+});
 
 describe('validateQueryParams', () => {
   it('should pass when data is valid', () => {
