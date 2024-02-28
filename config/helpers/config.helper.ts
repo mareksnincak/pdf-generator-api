@@ -24,3 +24,15 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
 
   return envVars;
 }
+
+export function setEnvVarsFromConfig(environmentName: EnvironmentName, lambda: Lambda) {
+  const envVars = getEnvVars(environmentName).get(lambda);
+
+  if (!envVars) {
+    throw new Error('configHelper.setEnvVarsFromConfig.missingEnvVars');
+  }
+
+  for (const [name, value] of Object.entries(envVars)) {
+    process.env[name] = String(value);
+  }
+}
