@@ -1,9 +1,12 @@
-import { GetUrlForTemplateUploadRequestMockFactory } from './mock-factories/get-url-for-template-upload-request.mock-factory';
-import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
-import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
 import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
-import { getUrlForTemplateUpload } from './get-url-for-template-upload';
 import * as crypto from 'node:crypto';
+import { GetUrlForTemplateUploadRequestMockFactory } from '../../../src/lambdas/get-url-for-template-upload/mock-factories/get-url-for-template-upload-request.mock-factory';
+import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
+import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+import { EnvironmentName } from '../../../config/enums/config.enum';
+import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { getUrlForTemplateUpload } from '../../../src/lambdas/get-url-for-template-upload/get-url-for-template-upload';
 
 jest.mock('@aws-sdk/s3-request-presigner', () => {
   return {
@@ -23,6 +26,10 @@ const requestMockFactory = new GetUrlForTemplateUploadRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const context = new ContextMockFactory().create();
 
+beforeAll(async () => {
+  setEnvVarsFromConfig(EnvironmentName.itTest, Lambda.getUrlForTemplateUpload);
+});
+
 afterEach(() => {
   jest.resetAllMocks();
 });
@@ -33,7 +40,9 @@ describe('getUrlForTemplateUpload', () => {
     const uploadId = crypto.randomUUID();
 
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(uploadId);
-    jest.spyOn(s3RequestPresigner, 'getSignedUrl').mockResolvedValue(presignedUrl);
+    const getSignedUrlSpy = jest
+      .spyOn(s3RequestPresigner, 'getSignedUrl')
+      .mockResolvedValue(presignedUrl);
 
     const queryStringParameters = requestMockFactory.createRaw();
     const event = eventMockFactory.create({
@@ -46,6 +55,13 @@ describe('getUrlForTemplateUpload', () => {
     expect(JSON.parse(result.body)).toEqual({
       uploadId,
       url: presignedUrl,
+    });
+
+    const getSignedUrlArgs = getSignedUrlSpy.mock.lastCall;
+    expect(getSignedUrlArgs?.[1].input).toEqual({
+      Bucket: 'pdf-generator-api-it-test',
+      ContentLength: 1024,
+      Key: `templates/uploads/${uploadId}`,
     });
   });
 });
