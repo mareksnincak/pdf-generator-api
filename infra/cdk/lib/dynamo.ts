@@ -1,8 +1,9 @@
+import { RemovalPolicy } from 'aws-cdk-lib';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { type Construct } from 'constructs';
 
 export function createDynamoDbTable(scope: Construct, id: string) {
-  const table = new Table(scope, id, {
+  const table = new Table(scope, 'dynamo-db', {
     tableName: id,
     partitionKey: {
       name: 'PK',
@@ -12,6 +13,7 @@ export function createDynamoDbTable(scope: Construct, id: string) {
       name: 'SK',
       type: AttributeType.STRING,
     },
+    removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
   });
 
   return table;
