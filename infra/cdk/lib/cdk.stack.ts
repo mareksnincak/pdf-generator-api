@@ -1,5 +1,3 @@
-import path = require('path');
-
 import { Duration, Stack } from 'aws-cdk-lib';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -13,9 +11,11 @@ import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { join } from 'path';
+import { getEnvVars } from '../../../config/helpers/config.helper';
 
 function getLambdaEntryPath(lambda: Lambda) {
-  return path.join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, `${lambda}.ts`);
+  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, `${lambda}.ts`);
 }
 
 function getCommonNodeJsFunctionProps(lambda: Lambda) {
@@ -42,8 +42,11 @@ export class CdkStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
+    const envVars = getEnvVars('local');
+
     const s3Bucket = new Bucket(this, 's3-bucket', {
       enforceSSL: true,
+      bucketName: id,
     });
 
     const s3BucketName = s3Bucket.bucketName;
@@ -54,6 +57,7 @@ export class CdkStack extends Stack {
       handler: 'getOpenApi',
       environment: {
         API_URL_SSM_PARAM_NAME: apiUrlSsmParamName,
+        ...envVars.get(Lambda.getOpenApi),
       },
     });
 
@@ -62,6 +66,7 @@ export class CdkStack extends Stack {
       handler: 'getUrlForTemplateUpload',
       environment: {
         S3_BUCKET: s3BucketName,
+        ...envVars.get(Lambda.getUrlForTemplateUpload),
       },
     });
 
@@ -72,6 +77,7 @@ export class CdkStack extends Stack {
         DYNAMODB_ENDPOINT: 'http://host.docker.internal:8000',
         DYNAMODB_TABLE_NAME: 'PdfGenerator',
         S3_BUCKET: s3BucketName,
+        ...envVars.get(Lambda.createTemplate),
       },
     });
 
