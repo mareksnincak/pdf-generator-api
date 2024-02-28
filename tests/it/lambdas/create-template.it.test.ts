@@ -8,14 +8,16 @@ import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import * as templateRepository from '../../../src/db/template/template.repository';
+import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const templateEntity = new TemplateEntityMockFactory().create();
 const context = new ContextMockFactory().create();
 
-beforeAll(() => {
+beforeAll(async () => {
   setEnvVarsFromConfig(EnvironmentName.itTest, Lambda.createTemplate);
+  await refreshDynamoDb();
 });
 
 beforeEach(() => {

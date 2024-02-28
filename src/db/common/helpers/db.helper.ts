@@ -1,16 +1,11 @@
 import {
   CreateTableCommand,
-  type CreateTableCommandInput,
-  DynamoDB,
   ResourceInUseException,
+  type CreateTableCommandInput,
+  type DynamoDBClient,
 } from '@aws-sdk/client-dynamodb';
 
-const client = new DynamoDB({
-  region: 'local',
-  endpoint: 'http://localhost:8000',
-});
-
-async function initDb() {
+export async function initDb(client: DynamoDBClient) {
   try {
     const table: CreateTableCommandInput = {
       TableName: 'PdfGenerator',
@@ -32,9 +27,6 @@ async function initDb() {
       return;
     }
 
-    console.error(error);
     throw error;
   }
 }
-
-void initDb();

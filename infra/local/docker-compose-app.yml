@@ -9,6 +9,15 @@ services:
     volumes:
       - './volumes/dynamodb:/home/dynamodblocal/data'
     working_dir: /home/dynamodblocal
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'if [ "$(curl -s -o /dev/null -I -w ''%{http_code}'' http://localhost:8000)" == "400" ]; then exit 0; else exit 1; fi',
+        ]
+      interval: 1s
+      timeout: 3s
+      retries: 10
   dynamodb-admin:
     image: aaronshaf/dynamodb-admin
     ports:
@@ -19,4 +28,5 @@ services:
       AWS_ACCESS_KEY_ID: local
       AWS_SECRET_ACCESS_KEY: local
     depends_on:
-      - dynamodb-local
+      dynamodb-local:
+        condition: service_healthy
