@@ -13,6 +13,7 @@ import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { join } from 'path';
 import { getEnvVars } from '../../../config/helpers/config.helper';
+import { type EnvironmentName } from '../../../config/enums/config.enum';
 
 function getLambdaEntryPath(lambda: Lambda) {
   return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, `${lambda}.ts`);
@@ -39,10 +40,20 @@ function getCommonNodeJsFunctionProps(lambda: Lambda) {
 }
 
 export class CdkStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor({
+    scope,
+    id,
+    props,
+    environmentName,
+  }: {
+    scope: Construct;
+    id: string;
+    props?: StackProps;
+    environmentName: EnvironmentName;
+  }) {
     super(scope, id, props);
 
-    const envVars = getEnvVars('local');
+    const envVars = getEnvVars(environmentName);
 
     const s3Bucket = new Bucket(this, 's3-bucket', {
       enforceSSL: true,

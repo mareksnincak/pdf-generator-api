@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'path';
 import { type Lambda } from '../../infra/cdk/enums/lambda.enum';
+import { type EnvironmentName } from '../enums/config.enum';
 
-export function getEnvVars(environment: string) {
-  const configPath = join(__dirname, '..', 'values', `${environment}.config.json`);
+export function getEnvVars(environmentName: EnvironmentName) {
+  const configPath = join(__dirname, '..', 'values', `${environmentName}.config.json`);
   const configFile = readFileSync(configPath);
   const config = JSON.parse(configFile.toString()) as {
     global: Record<string, string>;
