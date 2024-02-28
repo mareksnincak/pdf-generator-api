@@ -18,12 +18,19 @@ function getLambdaEntryPath(lambda: Lambda) {
 }
 
 function getCommonNodeJsFunctionProps(lambda: Lambda) {
+  /**
+   * We are using static hash to be able to use local watch.
+   * We need dynamic hash for deploy as otherwise cdk won't pick
+   * up new lambda changes
+   */
+  const forceStaticHash = process.env.FORCE_STATIC_HASH === 'true';
+
   return {
     runtime: Runtime.NODEJS_20_X,
     architecture: Architecture.ARM_64,
     entry: getLambdaEntryPath(lambda),
     bundling: {
-      assetHash: lambda,
+      assetHash: forceStaticHash ? lambda : undefined,
     },
     logRetention: RetentionDays.ONE_YEAR,
     timeout: Duration.seconds(30),
