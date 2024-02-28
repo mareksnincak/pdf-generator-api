@@ -1,0 +1,8 @@
+version: '3.8'
+name: pdf-generator-api-it
+services:
+  dynamodb-local-it:
+    command: '-jar DynamoDBLocal.jar -sharedDb'
+    image: 'amazon/dynamodb-local:latest'
+    ports:
+      - '8001:8000'

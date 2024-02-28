@@ -1,19 +1,11 @@
 import type { Config } from 'jest';
+import { baseConfig } from './.jest/jest-base.config';
 
 const config: Config = {
-  maxWorkers: '50%',
-  preset: 'ts-jest',
+  ...baseConfig,
   roots: ['./src'],
   setupFiles: ['<rootDir>/.jest/jest.setup.ts'],
   testMatch: ['**/*.test.ts'],
-  transform: {
-    '^.+\\.(t|j)s$': [
-      'ts-jest',
-      {
-        isolatedModules: true,
-      },
-    ],
-  },
 };
 
 export default config;
