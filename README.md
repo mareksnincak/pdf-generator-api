@@ -10,6 +10,11 @@
 
 ## How to run
 
+1. set local config
+   ```bash
+   cp config/values/local.config.example.json config/values/local.config.json
+   # update values in config/values/local.config.json
+   ```
 1. run infrastructure
    ```bash
    npm run infra:up
