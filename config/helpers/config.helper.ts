@@ -12,7 +12,10 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
     lambda: Record<Lambda, Record<string, string>>;
   };
 
-  const envVars = new Map<Lambda, Record<string, string>>();
+  const envVars = new Map<Lambda | 'global', Record<string, string>>();
+
+  envVars.set('global', config.global);
+
   for (const [lambdaName, lambdaConfig] of Object.entries(config.lambda)) {
     const fullConfig = {
       ...config.global,
@@ -25,14 +28,19 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
   return envVars;
 }
 
-export function setEnvVarsFromConfig(environmentName: EnvironmentName, lambda: Lambda) {
-  const envVars = getEnvVars(environmentName).get(lambda);
+/**
+ * Sets values from config into process.env vars. Sets global values if lambda is omitted.
+ */
+export function setEnvVarsFromConfig(environmentName: EnvironmentName, lambda?: Lambda) {
+  const envVars = getEnvVars(environmentName);
 
-  if (!envVars) {
+  const values = lambda ? envVars.get(lambda) : envVars.get('global');
+
+  if (!values) {
     throw new Error('configHelper.setEnvVarsFromConfig.missingEnvVars');
   }
 
-  for (const [name, value] of Object.entries(envVars)) {
+  for (const [name, value] of Object.entries(values)) {
     process.env[name] = String(value);
   }
 }

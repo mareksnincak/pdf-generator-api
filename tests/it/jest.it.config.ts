@@ -5,6 +5,7 @@ const config: Config = {
   ...baseConfig,
   rootDir: '../../',
   testMatch: ['**/*.it.test.ts'],
+  setupFiles: ['<rootDir>/tests/it/jest.it.setup.ts'],
 };
 
 export default config;
