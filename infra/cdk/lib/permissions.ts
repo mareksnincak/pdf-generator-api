@@ -1,6 +1,7 @@
 import { type Bucket } from 'aws-cdk-lib/aws-s3';
 import { type createLambdas } from './lambdas';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 
 export function grantPermissions({
   region,
@@ -8,14 +9,16 @@ export function grantPermissions({
   lambdas,
   s3Bucket,
   apiUrlSsmParamName,
+  dynamoDbTable,
 }: {
   region: string;
   account: string;
   lambdas: ReturnType<typeof createLambdas>;
   s3Bucket: Bucket;
   apiUrlSsmParamName: string;
+  dynamoDbTable: Table;
 }) {
-  s3Bucket.grantWrite(lambdas.getUrlForTemplateUpload);
+  s3Bucket.grantPut(lambdas.getUrlForTemplateUpload);
   s3Bucket.grantReadWrite(lambdas.createTemplate);
   s3Bucket.grantDelete(lambdas.createTemplate);
 
@@ -26,4 +29,6 @@ export function grantPermissions({
       actions: ['ssm:GetParameter'],
     }),
   );
+
+  dynamoDbTable.grantWriteData(lambdas.createTemplate);
 }

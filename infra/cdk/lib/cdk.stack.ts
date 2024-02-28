@@ -51,6 +51,7 @@ export class CdkStack extends Stack {
       lambdas,
       s3Bucket,
       apiUrlSsmParamName,
+      dynamoDbTable,
     });
   }
 }

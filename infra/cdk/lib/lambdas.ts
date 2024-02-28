@@ -70,8 +70,7 @@ export function createLambdas({
     ...getCommonNodeJsFunctionProps(Lambda.createTemplate, cdkEnvVars),
     handler: 'createTemplate',
     environment: {
-      DYNAMODB_ENDPOINT: 'http://host.docker.internal:8000',
-      DYNAMODB_TABLE_NAME: 'PdfGenerator',
+      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.createTemplate),
     },
