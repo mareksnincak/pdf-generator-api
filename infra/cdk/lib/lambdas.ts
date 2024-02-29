@@ -5,7 +5,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { Lambda } from '../enums/lambda.enum';
 
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
-import { join } from 'path';
+import { join } from 'node:path';
 import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { type Construct } from 'constructs';
 import { getEnvVars } from '../../../config/helpers/config.helper';

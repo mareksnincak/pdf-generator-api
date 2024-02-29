@@ -23,6 +23,7 @@ async function createPresignedUrl({
   });
 
   const s3Client = getS3Client();
+
   const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   return url;
 }

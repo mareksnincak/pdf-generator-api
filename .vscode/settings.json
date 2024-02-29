@@ -7,9 +7,11 @@
     "linebreak",
     "nvmrc",
     "openapi",
+    "paren",
     "pino",
     "presigner",
     "presynth",
+    "singleline",
     "trpc",
     "unmarshall"
   ],
