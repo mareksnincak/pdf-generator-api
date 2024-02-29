@@ -10,6 +10,7 @@ import { validateBody } from '../../helpers/validation.helper';
 import { NotFoundError } from '../../errors/not-found.error';
 import { ErrorMessage } from '../../enums/error.enum';
 import { moveObject } from '../../helpers/s3.helper';
+import { randomUUID } from 'node:crypto';
 
 async function moveTemplateDataToPermanentLocation(uploadId: string) {
   try {
@@ -21,7 +22,7 @@ async function moveTemplateDataToPermanentLocation(uploadId: string) {
     }
 
     const uploadedDataS3Key = `templates/uploads/${uploadId}`;
-    const storedDataS3Key = `/templates/data/${uploadId}`;
+    const storedDataS3Key = `/templates/data/${randomUUID()}`;
 
     await moveObject({
       sourceBucket: bucket,
