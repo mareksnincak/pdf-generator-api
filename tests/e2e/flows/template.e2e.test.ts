@@ -1,10 +1,11 @@
 import request from 'supertest';
+import { getE2eBaseUrl } from '../helpers/setup.helper';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
 
-// TODO customizable
 // TODO clean up resources
-const baseUrl = 'http://127.0.0.1:3000';
+const baseUrl = getE2eBaseUrl();
+
 const createTemplateRequestMockFactory = new CreateTemplateRequestMockFactory();
 
 describe('Create template flow', () => {
