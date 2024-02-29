@@ -65,7 +65,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: cdk-output
-          path: infra/cdk/cdk.output.json
+          path: ./infra/cdk/cdk.output.json
   test-e2e:
     # if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
@@ -79,6 +79,4 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: cdk-output
-      - run: npm run test:e2e
-        env:
-          E2E_BASE_URL: $(jq -r '.[].apiUrl' ./infra/cdk/cdk.output.json)
+      - run: export E2E_BASE_URL=$(jq -r '.[].apiUrl' ./infra/cdk/cdk.output.json) && npm run test:e2e
