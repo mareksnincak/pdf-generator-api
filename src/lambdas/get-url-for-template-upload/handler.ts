@@ -4,9 +4,9 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'node:crypto';
 import { handleError } from '../../helpers/error.helper';
-import { type GetUrlForTemplateUploadResponseDto } from './dtos/get-url-for-template-upload-response.dto';
+import { type GetUrlForTemplateUploadResponseDto } from './dtos/response.dto';
 import { validateQueryParams } from '../../helpers/validation.helper';
-import { getUrlForTemplateUploadRequestDto } from './dtos/get-url-for-template-upload-request.dto';
+import { getUrlForTemplateUploadRequestDto } from './dtos/request.dto';
 
 const s3Client = new S3Client();
 

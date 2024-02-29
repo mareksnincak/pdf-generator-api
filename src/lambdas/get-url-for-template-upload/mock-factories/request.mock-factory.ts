@@ -1,5 +1,5 @@
 import { type APIGatewayProxyEventQueryStringParameters } from 'aws-lambda';
-import { type GetUrlForTemplateUploadRequestDto } from '../dtos/get-url-for-template-upload-request.dto';
+import { type GetUrlForTemplateUploadRequestDto } from '../dtos/request.dto';
 
 export class GetUrlForTemplateUploadRequestMockFactory {
   create(

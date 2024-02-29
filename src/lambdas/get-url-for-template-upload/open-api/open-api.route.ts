@@ -1,6 +1,6 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
-import { getUrlForTemplateUploadRequestDto } from '../dtos/get-url-for-template-upload-request.dto';
-import { getUrlForTemplateUploadResponseDto } from '../dtos/get-url-for-template-upload-response.dto';
+import { getUrlForTemplateUploadRequestDto } from '../dtos/request.dto';
+import { getUrlForTemplateUploadResponseDto } from '../dtos/response.dto';
 
 export const getUrlForTemplateUploadRoute: RouteConfig = {
   method: 'get',
