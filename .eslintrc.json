@@ -40,6 +40,15 @@
             },
             "multilineDetection": "brackets"
           }
+        ],
+        "import/order": [
+          "error",
+          {
+            "alphabetize": {
+              "order": "asc"
+            },
+            "newlines-between": "always"
+          }
         ]
       }
     },

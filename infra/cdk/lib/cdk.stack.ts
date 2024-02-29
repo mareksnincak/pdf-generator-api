@@ -1,15 +1,16 @@
 import { Stack } from 'aws-cdk-lib';
-
 import type { StackProps } from 'aws-cdk-lib';
-import type { Construct } from 'constructs';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
+import type { Construct } from 'constructs';
+
 import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
-import { createDynamoDbTable } from './dynamo';
-import { createS3Bucket } from './s3';
-import { createLambdas } from './lambdas';
-import { grantPermissions } from './permissions';
+
 import { createApi } from './api';
+import { createDynamoDbTable } from './dynamo';
+import { createLambdas } from './lambdas';
 import { createOutputs } from './outputs';
+import { grantPermissions } from './permissions';
+import { createS3Bucket } from './s3';
 
 export class CdkStack extends Stack {
   constructor({

@@ -1,4 +1,5 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
+
 import { type PrimaryKey } from '../common/types/entity.type';
 
 export abstract class BaseEntity {

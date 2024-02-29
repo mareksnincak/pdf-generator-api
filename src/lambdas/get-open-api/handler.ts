@@ -1,8 +1,9 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { handleError } from '../../helpers/error.helper';
-import { generateOpenApi } from '../../open-api/generate-open-api.helper';
 import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+
+import { handleError } from '../../helpers/error.helper';
+import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { generateOpenApi } from '../../open-api/generate-open-api.helper';
 
 let openApiDocument: ReturnType<typeof generateOpenApi>;
 const ssmClient = new SSMClient();

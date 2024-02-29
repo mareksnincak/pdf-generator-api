@@ -1,8 +1,9 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
-import { createTemplateRoute } from '../lambdas/create-template/open-api/open-api.route';
-import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/open-api.route';
+
 import * as packageJson from '../../package.json';
+import { createTemplateRoute } from '../lambdas/create-template/open-api/open-api.route';
 import { deleteTemplateRoute } from '../lambdas/delete-template/open-api/open-api.route';
+import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/open-api.route';
 
 export function generateOpenApi(apiUrl = '/') {
   const registry = new OpenAPIRegistry();

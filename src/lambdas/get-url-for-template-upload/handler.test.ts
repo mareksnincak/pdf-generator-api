@@ -1,12 +1,15 @@
-import { GetUrlForTemplateUploadRequestMockFactory } from './mock-factories/request.mock-factory';
-import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
-import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
-import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
-import { getUrlForTemplateUpload } from './handler';
 import * as crypto from 'node:crypto';
-import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+
+import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
+
 import { EnvironmentName } from '../../../config/enums/config.enum';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
+import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
+
+import { getUrlForTemplateUpload } from './handler';
+import { GetUrlForTemplateUploadRequestMockFactory } from './mock-factories/request.mock-factory';
 
 jest.mock('@aws-sdk/s3-request-presigner', () => {
   return {

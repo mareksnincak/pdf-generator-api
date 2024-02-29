@@ -1,7 +1,8 @@
 import request from 'supertest';
-import { getE2eBaseUrl } from '../helpers/setup.helper';
+
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
+import { getE2eBaseUrl } from '../helpers/setup.helper';
 
 const baseUrl = getE2eBaseUrl();
 

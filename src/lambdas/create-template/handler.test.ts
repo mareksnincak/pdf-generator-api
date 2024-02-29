@@ -1,16 +1,18 @@
+import { NoSuchKey } from '@aws-sdk/client-s3';
+
+import { EnvironmentName } from '../../../config/enums/config.enum';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { TemplateEntityMockFactory } from '../../db/template/template.mock-factory';
+import * as templateRepository from '../../db/template/template.repository';
+import { ErrorMessage } from '../../enums/error.enum';
+import * as s3Helper from '../../helpers/s3.helper';
+import { mockLogger } from '../../helpers/test.helper';
+import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
+import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
+
 import { createTemplate } from './handler';
 import { CreateTemplateRequestMockFactory } from './mock-factories/request.mock-factory';
-import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
-import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
-import { NoSuchKey } from '@aws-sdk/client-s3';
-import * as templateRepository from '../../db/template/template.repository';
-import { TemplateEntityMockFactory } from '../../db/template/template.mock-factory';
-import { mockLogger } from '../../helpers/test.helper';
-import * as s3Helper from '../../helpers/s3.helper';
-import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
-import { EnvironmentName } from '../../../config/enums/config.enum';
-import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { ErrorMessage } from '../../enums/error.enum';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();

@@ -1,4 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+
 import { initDb } from '../src/db/common/helpers/db.helper';
 
 const client = new DynamoDBClient({

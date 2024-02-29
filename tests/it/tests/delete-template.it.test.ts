@@ -1,16 +1,17 @@
-import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
+
 import { EnvironmentName } from '../../../config/enums/config.enum';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
+import { createOrReplace, findById } from '../../../src/db/template/template.repository';
+import { ErrorMessage } from '../../../src/enums/error.enum';
+import { mockLogger } from '../../../src/helpers/test.helper';
+import { deleteTemplate } from '../../../src/lambdas/delete-template/handler';
 import { DeleteTemplateRequestMockFactory } from '../../../src/lambdas/delete-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
-import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
-import { createOrReplace, findById } from '../../../src/db/template/template.repository';
-import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { deleteTemplate } from '../../../src/lambdas/delete-template/handler';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
-import { mockLogger } from '../../../src/helpers/test.helper';
-import { ErrorMessage } from '../../../src/enums/error.enum';
 
 const requestMockFactory = new DeleteTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
