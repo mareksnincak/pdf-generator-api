@@ -1,4 +1,4 @@
-import { NoSuchKey, S3Client } from '@aws-sdk/client-s3';
+import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aws-sdk/client-s3';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
@@ -16,8 +16,11 @@ const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const context = new ContextMockFactory().create();
 
-beforeAll(async () => {
+beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.createTemplate);
+});
+
+beforeEach(async () => {
   await refreshDynamoDb();
 });
 
@@ -45,7 +48,17 @@ describe('createTemplate', () => {
       templateId: expect.any(String),
     });
 
-    expect(s3ClientSpy.mock.lastCall?.[0].input).toEqual({
+    const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
+    expect(s3CopyArgs.input).toEqual({
+      Bucket: 'pdf-generator-api-it-test',
+      CopySource: `pdf-generator-api-it-test/templates/uploads/${requestBody.uploadId}`,
+      Key: `/templates/data/${requestBody.uploadId}`,
+    });
+
+    const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
+    expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
+    expect(s3DeleteArgs.input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
       Key: `templates/uploads/${requestBody.uploadId}`,
     });
