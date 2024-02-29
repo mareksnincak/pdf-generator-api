@@ -59,7 +59,7 @@ export async function createTemplate(
     const template = await createOrReplace({ id, name, type, s3Key });
 
     const response: CreateTemplateResponseDto = {
-      templateId: template.id,
+      id: template.id,
     };
     logger.info(response, 'createTemplate.response');
     return {

@@ -50,8 +50,8 @@ describe('Template', () => {
       )
       .expect(200);
 
-    expect(createTemplateResponse).toHaveProperty('templateId');
-    templateId = createTemplateResponse.templateId;
+    expect(createTemplateResponse).toHaveProperty('id');
+    templateId = createTemplateResponse.id;
   });
 
   it('should delete template', async () => {

@@ -45,7 +45,7 @@ describe('createTemplate', () => {
 
     const body = JSON.parse(result.body) as CreateTemplateResponseDto;
     expect(body).toEqual({
-      templateId: expect.any(String),
+      id: expect.any(String),
     });
 
     const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
@@ -63,12 +63,12 @@ describe('createTemplate', () => {
       Key: `templates/uploads/${requestBody.uploadId}`,
     });
 
-    const { templateId } = body;
-    const createdTemplate = await templateRepository.findById(templateId);
+    const { id } = body;
+    const createdTemplate = await templateRepository.findById(id);
     expect(createdTemplate).toEqual({
-      PK: `TEMPLATE#${templateId}`,
+      PK: `TEMPLATE#${id}`,
       SK: '#',
-      id: templateId,
+      id,
       name: requestBody.name,
       s3Key: `/templates/data/${requestBody.uploadId}`,
       type: 'html/handlebars',
