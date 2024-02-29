@@ -10,6 +10,7 @@ import * as s3Helper from '../../helpers/s3.helper';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { ErrorMessage } from '../../enums/error.enum';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
@@ -57,7 +58,7 @@ describe('createTemplate', () => {
 
     expect(result.statusCode).toEqual(404);
     expect(JSON.parse(result.body)).toEqual({
-      message: 'Template data not found.',
+      message: ErrorMessage.templateDataNotFound,
     });
   });
 });
