@@ -1,6 +1,6 @@
 import type { Config } from 'jest';
 
-export const baseConfig: Config = {
+export const commonConfig: Config = {
   maxWorkers: '50%',
   preset: 'ts-jest',
   transform: {
@@ -11,4 +11,9 @@ export const baseConfig: Config = {
       },
     ],
   },
+  setupFiles: ['<rootDir>/.jest/jest.setup.ts'],
+  rootDir: '../',
+  testMatch: ['**/*.test.ts'],
 };
+
+export default commonConfig;
