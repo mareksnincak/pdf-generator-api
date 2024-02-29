@@ -5,7 +5,7 @@
   "description": "API for generating dynamic PDF documents.",
   "scripts": {
     "deploy": "export ENVIRONMENT_NAME=manual-deploy && npm run deploy:prod",
-    "deploy:prod": "npm run synth && cd ./infra/cdk && cdk deploy --require-approval ${REQUIRE_APPROVAL:-broadening}",
+    "deploy:prod": "npm run synth && cd ./infra/cdk && cdk deploy --require-approval ${REQUIRE_APPROVAL:-broadening} --outputs-file ./cdk.output.json",
     "infra:down": "docker compose -f ./infra/local/docker-compose-app.yml down",
     "infra:up": "docker compose -f ./infra/local/docker-compose-app.yml up --wait -d && npm run init:db",
     "init:db": "npx ts-node ./scripts/init-db.ts",

@@ -9,6 +9,7 @@ import { createS3Bucket } from './s3';
 import { createLambdas } from './lambdas';
 import { grantPermissions } from './permissions';
 import { createApi } from './api';
+import { createOutputs } from './outputs';
 
 export class CdkStack extends Stack {
   constructor({
@@ -53,5 +54,7 @@ export class CdkStack extends Stack {
       apiUrlSsmParamName,
       dynamoDbTable,
     });
+
+    createOutputs({ scope: this, api });
   }
 }
