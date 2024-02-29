@@ -47,9 +47,16 @@ export async function deleteById(id: string) {
   const command = new DeleteItemCommand({
     TableName: getTableName(),
     Key: TemplateEntity.getDynamoPartitionKey({ id }),
+    ReturnValues: 'ALL_OLD',
   });
 
-  await getDynamoDbClient().send(command);
+  const { Attributes } = await getDynamoDbClient().send(command);
+
+  if (!Attributes) {
+    throw new Error('templateRepository.deleteById.missingReturnValue');
+  }
+  const deletedTemplate = await TemplateEntity.fromDynamoItem(Attributes);
 
   logger.info('templateRepository.deleteById.success');
+  return deletedTemplate;
 }

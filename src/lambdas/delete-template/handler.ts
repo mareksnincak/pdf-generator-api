@@ -4,6 +4,9 @@ import { deleteById } from '../../db/template/template.repository';
 import { deleteTemplateRequestDto } from './dtos/request.dto';
 import { handleError } from '../../helpers/error.helper';
 import { validatePathParams } from '../../helpers/validation.helper';
+import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
+
+const s3Client = new S3Client();
 
 export async function deleteTemplate(
   event: APIGatewayProxyEvent,
@@ -18,10 +21,16 @@ export async function deleteTemplate(
 
     const { id } = validatedData;
 
-    // TODO delete from s3
     // TODO handle 404
     // TODO tests
-    await deleteById(id);
+    // TODO move s3 operations to s3 helper
+    const deletedTemplate = await deleteById(id);
+    await s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.S3_BUCKET,
+        Key: deletedTemplate.s3Key,
+      }),
+    );
 
     logger.info('deleteTemplate.success');
     return {
@@ -29,6 +38,6 @@ export async function deleteTemplate(
       body: '',
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'createTemplate' });
+    return handleError({ error, logPrefix: 'deleteTemplate' });
   }
 }
