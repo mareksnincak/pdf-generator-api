@@ -4,6 +4,9 @@ import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gatewa
 import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
 import { getUrlForTemplateUpload } from './handler';
 import * as crypto from 'node:crypto';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+import { EnvironmentName } from '../../../config/enums/config.enum';
+import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 
 jest.mock('@aws-sdk/s3-request-presigner', () => {
   return {
@@ -22,6 +25,10 @@ jest.mock('node:crypto', () => {
 const requestMockFactory = new GetUrlForTemplateUploadRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const context = new ContextMockFactory().create();
+
+beforeAll(() => {
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getUrlForTemplateUpload);
+});
 
 afterEach(() => {
   jest.resetAllMocks();

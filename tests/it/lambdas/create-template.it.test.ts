@@ -15,7 +15,7 @@ const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const context = new ContextMockFactory().create();
 
 beforeAll(async () => {
-  setEnvVarsFromConfig(EnvironmentName.itTest, Lambda.createTemplate);
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.createTemplate);
   await refreshDynamoDb();
 });
 
