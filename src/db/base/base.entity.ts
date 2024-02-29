@@ -18,7 +18,7 @@ export abstract class BaseEntity {
     };
   }
 
-  static fromDynamoDbItem(
+  static fromDynamoItem(
     _rawItem: Record<string, AttributeValue>,
   ): BaseEntity | Promise<BaseEntity> {
     throw new Error('BaseEntity.fromDynamoDbItem.notImplemented');

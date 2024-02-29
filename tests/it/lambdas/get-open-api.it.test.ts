@@ -10,7 +10,7 @@ const event = new ApiGatewayProxyEventMockFactory().create();
 const context = new ContextMockFactory().create();
 
 beforeAll(async () => {
-  setEnvVarsFromConfig(EnvironmentName.itTest, Lambda.getOpenApi);
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getOpenApi);
 });
 
 afterEach(() => {

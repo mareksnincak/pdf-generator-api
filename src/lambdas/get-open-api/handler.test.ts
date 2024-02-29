@@ -3,9 +3,16 @@ import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gatewa
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 import * as generateOpenApiHelper from '../../open-api/generate-open-api.helper';
 import { getOpenApi } from './handler';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+import { EnvironmentName } from '../../../config/enums/config.enum';
+import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 
 const event = new ApiGatewayProxyEventMockFactory().create();
 const context = new ContextMockFactory().create();
+
+beforeAll(() => {
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getOpenApi);
+});
 
 describe('getOpenApi', () => {
   it('should return open-api', async () => {

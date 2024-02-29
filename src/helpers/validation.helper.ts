@@ -21,6 +21,13 @@ export function validateQueryParams<T extends ZodRawShape>(
   return validate(event.queryStringParameters, dto);
 }
 
+export function validatePathParams<T extends ZodRawShape>(
+  event: Pick<APIGatewayProxyEvent, 'pathParameters'>,
+  dto: ZodObject<T>,
+) {
+  return validate(event.pathParameters, dto);
+}
+
 export function validateBody<T extends ZodRawShape>(
   event: Pick<APIGatewayProxyEvent, 'body'>,
   dto: ZodObject<T>,

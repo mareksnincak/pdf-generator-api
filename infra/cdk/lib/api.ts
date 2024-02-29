@@ -20,6 +20,10 @@ export function createApi({
 
   const templatesResource = api.root.addResource('templates');
   templatesResource.addMethod('POST', new LambdaIntegration(lambdas.createTemplate));
+
+  const templateByIdResource = templatesResource.addResource('{id}');
+  templateByIdResource.addMethod('DELETE', new LambdaIntegration(lambdas.deleteTemplate));
+
   templatesResource
     .addResource('upload-url')
     .addMethod('GET', new LambdaIntegration(lambdas.getUrlForTemplateUpload));

@@ -1,14 +1,13 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'node:crypto';
 import { handleError } from '../../helpers/error.helper';
 import { type GetUrlForTemplateUploadResponseDto } from './dtos/response.dto';
 import { validateQueryParams } from '../../helpers/validation.helper';
 import { getUrlForTemplateUploadRequestDto } from './dtos/request.dto';
-
-const s3Client = new S3Client();
+import { getS3Client } from '../../helpers/s3.helper';
 
 async function createPresignedUrl({
   fileSizeBytes,
@@ -23,6 +22,7 @@ async function createPresignedUrl({
     ContentLength: fileSizeBytes,
   });
 
+  const s3Client = getS3Client();
   const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   return url;
 }

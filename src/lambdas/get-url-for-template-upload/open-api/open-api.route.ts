@@ -6,13 +6,13 @@ export const getUrlForTemplateUploadRoute: RouteConfig = {
   method: 'get',
   path: '/templates/upload-url',
   tags: ['templates'],
-  summary: 'Get url for template upload.',
+  summary: 'Get url for template upload',
   request: {
     query: getUrlForTemplateUploadRequestDto,
   },
   responses: {
     200: {
-      description: 'Data for template upload.',
+      description: 'Success.',
       content: {
         'application/json': {
           schema: getUrlForTemplateUploadResponseDto,

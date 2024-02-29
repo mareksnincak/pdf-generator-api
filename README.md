@@ -35,8 +35,10 @@ API for generating dynamic PDF documents.
    npm run start:debug
 
    # Invoke single lambda function
+   cp ./events/${LAMBDA_NAME}.event.example.json ./events/${LAMBDA_NAME}.event.json
    npm run invoke ${LAMBDA_NAME} -- --event ./events/${LAMBDA_NAME}.event.json
 
    # Invoke single lambda function in debug mode
+   cp ./events/${LAMBDA_NAME}.event.example.json ./events/${LAMBDA_NAME}.event.json
    npm run invoke:debug ${LAMBDA_NAME} -- --event ./events/${LAMBDA_NAME}.event.json
    ```

@@ -1,5 +1,10 @@
 import z from 'zod';
-import { validate, validateBody, validateQueryParams } from './validation.helper';
+import {
+  validate,
+  validateBody,
+  validatePathParams,
+  validateQueryParams,
+} from './validation.helper';
 import { BadRequestError } from '../errors/bad-request.error';
 
 describe('validate', () => {
@@ -85,6 +90,54 @@ describe('validateQueryParams', () => {
 
     try {
       validateQueryParams(event, dto);
+      expect(true).toEqual(false);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestError);
+      expect((error as BadRequestError).message).toEqual(
+        'Expected number, received string at "foo"',
+      );
+    }
+  });
+});
+
+describe('validatePathParams', () => {
+  it('should pass when data is valid', () => {
+    const dto = z.object({
+      foo: z.string(),
+    });
+
+    const pathParameters = { foo: 'bar' };
+    const event = { pathParameters };
+
+    const result = validatePathParams(event, dto);
+
+    expect(result).toEqual(pathParameters);
+  });
+
+  it('should transform data when coerce option is used', () => {
+    const dto = z.object({
+      foo: z.coerce.date(),
+    });
+
+    const date = new Date();
+    const pathParameters = { foo: date.toISOString() };
+    const event = { pathParameters };
+
+    const result = validatePathParams(event, dto);
+
+    expect(result.foo).toEqual(date);
+  });
+
+  it('should throw error when data is not valid', () => {
+    const dto = z.object({
+      foo: z.number(),
+    });
+
+    const pathParameters = { foo: 'bar' };
+    const event = { pathParameters };
+
+    try {
+      validatePathParams(event, dto);
       expect(true).toEqual(false);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestError);

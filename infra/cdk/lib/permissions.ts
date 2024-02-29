@@ -21,6 +21,7 @@ export function grantPermissions({
   s3Bucket.grantPut(lambdas.getUrlForTemplateUpload);
   s3Bucket.grantReadWrite(lambdas.createTemplate);
   s3Bucket.grantDelete(lambdas.createTemplate);
+  s3Bucket.grantDelete(lambdas.deleteTemplate);
 
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(
@@ -31,4 +32,5 @@ export function grantPermissions({
   );
 
   dynamoDbTable.grantWriteData(lambdas.createTemplate);
+  dynamoDbTable.grantWriteData(lambdas.deleteTemplate);
 }

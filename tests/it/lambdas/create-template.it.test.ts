@@ -1,4 +1,4 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aws-sdk/client-s3';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
@@ -9,13 +9,18 @@ import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
 import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';
 import * as templateRepository from '../../../src/db/template/template.repository';
+import { mockLogger } from '../../../src/helpers/test.helper';
+import { ErrorMessage } from '../../../src/enums/error.enum';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
 const context = new ContextMockFactory().create();
 
-beforeAll(async () => {
-  setEnvVarsFromConfig(EnvironmentName.itTest, Lambda.createTemplate);
+beforeAll(() => {
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.createTemplate);
+});
+
+beforeEach(async () => {
   await refreshDynamoDb();
 });
 
@@ -43,13 +48,23 @@ describe('createTemplate', () => {
       templateId: expect.any(String),
     });
 
-    expect(s3ClientSpy.mock.lastCall?.[0].input).toEqual({
+    const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
+    expect(s3CopyArgs.input).toEqual({
+      Bucket: 'pdf-generator-api-it-test',
+      CopySource: `pdf-generator-api-it-test/templates/uploads/${requestBody.uploadId}`,
+      Key: `/templates/data/${requestBody.uploadId}`,
+    });
+
+    const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
+    expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
+    expect(s3DeleteArgs.input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
       Key: `templates/uploads/${requestBody.uploadId}`,
     });
 
     const { templateId } = body;
-    const createdTemplate = await templateRepository.findOneById(templateId);
+    const createdTemplate = await templateRepository.findById(templateId);
     expect(createdTemplate).toEqual({
       PK: `TEMPLATE#${templateId}`,
       SK: '#',
@@ -57,6 +72,25 @@ describe('createTemplate', () => {
       name: requestBody.name,
       s3Key: `/templates/data/${requestBody.uploadId}`,
       type: 'html/handlebars',
+    });
+  });
+
+  it('should return 404 when template data does not exist', async () => {
+    mockLogger();
+    jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
+      throw new NoSuchKey({ message: 'No such key', $metadata: {} });
+    });
+
+    const requestBody = requestMockFactory.create();
+    const event = eventMockFactory.create({
+      body: JSON.stringify(requestBody),
+    });
+
+    const result = await createTemplate(event, context);
+
+    expect(result.statusCode).toEqual(404);
+    expect(JSON.parse(result.body)).toEqual({
+      message: ErrorMessage.templateDataNotFound,
     });
   });
 });
