@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'path';
+import { join } from 'node:path';
+
 import { type Lambda } from '../../infra/cdk/enums/lambda.enum';
 import { type EnvironmentName } from '../enums/config.enum';
 import { type EnvVars } from '../types/env.type';

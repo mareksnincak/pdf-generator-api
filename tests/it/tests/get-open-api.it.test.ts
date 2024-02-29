@@ -1,10 +1,11 @@
 import { SSMClient } from '@aws-sdk/client-ssm';
+
+import { EnvironmentName } from '../../../config/enums/config.enum';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { getOpenApi } from '../../../src/lambdas/get-open-api/handler';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
-import { getOpenApi } from '../../../src/lambdas/get-open-api/handler';
-import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
-import { EnvironmentName } from '../../../config/enums/config.enum';
-import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 
 const event = new ApiGatewayProxyEventMockFactory().create();
 const context = new ContextMockFactory().create();

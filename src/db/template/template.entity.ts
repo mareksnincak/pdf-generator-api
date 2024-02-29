@@ -1,12 +1,13 @@
+import { randomUUID } from 'node:crypto';
+
+import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { type Optional } from 'utility-types';
 
 import { BaseEntity } from '../base/base.entity';
 
-import type { AttributeValue } from '@aws-sdk/client-dynamodb';
-import { type Template, type StoredTemplate } from './template.type';
 import { type TemplateType } from './template.enum';
-import { randomUUID } from 'crypto';
-import { type Optional } from 'utility-types';
+import { type Template, type StoredTemplate } from './template.type';
 
 export class TemplateEntity extends BaseEntity {
   constructor({ id = randomUUID(), name, type, s3Key }: Optional<Template, 'id'>) {

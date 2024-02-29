@@ -1,7 +1,8 @@
-import { type Bucket } from 'aws-cdk-lib/aws-s3';
-import { type createLambdas } from './lambdas';
-import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { type Bucket } from 'aws-cdk-lib/aws-s3';
+
+import { type createLambdas } from './lambdas';
 
 export function grantPermissions({
   region,

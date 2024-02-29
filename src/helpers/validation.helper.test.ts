@@ -1,11 +1,13 @@
 import z from 'zod';
+
+import { BadRequestError } from '../errors/bad-request.error';
+
 import {
   validate,
   validateBody,
   validatePathParams,
   validateQueryParams,
 } from './validation.helper';
-import { BadRequestError } from '../errors/bad-request.error';
 
 describe('validate', () => {
   it('should pass when data is valid', () => {

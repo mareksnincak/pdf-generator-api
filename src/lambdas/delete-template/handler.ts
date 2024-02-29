@@ -1,10 +1,12 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+
 import { deleteById } from '../../db/template/template.repository';
-import { deleteTemplateRequestDto } from './dtos/request.dto';
 import { handleError } from '../../helpers/error.helper';
-import { validatePathParams } from '../../helpers/validation.helper';
+import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObject } from '../../helpers/s3.helper';
+import { validatePathParams } from '../../helpers/validation.helper';
+
+import { deleteTemplateRequestDto } from './dtos/request.dto';
 
 export async function deleteTemplate(
   event: APIGatewayProxyEvent,

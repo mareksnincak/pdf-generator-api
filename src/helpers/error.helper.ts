@@ -1,5 +1,7 @@
 import { type APIGatewayProxyResult } from 'aws-lambda';
+
 import { HttpError } from '../errors/http.error';
+
 import { logger } from './logger.helper';
 
 export function handleError({

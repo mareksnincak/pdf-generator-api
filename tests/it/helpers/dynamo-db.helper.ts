@@ -1,4 +1,5 @@
 import { DeleteTableCommand, ResourceNotFoundException } from '@aws-sdk/client-dynamodb';
+
 import { getDynamoDbClient, getTableName } from '../../../src/db/common/helpers/connection.helper';
 import { initDb } from '../../../src/db/common/helpers/db.helper';
 

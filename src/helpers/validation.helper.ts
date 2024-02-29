@@ -1,6 +1,7 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { type ZodObject, type ZodRawShape } from 'zod';
 import { fromZodError } from 'zod-validation-error';
+
 import { BadRequestError } from '../errors/bad-request.error';
 
 export function validate<T extends ZodRawShape>(data: unknown, dto: ZodObject<T>) {

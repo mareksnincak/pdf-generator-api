@@ -1,13 +1,16 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { randomUUID } from 'node:crypto';
+
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { randomUUID } from 'node:crypto';
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+
 import { handleError } from '../../helpers/error.helper';
-import { type GetUrlForTemplateUploadResponseDto } from './dtos/response.dto';
-import { validateQueryParams } from '../../helpers/validation.helper';
-import { getUrlForTemplateUploadRequestDto } from './dtos/request.dto';
+import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getS3Client } from '../../helpers/s3.helper';
+import { validateQueryParams } from '../../helpers/validation.helper';
+
+import { getUrlForTemplateUploadRequestDto } from './dtos/request.dto';
+import { type GetUrlForTemplateUploadResponseDto } from './dtos/response.dto';
 
 async function createPresignedUrl({
   fileSizeBytes,
@@ -23,6 +26,7 @@ async function createPresignedUrl({
   });
 
   const s3Client = getS3Client();
+
   const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   return url;
 }

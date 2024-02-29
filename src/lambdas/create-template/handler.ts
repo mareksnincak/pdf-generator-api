@@ -1,16 +1,19 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { createOrReplace } from '../../db/template/template.repository';
+import { randomUUID } from 'node:crypto';
+
 import { S3ServiceException } from '@aws-sdk/client-s3';
+import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+
+import { createOrReplace } from '../../db/template/template.repository';
+import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
+import { NotFoundError } from '../../errors/not-found.error';
+import { handleError } from '../../helpers/error.helper';
+import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { moveObject } from '../../helpers/s3.helper';
+import { validateBody } from '../../helpers/validation.helper';
+
 import { createTemplateRequestDto } from './dtos/request.dto';
 import { type CreateTemplateResponseDto } from './dtos/response.dto';
-import { handleError } from '../../helpers/error.helper';
-import { validateBody } from '../../helpers/validation.helper';
-import { NotFoundError } from '../../errors/not-found.error';
-import { ErrorMessage } from '../../enums/error.enum';
-import { moveObject } from '../../helpers/s3.helper';
-import { randomUUID } from 'node:crypto';
 
 async function moveTemplateDataToPermanentLocation(uploadId: string) {
   try {

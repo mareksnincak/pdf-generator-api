@@ -1,7 +1,8 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
-import { deleteTemplateRequestDto } from '../dtos/request.dto';
+
 import { ErrorMessage } from '../../../enums/error.enum';
 import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
+import { deleteTemplateRequestDto } from '../dtos/request.dto';
 
 export const deleteTemplateRoute: RouteConfig = {
   method: 'delete',

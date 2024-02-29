@@ -1,4 +1,4 @@
 dist
 cdk.out
 node_modules
-.eslintrc.js
+.eslintrc.json

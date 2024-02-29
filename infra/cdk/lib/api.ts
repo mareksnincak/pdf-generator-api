@@ -1,5 +1,6 @@
 import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { type Construct } from 'constructs';
+
 import { type createLambdas } from './lambdas';
 
 export function createApi({

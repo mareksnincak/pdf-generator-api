@@ -1,15 +1,15 @@
+import { join } from 'node:path';
+
 import { Duration } from 'aws-cdk-lib';
+import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-
-import { Lambda } from '../enums/lambda.enum';
-
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
-import { join } from 'path';
-import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { type Construct } from 'constructs';
+
 import { getEnvVars } from '../../../config/helpers/config.helper';
-import { type Table } from 'aws-cdk-lib/aws-dynamodb';
+import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
+import { Lambda } from '../enums/lambda.enum';
 
 function getLambdaEntryPath(lambda: Lambda) {
   return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, 'handler.ts');

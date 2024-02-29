@@ -1,7 +1,8 @@
 import { BadRequestError } from '../errors/bad-request.error';
-import { mockLogger } from './test.helper';
-import { handleError } from './error.helper';
 import { NotFoundError } from '../errors/not-found.error';
+
+import { handleError } from './error.helper';
+import { mockLogger } from './test.helper';
 
 afterEach(() => {
   jest.resetAllMocks();

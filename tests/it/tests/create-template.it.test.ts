@@ -1,18 +1,20 @@
+import * as crypto from 'node:crypto';
+import { randomUUID } from 'node:crypto';
+
 import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aws-sdk/client-s3';
+
+import { EnvironmentName } from '../../../config/enums/config.enum';
+import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
+import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import * as templateRepository from '../../../src/db/template/template.repository';
+import { ErrorMessage } from '../../../src/enums/error.enum';
+import { mockLogger } from '../../../src/helpers/test.helper';
+import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';
+import { createTemplate } from '../../../src/lambdas/create-template/handler';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
-import { createTemplate } from '../../../src/lambdas/create-template/handler';
-import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
-import { EnvironmentName } from '../../../config/enums/config.enum';
-import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
-import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';
-import * as templateRepository from '../../../src/db/template/template.repository';
-import { mockLogger } from '../../../src/helpers/test.helper';
-import { ErrorMessage } from '../../../src/enums/error.enum';
-import * as crypto from 'node:crypto';
-import { randomUUID } from 'node:crypto';
 
 jest.mock('node:crypto', () => {
   return {

@@ -1,4 +1,5 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
+
 import { getUrlForTemplateUploadRequestDto } from '../dtos/request.dto';
 import { getUrlForTemplateUploadResponseDto } from '../dtos/response.dto';
 
