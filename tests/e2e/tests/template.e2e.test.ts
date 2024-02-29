@@ -3,12 +3,23 @@ import { getE2eBaseUrl } from '../helpers/setup.helper';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
 
-// TODO clean up resources
 const baseUrl = getE2eBaseUrl();
 
 const createTemplateRequestMockFactory = new CreateTemplateRequestMockFactory();
 
-describe('Create template flow', () => {
+let templateId: string | null = null;
+
+afterAll(async () => {
+  if (templateId) {
+    /**
+     * Try to delete task it wasn't deleted it delete test e.g. if running only create test
+     */
+    console.log('templateE2e.cleanup.deletingTemplate', templateId);
+    await request(baseUrl).delete(`/templates/${templateId}`).expect(204);
+  }
+});
+
+describe('Template', () => {
   it('should create template', async () => {
     const templateData = '<html>test template</html>';
 
@@ -40,5 +51,12 @@ describe('Create template flow', () => {
       .expect(200);
 
     expect(createTemplateResponse).toHaveProperty('templateId');
+    templateId = createTemplateResponse.templateId;
+  });
+
+  it('should delete template', async () => {
+    expect(templateId).toBeDefined();
+    await request(baseUrl).delete(`/templates/${templateId}`).expect(204);
+    templateId = null;
   });
 });
