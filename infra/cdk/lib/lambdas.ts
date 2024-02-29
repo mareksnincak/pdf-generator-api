@@ -12,7 +12,7 @@ import { getEnvVars } from '../../../config/helpers/config.helper';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 
 function getLambdaEntryPath(lambda: Lambda) {
-  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, `${lambda}.ts`);
+  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, 'handler.ts');
 }
 
 function getCommonNodeJsFunctionProps(lambda: Lambda, cdkEnvVars: CdkEnvVarsDto) {

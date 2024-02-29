@@ -1,6 +1,6 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
-import { createTemplateRequestDto } from '../dtos/create-template-request.dto';
-import { createTemplateResponseDto } from '../dtos/create-template-response.dto';
+import { createTemplateRequestDto } from '../dtos/request.dto';
+import { createTemplateResponseDto } from '../dtos/response.dto';
 import { ErrorMessage } from '../../../enums/error.enum';
 import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
 

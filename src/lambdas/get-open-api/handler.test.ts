@@ -2,7 +2,7 @@ import { SSMClient } from '@aws-sdk/client-ssm';
 import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 import * as generateOpenApiHelper from '../../open-api/generate-open-api.helper';
-import { getOpenApi } from './get-open-api';
+import { getOpenApi } from './handler';
 
 const event = new ApiGatewayProxyEventMockFactory().create();
 const context = new ContextMockFactory().create();

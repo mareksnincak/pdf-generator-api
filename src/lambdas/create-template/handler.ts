@@ -8,8 +8,8 @@ import {
   S3ServiceException,
 } from '@aws-sdk/client-s3';
 import { S3ExceptionName } from '../../enums/s3.enum';
-import { createTemplateRequestDto } from './dtos/create-template-request.dto';
-import { type CreateTemplateResponseDto } from './dtos/create-template-response.dto';
+import { createTemplateRequestDto } from './dtos/request.dto';
+import { type CreateTemplateResponseDto } from './dtos/response.dto';
 import { handleError } from '../../helpers/error.helper';
 import { validateBody } from '../../helpers/validation.helper';
 import { NotFoundError } from '../../errors/not-found.error';

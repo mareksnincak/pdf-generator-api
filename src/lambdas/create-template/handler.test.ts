@@ -1,5 +1,5 @@
-import { createTemplate } from './create-template';
-import { CreateTemplateRequestMockFactory } from './mock-factories/create-template-request.mock-factory';
+import { createTemplate } from './handler';
+import { CreateTemplateRequestMockFactory } from './mock-factories/request.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
 import { NoSuchKey, S3Client } from '@aws-sdk/client-s3';

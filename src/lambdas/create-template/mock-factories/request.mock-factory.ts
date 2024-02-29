@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 
-import { type CreateTemplateRequestDto } from '../dtos/create-template-request.dto';
+import { type CreateTemplateRequestDto } from '../dtos/request.dto';
 import { TemplateType } from '../../../db/template/template.enum';
 
 export class CreateTemplateRequestMockFactory {

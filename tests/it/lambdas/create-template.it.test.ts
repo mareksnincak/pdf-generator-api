@@ -1,13 +1,13 @@
 import { S3Client } from '@aws-sdk/client-s3';
-import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/create-template-request.mock-factory';
+import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
-import { createTemplate } from '../../../src/lambdas/create-template/create-template';
+import { createTemplate } from '../../../src/lambdas/create-template/handler';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
-import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/create-template-response.dto';
+import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';
 import * as templateRepository from '../../../src/db/template/template.repository';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();

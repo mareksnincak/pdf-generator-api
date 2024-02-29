@@ -1,7 +1,7 @@
 import { SSMClient } from '@aws-sdk/client-ssm';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
-import { getOpenApi } from '../../../src/lambdas/get-open-api/get-open-api';
+import { getOpenApi } from '../../../src/lambdas/get-open-api/handler';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';

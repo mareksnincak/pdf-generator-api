@@ -1,8 +1,8 @@
-import { GetUrlForTemplateUploadRequestMockFactory } from './mock-factories/get-url-for-template-upload-request.mock-factory';
+import { GetUrlForTemplateUploadRequestMockFactory } from './mock-factories/request.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
 import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
-import { getUrlForTemplateUpload } from './get-url-for-template-upload';
+import { getUrlForTemplateUpload } from './handler';
 import * as crypto from 'node:crypto';
 
 jest.mock('@aws-sdk/s3-request-presigner', () => {
