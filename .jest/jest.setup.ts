@@ -1,1 +1,4 @@
-process.env.LOG_LEVEL = 'warn';
+import { EnvironmentName } from '../config/enums/config.enum';
+import { setEnvVarsFromConfig } from '../config/helpers/config.helper';
+
+setEnvVarsFromConfig(EnvironmentName.localTest);

@@ -2,7 +2,6 @@ import { CopyObjectCommand, DeleteObjectCommand, S3Client } from '@aws-sdk/clien
 
 let s3Client: S3Client | undefined;
 
-// TODO tests
 export function getS3Client() {
   if (!s3Client) {
     s3Client = new S3Client();
