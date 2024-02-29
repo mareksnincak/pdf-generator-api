@@ -9,6 +9,12 @@
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
       "S3_BUCKET": "pdf-generator-api-it-test"
     },
+    "delete-template": {
+      "DYNAMODB_ENDPOINT": "http://localhost:7999",
+      "DYNAMODB_REGION": "local",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
+      "S3_BUCKET": "pdf-generator-api-it-test"
+    },
     "get-open-api": {
       "API_URL_SSM_PARAM_NAME": "pdf-generator-api-api-url-it-test"
     },
