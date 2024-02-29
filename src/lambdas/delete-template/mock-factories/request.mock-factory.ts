@@ -1,19 +1,12 @@
-import { randomBytes, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 
 import { type DeleteTemplateRequestDto } from '../dtos/request.dto';
-import { TemplateType } from '../../../db/template/template.enum';
 
-export class CreateTemplateRequestMockFactory {
+export class DeleteTemplateRequestMockFactory {
   create(overrides: Partial<DeleteTemplateRequestDto> = {}): DeleteTemplateRequestDto {
     return {
-      name: randomBytes(8).toString('hex'),
-      uploadId: randomUUID(),
-      type: TemplateType.htmlHandlebars,
+      id: randomUUID(),
       ...overrides,
     };
-  }
-
-  createRaw(overrides: Partial<DeleteTemplateRequestDto> = {}): string {
-    return JSON.stringify(this.create(overrides));
   }
 }
