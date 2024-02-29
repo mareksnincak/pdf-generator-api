@@ -14,6 +14,7 @@ export const commonConfig: Config = {
   setupFiles: ['<rootDir>/.jest/jest.setup.ts'],
   rootDir: '../',
   testMatch: ['**/*.test.ts'],
+  testTimeout: 15000,
 };
 
 export default commonConfig;

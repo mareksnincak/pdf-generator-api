@@ -5,7 +5,7 @@
   "description": "API for generating dynamic PDF documents.",
   "scripts": {
     "deploy": "export ENVIRONMENT_NAME=manual-deploy && npm run deploy:prod",
-    "deploy:prod": "npm run synth && cd ./infra/cdk && cdk deploy --require-approval ${REQUIRE_APPROVAL:-broadening}",
+    "deploy:prod": "npm run synth && cd ./infra/cdk && cdk deploy --require-approval ${REQUIRE_APPROVAL:-broadening} --outputs-file ./cdk.output.json",
     "infra:down": "docker compose -f ./infra/local/docker-compose-app.yml down",
     "infra:up": "docker compose -f ./infra/local/docker-compose-app.yml up --wait -d && npm run init:db",
     "init:db": "npx ts-node ./scripts/init-db.ts",
@@ -22,6 +22,7 @@
     "presynth": "shx rm -rf ./infra/cdk/cdk.out",
     "synth": "cd ./infra/cdk && cdk synth",
     "test": "jest --config ./.jest/jest.unit.config.ts",
+    "test:e2e": "jest --config ./.jest/jest.e2e.config.ts",
     "test:it": "npm run it-infra:up && jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down"
   },
   "dependencies": {
@@ -41,6 +42,7 @@
     "@types/aws-lambda": "^8.10.130",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.10.4",
+    "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^6.14.0",
     "aws-cdk": "^2.115.0",
     "aws-cdk-lib": "^2.115.0",
@@ -56,6 +58,7 @@
     "jest": "^29.7.0",
     "prettier": "^3.1.1",
     "shx": "^0.3.4",
+    "supertest": "^6.3.4",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3",

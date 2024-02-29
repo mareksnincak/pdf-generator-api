@@ -7,3 +7,4 @@ src/open-api/open-api.json
 config/values/local.config.json
 events/*
 !events/*.example.json
+infra/cdk/cdk.output.json

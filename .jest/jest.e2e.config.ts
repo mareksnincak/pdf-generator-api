@@ -3,8 +3,7 @@ import { commonConfig } from './jest.common.config';
 
 const config: Config = {
   ...commonConfig,
-  testMatch: ['**/*.it.test.ts'],
-  testTimeout: 5000,
+  testMatch: ['**/*.e2e.test.ts'],
 };
 
 export default config;
