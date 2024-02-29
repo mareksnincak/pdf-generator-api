@@ -12,5 +12,7 @@
     "presynth",
     "trpc",
     "unmarshall"
-  ]
+  ],
+  "jestrunner.configPath": ".jest/jest.common.config.ts",
+  "jestrunner.runOptions": ["--runInBand"]
 }
