@@ -43,7 +43,7 @@ describe('createTemplate', () => {
     });
   });
 
-  it('should return 404 when template data do not exist', async () => {
+  it('should return 404 when template data does not exist', async () => {
     mockLogger();
     jest.spyOn(s3Helper, 'moveObject').mockImplementation(() => {
       throw new NoSuchKey({ message: 'No such key', $metadata: {} });

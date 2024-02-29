@@ -1,4 +1,4 @@
-import { S3Client } from '@aws-sdk/client-s3';
+import { NoSuchKey, S3Client } from '@aws-sdk/client-s3';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
@@ -9,6 +9,8 @@ import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
 import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';
 import * as templateRepository from '../../../src/db/template/template.repository';
+import { mockLogger } from '../../../src/helpers/test.helper';
+import { ErrorMessage } from '../../../src/enums/error.enum';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
@@ -57,6 +59,25 @@ describe('createTemplate', () => {
       name: requestBody.name,
       s3Key: `/templates/data/${requestBody.uploadId}`,
       type: 'html/handlebars',
+    });
+  });
+
+  it('should return 404 when template data does not exist', async () => {
+    mockLogger();
+    jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
+      throw new NoSuchKey({ message: 'No such key', $metadata: {} });
+    });
+
+    const requestBody = requestMockFactory.create();
+    const event = eventMockFactory.create({
+      body: JSON.stringify(requestBody),
+    });
+
+    const result = await createTemplate(event, context);
+
+    expect(result.statusCode).toEqual(404);
+    expect(JSON.parse(result.body)).toEqual({
+      message: ErrorMessage.templateDataNotFound,
     });
   });
 });
