@@ -1,12 +1,7 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { createOrReplace } from '../../db/template/template.repository';
-import {
-  CopyObjectCommand,
-  DeleteObjectCommand,
-  S3Client,
-  S3ServiceException,
-} from '@aws-sdk/client-s3';
+import { S3ServiceException } from '@aws-sdk/client-s3';
 import { S3ExceptionName } from '../../enums/s3.enum';
 import { createTemplateRequestDto } from './dtos/request.dto';
 import { type CreateTemplateResponseDto } from './dtos/response.dto';
@@ -14,30 +9,26 @@ import { handleError } from '../../helpers/error.helper';
 import { validateBody } from '../../helpers/validation.helper';
 import { NotFoundError } from '../../errors/not-found.error';
 import { ErrorMessage } from '../../enums/error.enum';
-
-const s3Client = new S3Client();
+import { moveObject } from '../../helpers/s3.helper';
 
 async function moveTemplateDataToPermanentLocation(uploadId: string) {
   try {
     // TODO validate html
     const bucket = process.env.S3_BUCKET;
+
+    if (!bucket) {
+      throw new Error('createTemplate.moveTemplateDataToPermanentLocation.missingS3Bucket');
+    }
+
     const uploadedDataS3Key = `templates/uploads/${uploadId}`;
     const storedDataS3Key = `/templates/data/${uploadId}`;
 
-    await s3Client.send(
-      new CopyObjectCommand({
-        CopySource: `${bucket}/${uploadedDataS3Key}`,
-        Bucket: bucket,
-        Key: storedDataS3Key,
-      }),
-    );
-
-    await s3Client.send(
-      new DeleteObjectCommand({
-        Bucket: bucket,
-        Key: uploadedDataS3Key,
-      }),
-    );
+    await moveObject({
+      sourceBucket: bucket,
+      sourceKey: uploadedDataS3Key,
+      destinationBucket: bucket,
+      destinationKey: storedDataS3Key,
+    });
 
     return storedDataS3Key;
   } catch (error) {
