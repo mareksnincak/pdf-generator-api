@@ -4,6 +4,8 @@ import { TemplateEntity } from './template.entity';
 import { type Template } from './template.type';
 import { type Optional } from 'utility-types';
 import { getDynamoDbClient, getTableName } from '../common/helpers/connection.helper';
+import { NotFoundError } from '../../errors/not-found.error';
+import { ErrorMessage } from '../../enums/error.enum';
 
 export async function createOrReplace(template: Optional<Template, 'id'>) {
   logger.info('templateRepository.createOrReplace');
@@ -53,7 +55,9 @@ export async function deleteById(id: string) {
   const { Attributes } = await getDynamoDbClient().send(command);
 
   if (!Attributes) {
-    throw new Error('templateRepository.deleteById.missingReturnValue');
+    throw new NotFoundError({
+      message: ErrorMessage.templateNotFound,
+    });
   }
   const deletedTemplate = await TemplateEntity.fromDynamoItem(Attributes);
 
