@@ -11,6 +11,15 @@ import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-temp
 import * as templateRepository from '../../../src/db/template/template.repository';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { ErrorMessage } from '../../../src/enums/error.enum';
+import * as crypto from 'node:crypto';
+import { randomUUID } from 'node:crypto';
+
+jest.mock('node:crypto', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual<Record<string, unknown>>('node:crypto'),
+  };
+});
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyEventMockFactory();
@@ -25,11 +34,14 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('createTemplate', () => {
   it('should create template', async () => {
+    const dataId = randomUUID();
+
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue(dataId);
     const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
 
     const requestBody = requestMockFactory.create({
@@ -45,7 +57,7 @@ describe('createTemplate', () => {
 
     const body = JSON.parse(result.body) as CreateTemplateResponseDto;
     expect(body).toEqual({
-      templateId: expect.any(String),
+      id: expect.any(String),
     });
 
     const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
@@ -53,7 +65,7 @@ describe('createTemplate', () => {
     expect(s3CopyArgs.input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
       CopySource: `pdf-generator-api-it-test/templates/uploads/${requestBody.uploadId}`,
-      Key: `/templates/data/${requestBody.uploadId}`,
+      Key: `/templates/data/${dataId}`,
     });
 
     const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
@@ -63,12 +75,12 @@ describe('createTemplate', () => {
       Key: `templates/uploads/${requestBody.uploadId}`,
     });
 
-    const { templateId } = body;
-    const createdTemplate = await templateRepository.findById(templateId);
+    const { id } = body;
+    const createdTemplate = await templateRepository.findById(id);
     expect(createdTemplate).toEqual({
-      PK: `TEMPLATE#${templateId}`,
+      PK: `TEMPLATE#${id}`,
       SK: '#',
-      id: templateId,
+      id,
       name: requestBody.name,
       s3Key: `/templates/data/${requestBody.uploadId}`,
       type: 'html/handlebars',
