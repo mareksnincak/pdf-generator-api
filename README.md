@@ -2,6 +2,13 @@
 
 API for generating dynamic PDF documents.
 
+- [How to run](#how-to-run)
+- [How to test](#how-to-test)
+  - [Unit tests](#unit-tests)
+  - [Integration tests](#integration-tests)
+  - [E2e tests](#e2e-tests)
+  - [Running single test only](#running-single-test-only)
+
 ## How to run
 
 1. install dependencies
@@ -105,4 +112,4 @@ Simplest way to run single test only is to use [Jest Runner VS Code](https://mar
   # npm run it-infra:down
   ```
 
-- E2e tests need either locally running app / or `E2E_BASE_URL` set
+- E2e tests need either locally running app or `E2E_BASE_URL` set
