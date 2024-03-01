@@ -2,22 +2,22 @@ import { CfnOutput } from 'aws-cdk-lib';
 import { type RestApi } from 'aws-cdk-lib/aws-apigateway';
 import { type Construct } from 'constructs';
 
-import { type createSsmParameters } from './ssm-parameters';
+import { type createCognito } from './cognito';
 
 export function createOutputs({
   scope,
   api,
-  ssmParameterNames,
+  cognito,
 }: {
   scope: Construct;
   api: RestApi;
-  ssmParameterNames: ReturnType<typeof createSsmParameters>;
+  cognito: ReturnType<typeof createCognito>;
 }) {
   new CfnOutput(scope, 'apiUrl', {
     value: api.url,
   });
 
-  new CfnOutput(scope, 'defaultUserCredentialsSsmParamName', {
-    value: ssmParameterNames.defaultUserCredentialsName,
+  new CfnOutput(scope, 'defaultUserCredentialsSecretName', {
+    value: cognito.defaultUsersCredentialsSecret.secretName,
   });
 }

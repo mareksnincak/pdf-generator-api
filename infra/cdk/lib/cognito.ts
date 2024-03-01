@@ -1,6 +1,6 @@
-import { randomBytes } from 'node:crypto';
-
+import { RemovalPolicy } from 'aws-cdk-lib';
 import { CfnUserPoolUser, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import {
   AwsCustomResource,
   AwsCustomResourcePolicy,
@@ -8,18 +8,21 @@ import {
 } from 'aws-cdk-lib/custom-resources';
 import { type Construct } from 'constructs';
 
-export type UserCredentials = {
-  email: string;
-  password: string;
-};
-
 export function createCognito(scope: Construct, stackId: string) {
   const userPool = new UserPool(scope, 'user-pool', {
     userPoolName: stackId,
     selfSignUpEnabled: false,
   });
 
+  // new UserPoolDomain(scope, 'user-pool-domain', {
+  //   userPool,
+  //   cognitoDomain: {
+  //     domainPrefix: `${stackId}-${randomBytes(4).to}`,
+  //   },
+  // });
+
   const userPoolClient = new UserPoolClient(scope, 'user-pool-client', {
+    generateSecret: false,
     userPool,
     userPoolClientName: stackId,
     authFlows: {
@@ -28,16 +31,24 @@ export function createCognito(scope: Construct, stackId: string) {
     preventUserExistenceErrors: true,
   });
 
-  const defaultUserCredentials: UserCredentials = {
-    email: 'default-user@example.com',
-    password: `P4ssw0rd.${randomBytes(8).toString('hex')}`,
-  };
+  const defaultUserUsername = 'default-user';
+
+  const defaultUsersCredentialsSecret = new Secret(scope, 'default-user-credentials', {
+    removalPolicy: RemovalPolicy.DESTROY,
+    secretName: `${stackId}-default-user-credentials`,
+    generateSecretString: {
+      secretStringTemplate: JSON.stringify({ username: defaultUserUsername }),
+      generateStringKey: 'password',
+      passwordLength: 16,
+      requireEachIncludedType: true,
+    },
+  });
 
   new CfnUserPoolUser(scope, 'default-user', {
     userPoolId: userPool.userPoolId,
-    username: defaultUserCredentials.email,
+    username: defaultUserUsername,
     userAttributes: [
-      { name: 'email', value: defaultUserCredentials.email },
+      { name: 'email', value: 'default-user@example.com' },
       { name: 'email_verified', value: 'true' },
     ],
     desiredDeliveryMediums: ['EMAIL'],
@@ -49,8 +60,8 @@ export function createCognito(scope: Construct, stackId: string) {
       action: 'adminSetUserPassword',
       parameters: {
         UserPoolId: userPool.userPoolId,
-        Username: defaultUserCredentials.email,
-        Password: defaultUserCredentials.password,
+        Username: defaultUserUsername,
+        Password: defaultUsersCredentialsSecret.secretValueFromJson('password').unsafeUnwrap(),
         Permanent: true,
       },
       physicalResourceId: PhysicalResourceId.of('set-default-user-password'),
@@ -67,5 +78,5 @@ export function createCognito(scope: Construct, stackId: string) {
   // new CfnOutput(this, 'userPoolClientId', {
   //   value: userPoolClient.userPoolClientId,
   // });
-  return { userPool, userPoolClient, defaultUserCredentials };
+  return { userPool, userPoolClient, defaultUsersCredentialsSecret };
 }

@@ -11,7 +11,6 @@ import { createLambdas } from './lambdas';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
-import { createSsmParameters } from './ssm-parameters';
 
 // TODO move lib/cdk.stack.ts to stack/index.ts
 export class CdkStack extends Stack {
@@ -44,7 +43,7 @@ export class CdkStack extends Stack {
 
     const cognito = createCognito(this, id);
 
-    const api = createApi({ scope: this, lambdas });
+    const api = createApi({ scope: this, lambdas, apiUrlSsmParamName });
 
     grantPermissions({
       region: this.region,
@@ -55,14 +54,6 @@ export class CdkStack extends Stack {
       dynamoDbTable,
     });
 
-    const ssmParameterNames = createSsmParameters({
-      scope: this,
-      stackId: id,
-      api,
-      apiUrlSsmParamName,
-      defaultUserCredentials: cognito.defaultUserCredentials,
-    });
-
-    createOutputs({ scope: this, api, ssmParameterNames });
+    createOutputs({ scope: this, api, cognito });
   }
 }
