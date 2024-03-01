@@ -12,7 +12,6 @@ import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
 
-// TODO move lib/cdk.stack.ts to stack/index.ts
 export class CdkStack extends Stack {
   constructor({
     scope,
