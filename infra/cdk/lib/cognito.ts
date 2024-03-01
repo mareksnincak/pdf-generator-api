@@ -6,38 +6,17 @@ import { type Construct } from 'constructs';
 
 import { type createLambdas } from './lambdas';
 
-export function createCognito({
+function createDefaultUser({
   scope,
   stackId,
+  userPool,
   lambdas,
 }: {
   scope: Construct;
   stackId: string;
+  userPool: UserPool;
   lambdas: ReturnType<typeof createLambdas>;
 }) {
-  const userPool = new UserPool(scope, 'user-pool', {
-    userPoolName: stackId,
-    selfSignUpEnabled: false,
-    removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
-  });
-
-  new UserPoolDomain(scope, 'user-pool-domain', {
-    userPool,
-    cognitoDomain: {
-      domainPrefix: stackId,
-    },
-  });
-
-  const userPoolClient = new UserPoolClient(scope, 'user-pool-client', {
-    generateSecret: false,
-    userPool,
-    userPoolClientName: stackId,
-    authFlows: {
-      userSrp: true,
-    },
-    preventUserExistenceErrors: true,
-  });
-
   const defaultUserUsername = 'default-user';
 
   const defaultUsersCredentialsSecret = new Secret(scope, 'default-user-credentials', {
@@ -80,6 +59,48 @@ export function createCognito({
 
   setDefaultUserPasswordCustomResource.node.addDependency(defaultUsersCredentialsSecret);
   setDefaultUserPasswordCustomResource.node.addDependency(user);
+
+  return { defaultUsersCredentialsSecret };
+}
+
+export function createCognito({
+  scope,
+  stackId,
+  lambdas,
+}: {
+  scope: Construct;
+  stackId: string;
+  lambdas: ReturnType<typeof createLambdas>;
+}) {
+  const userPool = new UserPool(scope, 'user-pool', {
+    userPoolName: stackId,
+    selfSignUpEnabled: false,
+    removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+  });
+
+  new UserPoolDomain(scope, 'user-pool-domain', {
+    userPool,
+    cognitoDomain: {
+      domainPrefix: stackId,
+    },
+  });
+
+  const userPoolClient = new UserPoolClient(scope, 'user-pool-client', {
+    generateSecret: false,
+    userPool,
+    userPoolClientName: stackId,
+    authFlows: {
+      userSrp: true,
+    },
+    preventUserExistenceErrors: true,
+  });
+
+  const { defaultUsersCredentialsSecret } = createDefaultUser({
+    scope,
+    stackId,
+    userPool,
+    lambdas,
+  });
 
   return { userPool, userPoolClient, defaultUsersCredentialsSecret };
 }

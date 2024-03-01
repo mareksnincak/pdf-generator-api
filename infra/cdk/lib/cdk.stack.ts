@@ -42,7 +42,6 @@ export class CdkStack extends Stack {
     });
 
     const cognito = createCognito({ scope: this, stackId: id, lambdas });
-    // const cognito = undefined;
 
     const api = createApi({ scope: this, lambdas, apiUrlSsmParamName });
 
