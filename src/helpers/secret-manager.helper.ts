@@ -2,14 +2,21 @@ import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-sec
 
 import { logger } from './logger.helper';
 
-export const secretManagerClient = new SecretsManagerClient({});
+let secretManagerClient: SecretsManagerClient | undefined;
 
-// TODO test
+export function getSecretManagerClient() {
+  if (!secretManagerClient) {
+    secretManagerClient = new SecretsManagerClient({});
+  }
+
+  return secretManagerClient;
+}
+
 export async function getSecret({ secretId }: { secretId: string }): Promise<string> {
   logger.info({ secretId }, 'secretManagerHelper.getSecret.input');
 
   const command = new GetSecretValueCommand({ SecretId: secretId });
-  const response = await secretManagerClient.send(command);
+  const response = await getSecretManagerClient().send(command);
 
   const value = response.SecretString;
   if (value === undefined) {
