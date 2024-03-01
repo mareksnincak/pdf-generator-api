@@ -5,6 +5,7 @@ import { PhysicalResourceId, Provider } from 'aws-cdk-lib/custom-resources';
 import { type Construct } from 'constructs';
 
 import { type createLambdas } from './lambdas';
+import { SetDefaultUserPasswordResourceProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
 
 function createDefaultUser({
   scope,
@@ -50,10 +51,10 @@ function createDefaultUser({
     {
       serviceToken: setDefaultUserPasswordProvider.serviceToken,
       properties: {
-        physicalResourceId: PhysicalResourceId.of('set-default-user-password').id,
+        physicalResourceId: PhysicalResourceId.of('set-default-user-password').id!,
         userCredentialsSecretName: defaultUsersCredentialsSecret.secretName,
         userPoolId: userPool.userPoolId,
-      },
+      } satisfies SetDefaultUserPasswordResourceProperties,
     },
   );
 
