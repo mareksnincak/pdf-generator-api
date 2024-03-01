@@ -1,5 +1,5 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
-import { CfnUserPoolUser, UserPool, UserPoolClient } from 'aws-cdk-lib/aws-cognito';
+import { CfnUserPoolUser, UserPool, UserPoolClient, UserPoolDomain } from 'aws-cdk-lib/aws-cognito';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import {
   AwsCustomResource,
@@ -14,12 +14,12 @@ export function createCognito(scope: Construct, stackId: string) {
     selfSignUpEnabled: false,
   });
 
-  // new UserPoolDomain(scope, 'user-pool-domain', {
-  //   userPool,
-  //   cognitoDomain: {
-  //     domainPrefix: `${stackId}-${randomBytes(4).to}`,
-  //   },
-  // });
+  new UserPoolDomain(scope, 'user-pool-domain', {
+    userPool,
+    cognitoDomain: {
+      domainPrefix: stackId,
+    },
+  });
 
   const userPoolClient = new UserPoolClient(scope, 'user-pool-client', {
     generateSecret: false,
