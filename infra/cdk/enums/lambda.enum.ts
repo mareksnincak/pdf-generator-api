@@ -3,4 +3,5 @@ export enum Lambda {
   getUrlForTemplateUpload = 'get-url-for-template-upload',
   createTemplate = 'create-template',
   deleteTemplate = 'delete-template',
+  setDefaultUserPassword = 'set-default-user-password',
 }

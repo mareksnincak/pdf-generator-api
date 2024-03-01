@@ -86,10 +86,19 @@ export function createLambdas({
     },
   });
 
+  const setDefaultUserPassword = new NodejsFunction(scope, Lambda.setDefaultUserPassword, {
+    ...getCommonNodeJsFunctionProps(Lambda.setDefaultUserPassword, cdkEnvVars),
+    handler: 'setDefaultUserPassword',
+    environment: {
+      ...envVars.get(Lambda.setDefaultUserPassword),
+    },
+  });
+
   return {
     getOpenApi,
     getUrlForTemplateUpload,
     createTemplate,
     deleteTemplate,
+    setDefaultUserPassword,
   };
 }

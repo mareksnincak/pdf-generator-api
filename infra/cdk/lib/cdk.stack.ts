@@ -41,7 +41,8 @@ export class CdkStack extends Stack {
       dynamoDbTable,
     });
 
-    const cognito = createCognito(this, id);
+    const cognito = createCognito({ scope: this, stackId: id, lambdas });
+    // const cognito = undefined;
 
     const api = createApi({ scope: this, lambdas, apiUrlSsmParamName });
 
@@ -52,6 +53,7 @@ export class CdkStack extends Stack {
       s3Bucket,
       apiUrlSsmParamName,
       dynamoDbTable,
+      cognito,
     });
 
     createOutputs({ scope: this, api, cognito });

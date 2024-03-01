@@ -1,17 +1,24 @@
-import { RemovalPolicy } from 'aws-cdk-lib';
+import { CustomResource, RemovalPolicy } from 'aws-cdk-lib';
 import { CfnUserPoolUser, UserPool, UserPoolClient, UserPoolDomain } from 'aws-cdk-lib/aws-cognito';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
-import {
-  AwsCustomResource,
-  AwsCustomResourcePolicy,
-  PhysicalResourceId,
-} from 'aws-cdk-lib/custom-resources';
+import { PhysicalResourceId, Provider } from 'aws-cdk-lib/custom-resources';
 import { type Construct } from 'constructs';
 
-export function createCognito(scope: Construct, stackId: string) {
+import { type createLambdas } from './lambdas';
+
+export function createCognito({
+  scope,
+  stackId,
+  lambdas,
+}: {
+  scope: Construct;
+  stackId: string;
+  lambdas: ReturnType<typeof createLambdas>;
+}) {
   const userPool = new UserPool(scope, 'user-pool', {
     userPoolName: stackId,
     selfSignUpEnabled: false,
+    removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
   });
 
   new UserPoolDomain(scope, 'user-pool-domain', {
@@ -44,39 +51,35 @@ export function createCognito(scope: Construct, stackId: string) {
     },
   });
 
-  new CfnUserPoolUser(scope, 'default-user', {
+  const user = new CfnUserPoolUser(scope, 'default-user', {
     userPoolId: userPool.userPoolId,
     username: defaultUserUsername,
     userAttributes: [
-      { name: 'email', value: 'default-user@example.com' },
+      { name: 'email', value: 'pdfgenerator.team@gmail.com' },
       { name: 'email_verified', value: 'true' },
     ],
     desiredDeliveryMediums: ['EMAIL'],
   });
 
-  new AwsCustomResource(scope, 'set-default-user-password', {
-    onCreate: {
-      service: 'CognitoIdentityServiceProvider',
-      action: 'adminSetUserPassword',
-      parameters: {
-        UserPoolId: userPool.userPoolId,
-        Username: defaultUserUsername,
-        Password: defaultUsersCredentialsSecret.secretValueFromJson('password').unsafeUnwrap(),
-        Permanent: true,
-      },
-      physicalResourceId: PhysicalResourceId.of('set-default-user-password'),
-    },
-    policy: AwsCustomResourcePolicy.fromSdkCalls({
-      resources: AwsCustomResourcePolicy.ANY_RESOURCE,
-    }),
+  const setDefaultUserPasswordProvider = new Provider(scope, 'set-default-user-password-provider', {
+    onEventHandler: lambdas.setDefaultUserPassword,
   });
 
-  // new CfnOutput(this, 'userPoolId', {
-  //   value: userPool.userPoolId,
-  // });
+  const setDefaultUserPasswordCustomResource = new CustomResource(
+    scope,
+    'set-default-user-password-custom-resource',
+    {
+      serviceToken: setDefaultUserPasswordProvider.serviceToken,
+      properties: {
+        physicalResourceId: PhysicalResourceId.of('set-default-user-password').id,
+        userCredentialsSecretName: defaultUsersCredentialsSecret.secretName,
+        userPoolId: userPool.userPoolId,
+      },
+    },
+  );
 
-  // new CfnOutput(this, 'userPoolClientId', {
-  //   value: userPoolClient.userPoolClientId,
-  // });
+  setDefaultUserPasswordCustomResource.node.addDependency(defaultUsersCredentialsSecret);
+  setDefaultUserPasswordCustomResource.node.addDependency(user);
+
   return { userPool, userPoolClient, defaultUsersCredentialsSecret };
 }

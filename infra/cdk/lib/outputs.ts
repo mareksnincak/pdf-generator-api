@@ -11,13 +11,15 @@ export function createOutputs({
 }: {
   scope: Construct;
   api: RestApi;
-  cognito: ReturnType<typeof createCognito>;
+  cognito?: ReturnType<typeof createCognito>;
 }) {
   new CfnOutput(scope, 'apiUrl', {
     value: api.url,
   });
 
-  new CfnOutput(scope, 'defaultUserCredentialsSecretName', {
-    value: cognito.defaultUsersCredentialsSecret.secretName,
-  });
+  if (cognito) {
+    new CfnOutput(scope, 'defaultUserCredentialsSecretName', {
+      value: cognito.defaultUsersCredentialsSecret.secretName,
+    });
+  }
 }

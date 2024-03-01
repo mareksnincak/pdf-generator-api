@@ -2,6 +2,7 @@ import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { type Bucket } from 'aws-cdk-lib/aws-s3';
 
+import { type createCognito } from './cognito';
 import { type createLambdas } from './lambdas';
 
 export function grantPermissions({
@@ -11,6 +12,7 @@ export function grantPermissions({
   s3Bucket,
   apiUrlSsmParamName,
   dynamoDbTable,
+  cognito,
 }: {
   region: string;
   account: string;
@@ -18,6 +20,7 @@ export function grantPermissions({
   s3Bucket: Bucket;
   apiUrlSsmParamName: string;
   dynamoDbTable: Table;
+  cognito: ReturnType<typeof createCognito>;
 }) {
   s3Bucket.grantPut(lambdas.getUrlForTemplateUpload);
   s3Bucket.grantReadWrite(lambdas.createTemplate);
@@ -34,4 +37,7 @@ export function grantPermissions({
 
   dynamoDbTable.grantWriteData(lambdas.createTemplate);
   dynamoDbTable.grantWriteData(lambdas.deleteTemplate);
+
+  cognito.defaultUsersCredentialsSecret.grantRead(lambdas.setDefaultUserPassword);
+  cognito.userPool.grant(lambdas.setDefaultUserPassword, 'cognito-idp:AdminSetUserPassword');
 }
