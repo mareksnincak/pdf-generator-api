@@ -82,17 +82,9 @@ npm run test:it
 Contain tests running against real resources using real app API. Nothing is mocked in this case.
 They are located in `tests/e2e` folder and use `.e2e.test.ts` suffix.
 
-To run against local app:
+As they use multiple AWS resources, they can be run only against deployed app.
 
-```bash
-# first terminal
-npm run start
-
-# second terminal
-npm run test:e2e
-```
-
-To run against deployed app:
+To run:
 
 ```bash
 E2E_BASE_URL=$DEPLOYED_ENV_URL \
@@ -116,4 +108,4 @@ Simplest way to run single test only is to use [Jest Runner VS Code](https://mar
   # npm run it-infra:down
   ```
 
-- E2e tests need either locally running app or [deployed app credentials set](#e2e-tests).
+- E2e tests need deployed app [env variables setup](#e2e-tests).
