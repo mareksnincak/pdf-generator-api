@@ -10,16 +10,14 @@ import { type TemplateType } from './template.enum';
 import { type Template, type StoredTemplate } from './template.type';
 
 export class TemplateEntity extends BaseEntity {
-  constructor({ id = randomUUID(), name, type, s3Key }: Optional<Template, 'id'>) {
-    super({
-      PK: `TEMPLATE#${id}`,
-      SK: '#',
-    });
+  constructor({ id = randomUUID(), name, type, s3Key, userId }: Optional<Template, 'id'>) {
+    super(TemplateEntity.getPartitionKey({ id, userId }));
 
     this.id = id;
     this.name = name;
     this.type = type;
     this.s3Key = s3Key;
+    this.userId = userId;
   }
 
   public id: string;
@@ -30,6 +28,8 @@ export class TemplateEntity extends BaseEntity {
 
   public s3Key: string;
 
+  public userId: string;
+
   async toDynamoItem(): Promise<Record<string, AttributeValue>> {
     const item: StoredTemplate = {
       ...this.primaryKey,
@@ -37,6 +37,7 @@ export class TemplateEntity extends BaseEntity {
       name: this.name,
       type: this.type,
       s3Key: this.s3Key,
+      userId: this.userId,
     };
 
     const result = marshall(item, {
@@ -52,10 +53,14 @@ export class TemplateEntity extends BaseEntity {
     return new TemplateEntity(rawTemplate);
   }
 
-  public static getDynamoPartitionKey({ id }: { id: string }) {
-    return marshall({
-      PK: `TEMPLATE#${id}`,
+  public static getPartitionKey({ id, userId }: { id: string; userId: string }) {
+    return {
+      PK: `TEMPLATE#${userId}#${id}`,
       SK: '#',
-    });
+    };
+  }
+
+  public static getDynamoPartitionKey({ id, userId }: { id: string; userId: string }) {
+    return marshall(this.getPartitionKey({ id, userId }));
   }
 }

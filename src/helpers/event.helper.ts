@@ -8,9 +8,7 @@ export function getUserIdFromEvent(
   return event.requestContext?.authorizer?.claims?.sub;
 }
 
-export function getUserIdFromEventOrFail(
-  event: PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent> | PartialDeep<APIGatewayEvent>,
-) {
+export function getUserIdFromEventOrFail(event: APIGatewayProxyWithCognitoAuthorizerEvent) {
   const userId = getUserIdFromEvent(event);
 
   if (!userId) {
