@@ -14,7 +14,7 @@ import { type Construct } from 'constructs';
 import { type SetDefaultUserPasswordResourceCustomProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
 import {
   AuthorizationScope,
-  PdfGeneratorAuthorizationScope,
+  PdfGeneratorCustomAuthorizationScope,
   ResourceServerIdentifier,
 } from '../enums/authorization.enum';
 
@@ -110,7 +110,7 @@ export function createCognito({
     identifier: ResourceServerIdentifier.pdfGenerator,
     scopes: [
       {
-        scopeName: PdfGeneratorAuthorizationScope.templateWrite,
+        scopeName: PdfGeneratorCustomAuthorizationScope.templateWrite,
         scopeDescription: 'Modify templates',
       },
     ],
@@ -126,7 +126,10 @@ export function createCognito({
     },
     preventUserExistenceErrors: true,
     oAuth: {
-      scopes: [OAuthScope.custom(AuthorizationScope.pdfGeneratorTemplateWrite)],
+      scopes: [
+        OAuthScope.COGNITO_ADMIN,
+        OAuthScope.custom(AuthorizationScope.pdfGeneratorTemplateWrite),
+      ],
     },
   });
 
