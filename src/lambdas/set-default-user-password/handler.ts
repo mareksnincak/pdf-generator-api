@@ -17,6 +17,7 @@ import {
   type SetDefaultUserPasswordResourceProperties,
   type SetDefaultUserPasswordResourceCustomProperties,
 } from './types/properties.type';
+import { type UserCredentialsSecret } from './types/secret.type';
 
 const cognitoIdentityProviderClient = new CognitoIdentityProviderClient();
 
@@ -27,7 +28,7 @@ async function onCreate({
   logger.info('setDefaultUserPassword.onCreate');
 
   const rawUserCredentials = await getSecret(userCredentialsSecretName);
-  const userCredentials = JSON.parse(rawUserCredentials) as { username: string; password: string };
+  const userCredentials = JSON.parse(rawUserCredentials) as UserCredentialsSecret;
 
   await cognitoIdentityProviderClient.send(
     new AdminSetUserPasswordCommand({

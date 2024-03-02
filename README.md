@@ -95,7 +95,11 @@ npm run test:e2e
 To run against deployed app:
 
 ```bash
-E2E_BASE_URL=$DEPLOYED_ENV_URL npm run test:e2e
+E2E_BASE_URL=$DEPLOYED_ENV_URL \
+E2E_AUTH_USER_POOL_ID=$USER_POOL_ID \
+E2E_AUTH_USER_POOL_CLIENT_ID=$USER_POOL_CLIENT_ID \
+E2E_AUTH_USER_CREDENTIALS_SECRET_NAME=$USER_CREDENTIALS_SECRET_NAME \
+npm run test:e2e
 ```
 
 ### Running single test only
@@ -112,4 +116,4 @@ Simplest way to run single test only is to use [Jest Runner VS Code](https://mar
   # npm run it-infra:down
   ```
 
-- E2e tests need either locally running app or `E2E_BASE_URL` set
+- E2e tests need either locally running app or [deployed app credentials set](#e2e-tests).

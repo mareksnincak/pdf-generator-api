@@ -4,27 +4,40 @@ import {
   CognitoIdentityProviderClient,
 } from '@aws-sdk/client-cognito-identity-provider';
 
+import { getSecret } from '../../../src/helpers/secret-manager.helper';
+import { type UserCredentialsSecret } from '../../../src/lambdas/set-default-user-password/types/secret.type';
+
 export async function getAccessToken(isLocalhost: boolean) {
   if (isLocalhost) {
     return '';
   }
 
-  const { E2E_AUTH_USER_POOL_ID, E2E_AUTH_CLIENT_ID, E2E_AUTH_USERNAME, E2E_AUTH_PASSWORD } =
-    process.env;
+  const {
+    E2E_AUTH_USER_POOL_ID,
+    E2E_AUTH_USER_POOL_CLIENT_ID,
+    E2E_AUTH_USER_CREDENTIALS_SECRET_NAME,
+  } = process.env;
 
-  if (!E2E_AUTH_USER_POOL_ID || !E2E_AUTH_CLIENT_ID || !E2E_AUTH_USERNAME || !E2E_AUTH_PASSWORD) {
+  if (
+    !E2E_AUTH_USER_POOL_ID ||
+    !E2E_AUTH_USER_POOL_CLIENT_ID ||
+    !E2E_AUTH_USER_CREDENTIALS_SECRET_NAME
+  ) {
     throw new Error('e2eSetupHelper.getAccessToken.missingEnvVariables');
   }
+
+  const rawCredentials = await getSecret(E2E_AUTH_USER_CREDENTIALS_SECRET_NAME);
+  const credentials = JSON.parse(rawCredentials) as UserCredentialsSecret;
 
   const client = new CognitoIdentityProviderClient();
   const response = await client.send(
     new AdminInitiateAuthCommand({
       UserPoolId: E2E_AUTH_USER_POOL_ID,
-      ClientId: E2E_AUTH_CLIENT_ID,
+      ClientId: E2E_AUTH_USER_POOL_CLIENT_ID,
       AuthFlow: AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
       AuthParameters: {
-        USERNAME: E2E_AUTH_USERNAME,
-        PASSWORD: E2E_AUTH_PASSWORD,
+        USERNAME: credentials.username,
+        PASSWORD: credentials.password,
       },
     }),
   );
