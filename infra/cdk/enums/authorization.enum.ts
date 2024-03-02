@@ -7,5 +7,5 @@ export enum ResourceServerIdentifier {
 }
 
 export enum AuthorizationScope {
-  templateWrite = `${ResourceServerIdentifier.pdfGenerator}/${PdfGeneratorAuthorizationScope.templateWrite}`,
+  pdfGeneratorTemplateWrite = `${ResourceServerIdentifier.pdfGenerator}/${PdfGeneratorAuthorizationScope.templateWrite}`,
 }

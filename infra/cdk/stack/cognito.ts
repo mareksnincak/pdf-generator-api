@@ -1,6 +1,7 @@
 import { CustomResource, RemovalPolicy } from 'aws-cdk-lib';
 import {
   CfnUserPoolUser,
+  OAuthScope,
   UserPool,
   UserPoolClient,
   UserPoolDomain,
@@ -12,6 +13,7 @@ import { type Construct } from 'constructs';
 
 import { type SetDefaultUserPasswordResourceCustomProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
 import {
+  AuthorizationScope,
   PdfGeneratorAuthorizationScope,
   ResourceServerIdentifier,
 } from '../enums/authorization.enum';
@@ -123,6 +125,9 @@ export function createCognito({
       adminUserPassword: true,
     },
     preventUserExistenceErrors: true,
+    oAuth: {
+      scopes: [OAuthScope.custom(AuthorizationScope.pdfGeneratorTemplateWrite)],
+    },
   });
 
   const { defaultUsersCredentialsSecret } = createDefaultUser({
