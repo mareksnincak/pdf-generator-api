@@ -1,7 +1,5 @@
 import { randomUUID } from 'node:crypto';
 
-import { PutObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import type {
   APIGatewayProxyResult,
   APIGatewayProxyWithCognitoAuthorizerEvent,
@@ -11,7 +9,7 @@ import type {
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { getS3Client } from '../../helpers/s3.helper';
+import { getPresignedUploadUrl } from '../../helpers/s3.helper';
 import { validateQueryParams } from '../../helpers/validation.helper';
 
 import { getUrlForTemplateUploadRequestDto } from './dtos/request.dto';
@@ -24,17 +22,18 @@ async function createPresignedUrl({
   fileSizeBytes: number;
   userId: string;
 }) {
-  const uploadId = randomUUID();
+  const bucket = process.env.S3_BUCKET;
+  if (!bucket) {
+    throw new Error('getUrlForTemplateUpload.createPresignedUrl.missingBucket');
+  }
 
-  const command = new PutObjectCommand({
-    Bucket: process.env.S3_BUCKET,
-    Key: `${userId}/templates/uploads/${uploadId}`,
-    ContentLength: fileSizeBytes,
+  const uploadId = randomUUID();
+  const url = await getPresignedUploadUrl({
+    bucket,
+    key: `${userId}/templates/uploads/${uploadId}`,
+    fileSizeBytes,
   });
 
-  const s3Client = getS3Client();
-
-  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
   return { url, uploadId };
 }
 

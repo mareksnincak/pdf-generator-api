@@ -2,6 +2,7 @@ import {
   CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
+  PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
@@ -60,6 +61,7 @@ export async function moveObject({
   await deleteObject({ bucket: sourceBucket, key: sourceKey });
 }
 
+// TODO tests
 export async function getPresignedShareUrl({ bucket, key }: { bucket: string; key: string }) {
   const client = getS3Client();
 
@@ -68,5 +70,27 @@ export async function getPresignedShareUrl({ bucket, key }: { bucket: string; ke
     Key: key,
   });
 
-  return await getSignedUrl(client, command);
+  return await getSignedUrl(client, command, { expiresIn: 3600 });
+}
+
+export async function getPresignedUploadUrl({
+  bucket,
+  key,
+  fileSizeBytes,
+}: {
+  bucket: string;
+  key: string;
+  fileSizeBytes: number;
+}) {
+  const client = getS3Client();
+
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    ContentLength: fileSizeBytes,
+  });
+
+  return await getSignedUrl(client, command, {
+    expiresIn: 3600,
+  });
 }
