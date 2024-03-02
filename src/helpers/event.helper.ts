@@ -3,7 +3,6 @@ import { type PartialDeep } from 'type-fest';
 
 import { LOCAL_USER_ID } from '../constants/user.constant';
 
-// TODO tests
 export function getUserIdFromEvent(
   event: PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent> | PartialDeep<APIGatewayEvent>,
 ): string | undefined {
