@@ -14,4 +14,14 @@ describe('generateOpenApi', () => {
 
     expect(result.servers).toEqual([{ url: apiUrl }]);
   });
+
+  it('should use authUrl when it is provided', async () => {
+    const authUrl = 'https://auth.example.com';
+    const result = generateOpenApi({ authUrl });
+
+    expect(result.components?.securitySchemes).toHaveProperty(
+      'oauth2Auth.flows.implicit.authorizationUrl',
+      authUrl,
+    );
+  });
 });
