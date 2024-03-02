@@ -20,10 +20,14 @@ afterEach(() => {
 
 describe('getOpenApi', () => {
   it('should return open-api', async () => {
-    const ssmParamValue = 'http://custom.example.com/path';
+    const ssmParamValue = {
+      apiUrl: 'http://api.example.com/path',
+      authUrl: 'http://auth.example.com/path',
+    };
+
     const ssmClientSpy = jest.spyOn(SSMClient.prototype, 'send').mockImplementation(() => ({
       Parameter: {
-        Value: ssmParamValue,
+        Value: JSON.stringify(ssmParamValue),
       },
     }));
 
@@ -33,10 +37,14 @@ describe('getOpenApi', () => {
 
     const body = JSON.parse(result.body);
     expect(body).toHaveProperty('openapi', '3.0.0');
-    expect(body).toHaveProperty('servers', [{ url: ssmParamValue }]);
+    expect(body).toHaveProperty('servers', [{ url: ssmParamValue.apiUrl }]);
+    expect(body).toHaveProperty(
+      'components.securitySchemes.oauth2Auth.flows.implicit.authorizationUrl',
+      ssmParamValue.authUrl,
+    );
 
     expect(ssmClientSpy.mock.lastCall?.[0].input).toEqual({
-      Name: 'pdf-generator-api-api-url-it-test',
+      Name: 'sample-open-api-ssm-param-name',
     });
   });
 });

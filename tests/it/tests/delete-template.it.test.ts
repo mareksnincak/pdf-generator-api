@@ -11,6 +11,7 @@ import { deleteTemplate } from '../../../src/lambdas/delete-template/handler';
 import { DeleteTemplateRequestMockFactory } from '../../../src/lambdas/delete-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
+import { mockAwsCredentials } from '../helpers/credential.helper';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
 
 const requestMockFactory = new DeleteTemplateRequestMockFactory();
@@ -20,6 +21,7 @@ const context = new ContextMockFactory().create();
 
 beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.deleteTemplate);
+  mockAwsCredentials();
 });
 
 beforeEach(async () => {
@@ -49,9 +51,9 @@ describe('deleteTemplate', () => {
     const templateAfterDeletion = await findById(templateEntity.id);
     expect(templateAfterDeletion).toEqual(null);
 
-    const s3DeleteSpy = s3ClientSpy.mock.calls[0][0];
-    expect(s3DeleteSpy).toBeInstanceOf(DeleteObjectCommand);
-    expect(s3DeleteSpy.input).toEqual({
+    const s3ClientArgs = s3ClientSpy.mock.calls[0][0];
+    expect(s3ClientArgs).toBeInstanceOf(DeleteObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
       Key: templateEntity.s3Key,
     });

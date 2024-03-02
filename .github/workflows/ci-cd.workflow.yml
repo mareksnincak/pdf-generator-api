@@ -79,4 +79,15 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: cdk-output
-      - run: export E2E_BASE_URL=$(jq -r '.[].apiUrl' ./cdk.output.json) && npm run test:e2e
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'eu-central-1'
+      - name: npm run test:e2e
+        run: |
+          E2E_BASE_URL=$(jq -r '.[].apiUrl' ./cdk.output.json) \
+          E2E_AUTH_USER_POOL_ID=$(jq -r '.[].userPoolId' ./cdk.output.json) \
+          E2E_AUTH_USER_POOL_CLIENT_ID=$(jq -r '.[].userPoolClientId' ./cdk.output.json) \
+          E2E_AUTH_USER_CREDENTIALS_SECRET_NAME=$(jq -r '.[].defaultUserCredentialsSecretName' ./cdk.output.json) \
+          npm run test:e2e

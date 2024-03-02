@@ -2,6 +2,7 @@ import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { type Bucket } from 'aws-cdk-lib/aws-s3';
 
+import { type createCognito } from './cognito';
 import { type createLambdas } from './lambdas';
 
 export function grantPermissions({
@@ -9,15 +10,17 @@ export function grantPermissions({
   account,
   lambdas,
   s3Bucket,
-  apiUrlSsmParamName,
+  openApiParamsSsmParamName,
   dynamoDbTable,
+  cognito,
 }: {
   region: string;
   account: string;
   lambdas: ReturnType<typeof createLambdas>;
   s3Bucket: Bucket;
-  apiUrlSsmParamName: string;
+  openApiParamsSsmParamName: string;
   dynamoDbTable: Table;
+  cognito: ReturnType<typeof createCognito>;
 }) {
   s3Bucket.grantPut(lambdas.getUrlForTemplateUpload);
   s3Bucket.grantReadWrite(lambdas.createTemplate);
@@ -27,11 +30,14 @@ export function grantPermissions({
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(
     new PolicyStatement({
-      resources: [`arn:aws:ssm:${region}:${account}:parameter/${apiUrlSsmParamName}`],
+      resources: [`arn:aws:ssm:${region}:${account}:parameter/${openApiParamsSsmParamName}`],
       actions: ['ssm:GetParameter'],
     }),
   );
 
   dynamoDbTable.grantWriteData(lambdas.createTemplate);
   dynamoDbTable.grantWriteData(lambdas.deleteTemplate);
+
+  cognito.defaultUsersCredentialsSecret.grantRead(lambdas.setDefaultUserPassword);
+  cognito.userPool.grant(lambdas.setDefaultUserPassword, 'cognito-idp:AdminSetUserPassword');
 }

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { type Lambda } from '../../infra/cdk/enums/lambda.enum';
+import { Lambda } from '../../infra/cdk/enums/lambda.enum';
 import { type EnvironmentName } from '../enums/config.enum';
 import { type EnvVars } from '../types/env.type';
 
@@ -17,7 +17,12 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
 
   envVars.set('global', config.global);
 
-  for (const [lambdaName, lambdaConfig] of Object.entries(config.lambda)) {
+  for (const lambdaName of Object.values(Lambda)) {
+    const lambdaConfig = config.lambda[lambdaName];
+    if (!lambdaConfig) {
+      throw new Error(`configHelper.missingLambdaConfig.${lambdaName}`);
+    }
+
     const fullConfig = {
       ...config.global,
       ...lambdaConfig,

@@ -2,13 +2,19 @@ import request from 'supertest';
 
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
-import { getE2eBaseUrl } from '../helpers/setup.helper';
+import { getE2eSetup } from '../helpers/setup.helper';
 
-const baseUrl = getE2eBaseUrl();
+let baseUrl: string;
+let accessToken: string;
 
 const createTemplateRequestMockFactory = new CreateTemplateRequestMockFactory();
-
 let templateId: string | null = null;
+
+beforeAll(async () => {
+  const e2eSetup = await getE2eSetup();
+  baseUrl = e2eSetup.baseUrl;
+  accessToken = e2eSetup.accessToken;
+});
 
 afterAll(async () => {
   if (templateId) {
@@ -30,6 +36,7 @@ describe('Template', () => {
       .query({
         fileSizeBytes: String(templateData.length),
       })
+      .auth(accessToken, { type: 'bearer' })
       .expect(200);
 
     expect(getUrlForTemplateUploadResponse).toHaveProperty('uploadId');
@@ -49,6 +56,7 @@ describe('Template', () => {
           uploadId,
         }),
       )
+      .auth(accessToken, { type: 'bearer' })
       .expect(200);
 
     expect(createTemplateResponse).toHaveProperty('id');
@@ -57,7 +65,12 @@ describe('Template', () => {
 
   it('should delete template', async () => {
     expect(templateId).toBeDefined();
-    await request(baseUrl).delete(`/templates/${templateId}`).expect(204);
+
+    await request(baseUrl)
+      .delete(`/templates/${templateId}`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(204);
+
     templateId = null;
   });
 });

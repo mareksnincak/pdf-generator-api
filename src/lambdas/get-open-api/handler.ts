@@ -1,26 +1,26 @@
-import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { handleError } from '../../helpers/error.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { generateOpenApi } from '../../open-api/generate-open-api.helper';
+import { getSsmParam } from '../../helpers/ssm.helper';
+import { generateOpenApi } from '../../open-api/generate-open-api.schema';
+
+import { type OpenApiParamsSsmParam } from './types/input.type';
 
 let openApiDocument: ReturnType<typeof generateOpenApi>;
-const ssmClient = new SSMClient();
 
 async function getOpenApiDocument() {
-  const ssmParamName = process.env.API_URL_SSM_PARAM_NAME;
+  const ssmParamName = process.env.OPEN_API_SSM_PARAM_NAME;
+  if (!ssmParamName) {
+    throw new Error('getOpenApi.getOpenApiDocument.missingSsmParamName');
+  }
 
-  logger.debug(ssmParamName, 'getOpenApi.getOpenApiDocument.ssmParamName');
-  const apiUrlSsmParam = await ssmClient.send(
-    new GetParameterCommand({
-      Name: ssmParamName,
-    }),
-  );
+  const value = await getSsmParam(ssmParamName);
 
-  const apiUrl = apiUrlSsmParam.Parameter?.Value;
-  logger.debug(apiUrl, 'getOpenApi.getOpenApiDocument.apiUrl');
-  return generateOpenApi(apiUrl);
+  const openApiParams = JSON.parse(value) as OpenApiParamsSsmParam;
+
+  logger.debug(openApiParams, 'getOpenApi.getOpenApiDocument.openApiParams');
+  return generateOpenApi(openApiParams);
 }
 
 export async function getOpenApi(

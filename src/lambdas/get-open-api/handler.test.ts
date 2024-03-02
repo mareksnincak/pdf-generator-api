@@ -1,11 +1,10 @@
-import { SSMClient } from '@aws-sdk/client-ssm';
-
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import * as ssmHelper from '../../helpers/ssm.helper';
 import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
-import * as generateOpenApiHelper from '../../open-api/generate-open-api.helper';
+import * as generateOpenApiHelper from '../../open-api/generate-open-api.schema';
 
 import { getOpenApi } from './handler';
 
@@ -18,12 +17,12 @@ beforeAll(() => {
 
 describe('getOpenApi', () => {
   it('should return open-api', async () => {
-    const ssmParamValue = 'customSsmParamValue';
-    jest.spyOn(SSMClient.prototype, 'send').mockImplementation(() => ({
-      Parameter: {
-        Value: ssmParamValue,
-      },
-    }));
+    const ssmParamValue = {
+      apiUrl: 'sample-api-url',
+      authUrl: 'sample-auth-url',
+    };
+
+    jest.spyOn(ssmHelper, 'getSsmParam').mockResolvedValue(JSON.stringify(ssmParamValue));
 
     const openApi = {
       openapi: '3.0.0',

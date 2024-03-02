@@ -1,16 +1,17 @@
-import { Stack } from 'aws-cdk-lib';
+import { RemovalPolicy, Stack } from 'aws-cdk-lib';
 import type { StackProps } from 'aws-cdk-lib';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import type { Construct } from 'constructs';
 
 import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 
 import { createApi } from './api';
+import { createCognito } from './cognito';
 import { createDynamoDbTable } from './dynamo';
 import { createLambdas } from './lambdas';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
+import { createStringParameters } from './ssm-parameters';
 
 export class CdkStack extends Stack {
   constructor({
@@ -26,25 +27,30 @@ export class CdkStack extends Stack {
   }) {
     super(scope, id, props);
 
-    const dynamoDbTable = createDynamoDbTable(this, id);
-    const s3Bucket = createS3Bucket(this, id);
+    const removalPolicy = cdkEnvVars.RETAIN_STATEFUL_RESOURCES
+      ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
+      : RemovalPolicy.DESTROY;
+
+    const dynamoDbTable = createDynamoDbTable({ scope: this, stackId: id, removalPolicy });
+    const s3Bucket = createS3Bucket({ scope: this, stackId: id, removalPolicy });
 
     const s3BucketName = s3Bucket.bucketName;
-    const apiUrlSsmParamName = `${id}-api-url`;
+    const openApiParamsSsmParamName = `${id}-open-api-params`;
 
     const lambdas = createLambdas({
       scope: this,
       s3BucketName,
-      apiUrlSsmParamName,
+      openApiParamsSsmParamName,
       cdkEnvVars,
       dynamoDbTable,
     });
 
-    const api = createApi({ scope: this, lambdas });
+    const cognito = createCognito({ scope: this, stackId: id, lambdas, removalPolicy });
 
-    new StringParameter(this, 'api-url', {
-      parameterName: apiUrlSsmParamName,
-      stringValue: api.url,
+    const api = createApi({
+      scope: this,
+      lambdas,
+      cognito,
     });
 
     grantPermissions({
@@ -52,10 +58,18 @@ export class CdkStack extends Stack {
       account: this.account,
       lambdas,
       s3Bucket,
-      apiUrlSsmParamName,
+      openApiParamsSsmParamName,
       dynamoDbTable,
+      cognito,
     });
 
-    createOutputs({ scope: this, api });
+    createStringParameters({
+      scope: this,
+      api,
+      openApiParamsSsmParamName,
+      cognito,
+    });
+
+    createOutputs({ scope: this, api, cognito });
   }
 }

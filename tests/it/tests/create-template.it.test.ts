@@ -14,6 +14,7 @@ import { createTemplate } from '../../../src/lambdas/create-template/handler';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
+import { mockAwsCredentials } from '../helpers/credential.helper';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
 
 jest.mock('node:crypto', () => {
@@ -29,6 +30,7 @@ const context = new ContextMockFactory().create();
 
 beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.createTemplate);
+  mockAwsCredentials();
 });
 
 beforeEach(async () => {

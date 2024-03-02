@@ -36,13 +36,13 @@ function getCommonNodeJsFunctionProps(lambda: Lambda, cdkEnvVars: CdkEnvVarsDto)
 export function createLambdas({
   scope,
   cdkEnvVars,
-  apiUrlSsmParamName,
+  openApiParamsSsmParamName,
   s3BucketName,
   dynamoDbTable,
 }: {
   scope: Construct;
   cdkEnvVars: CdkEnvVarsDto;
-  apiUrlSsmParamName: string;
+  openApiParamsSsmParamName: string;
   s3BucketName: string;
   dynamoDbTable: Table;
 }) {
@@ -52,7 +52,7 @@ export function createLambdas({
     ...getCommonNodeJsFunctionProps(Lambda.getOpenApi, cdkEnvVars),
     handler: 'getOpenApi',
     environment: {
-      API_URL_SSM_PARAM_NAME: apiUrlSsmParamName,
+      OPEN_API_SSM_PARAM_NAME: openApiParamsSsmParamName,
       ...envVars.get(Lambda.getOpenApi),
     },
   });
@@ -86,10 +86,19 @@ export function createLambdas({
     },
   });
 
+  const setDefaultUserPassword = new NodejsFunction(scope, Lambda.setDefaultUserPassword, {
+    ...getCommonNodeJsFunctionProps(Lambda.setDefaultUserPassword, cdkEnvVars),
+    handler: 'setDefaultUserPassword',
+    environment: {
+      ...envVars.get(Lambda.setDefaultUserPassword),
+    },
+  });
+
   return {
     getOpenApi,
     getUrlForTemplateUpload,
     createTemplate,
     deleteTemplate,
+    setDefaultUserPassword,
   };
 }

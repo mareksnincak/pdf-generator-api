@@ -4,7 +4,7 @@ import * as packageJson from '../../package.json';
 import { validate } from '../../src/helpers/validation.helper';
 
 import { cdkEnvVarsDto } from './dtos/cdk-env-vars.dto';
-import { CdkStack } from './lib/cdk.stack';
+import { CdkStack } from './stack';
 
 const app = new App();
 
