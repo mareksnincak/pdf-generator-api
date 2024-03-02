@@ -26,7 +26,7 @@ async function onCreate({
 }: SetDefaultUserPasswordResourceCustomProperties) {
   logger.info('setDefaultUserPassword.onCreate');
 
-  const rawUserCredentials = await getSecret({ secretId: userCredentialsSecretName });
+  const rawUserCredentials = await getSecret(userCredentialsSecretName);
   const userCredentials = JSON.parse(rawUserCredentials) as { username: string; password: string };
 
   await cognitoIdentityProviderClient.send(

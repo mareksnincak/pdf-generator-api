@@ -12,7 +12,7 @@ export function getSecretManagerClient() {
   return secretManagerClient;
 }
 
-export async function getSecret({ secretId }: { secretId: string }): Promise<string> {
+export async function getSecret(secretId: string): Promise<string> {
   logger.info({ secretId }, 'secretManagerHelper.getSecret.input');
 
   const command = new GetSecretValueCommand({ SecretId: secretId });

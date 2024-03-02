@@ -15,7 +15,7 @@ async function getOpenApiDocument() {
     throw new Error('getOpenApi.getOpenApiDocument.missingSsmParamName');
   }
 
-  const value = await getSsmParam({ name: ssmParamName });
+  const value = await getSsmParam(ssmParamName);
 
   const openApiParams = JSON.parse(value) as OpenApiParamsSsmParam;
 

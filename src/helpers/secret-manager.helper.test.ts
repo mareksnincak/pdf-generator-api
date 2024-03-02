@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 describe('getSecret', () => {
-  it('should return secret', async () => {
+  it('should return secret value', async () => {
     const secretId = 'sample-secret';
     const secretValue = 'sample-value';
 
@@ -16,7 +16,7 @@ describe('getSecret', () => {
       .spyOn(SecretsManagerClient.prototype, 'send')
       .mockImplementation(() => ({ SecretString: secretValue }));
 
-    const secret = await getSecret({ secretId });
+    const secret = await getSecret(secretId);
 
     expect(secret).toEqual(secretValue);
 
@@ -37,7 +37,8 @@ describe('getSecret', () => {
       .mockImplementation(() => ({ SecretString: secretValue }));
 
     try {
-      await getSecret({ secretId });
+      await getSecret(secretId);
+      expect(true).toEqual(false);
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
       expect((error as Error).message).toEqual('secretManagerHelper.getSecret.undefinedValue');
