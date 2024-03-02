@@ -1,4 +1,10 @@
-import { CopyObjectCommand, DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 let s3Client: S3Client | undefined;
 
@@ -52,4 +58,15 @@ export async function moveObject({
 }) {
   await copyObject({ sourceBucket, sourceKey, destinationBucket, destinationKey });
   await deleteObject({ bucket: sourceBucket, key: sourceKey });
+}
+
+export async function getPresignedShareUrl({ bucket, key }: { bucket: string; key: string }) {
+  const client = getS3Client();
+
+  const command = new GetObjectCommand({
+    Bucket: bucket,
+    Key: key,
+  });
+
+  return await getSignedUrl(client, command);
 }

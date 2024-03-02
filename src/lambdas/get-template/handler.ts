@@ -34,13 +34,13 @@ export async function getTemplate(
     const userId = getUserIdFromEventOrFail(event);
     const template = await getByIdOrFail({ id, userId });
 
-    const response: GetTemplateResponseDto = template.toPublicJson();
-    logger.info('deleteTemplate.success');
+    const response: GetTemplateResponseDto = await template.toPublicJsonWithData();
+    logger.info('getTemplate.success');
     return {
       statusCode: 200,
       body: JSON.stringify(response),
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'deleteTemplate' });
+    return handleError({ error, logPrefix: 'getTemplate' });
   }
 }

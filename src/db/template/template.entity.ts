@@ -4,6 +4,7 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type Optional } from 'utility-types';
 
+import { getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
 
 import { type TemplateType } from './template.enum';
@@ -69,6 +70,24 @@ export class TemplateEntity extends BaseEntity {
       id: this.id,
       name: this.name,
       type: this.type,
+    };
+  }
+
+  public async toPublicJsonWithData() {
+    const bucket = process.env.S3_BUCKET;
+
+    if (!bucket) {
+      throw new Error('templateEntity.toPublicJsonWithData.missingBucket');
+    }
+
+    const dataUrl = await getPresignedShareUrl({
+      bucket,
+      key: this.s3Key,
+    });
+
+    return {
+      ...this.toPublicJson(),
+      dataUrl,
     };
   }
 }
