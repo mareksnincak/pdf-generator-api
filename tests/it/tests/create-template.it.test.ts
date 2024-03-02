@@ -82,7 +82,7 @@ describe('createTemplate', () => {
     });
 
     const { id } = body;
-    const createdTemplate = await templateRepository.getById({ id, userId });
+    const createdTemplate = await templateRepository.getByIdOrFail({ id, userId });
     expect(createdTemplate).toEqual({
       PK: `TEMPLATE#${userId}#${id}`,
       SK: '#',

@@ -4,6 +4,7 @@ import { AuthorizationScope } from '../../infra/cdk/enums/authorization.enum';
 import * as packageJson from '../../package.json';
 import { createTemplateRoute } from '../lambdas/create-template/open-api/open-api.route';
 import { deleteTemplateRoute } from '../lambdas/delete-template/open-api/open-api.route';
+import { getTemplateRoute } from '../lambdas/get-template/open-api/open-api.route';
 import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/open-api.route';
 
 export function generateOpenApi({
@@ -16,6 +17,7 @@ export function generateOpenApi({
   const registry = new OpenAPIRegistry();
 
   registry.registerPath(createTemplateRoute);
+  registry.registerPath(getTemplateRoute);
   registry.registerPath(deleteTemplateRoute);
   registry.registerPath(getUrlForTemplateUploadRoute);
 
@@ -25,6 +27,7 @@ export function generateOpenApi({
       implicit: {
         authorizationUrl: authUrl,
         scopes: {
+          [AuthorizationScope.pdfGeneratorReadTemplates]: 'Read templates.',
           [AuthorizationScope.pdfGeneratorWriteTemplates]: 'Modify templates.',
         },
       },
@@ -43,7 +46,10 @@ export function generateOpenApi({
     servers: [{ url: apiUrl }],
     security: [
       {
-        [oauth2Auth.name]: [AuthorizationScope.pdfGeneratorWriteTemplates],
+        [oauth2Auth.name]: [
+          AuthorizationScope.pdfGeneratorReadTemplates,
+          AuthorizationScope.pdfGeneratorWriteTemplates,
+        ],
       },
     ],
   });

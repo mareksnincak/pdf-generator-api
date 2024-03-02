@@ -56,6 +56,12 @@ export function createApi({
   });
 
   const templateByIdResource = templatesResource.addResource('{id}');
+
+  templateByIdResource.addMethod('GET', new LambdaIntegration(lambdas.getTemplate), {
+    ...commonAuthorizationOptions,
+    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorReadTemplates],
+  });
+
   templateByIdResource.addMethod('DELETE', new LambdaIntegration(lambdas.deleteTemplate), {
     ...commonAuthorizationOptions,
     authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorWriteTemplates],

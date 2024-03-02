@@ -6,7 +6,7 @@ import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import { createOrReplace, getById } from '../../../src/db/template/template.repository';
+import { createOrReplace, getByIdOrFail } from '../../../src/db/template/template.repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { deleteTemplate } from '../../../src/lambdas/delete-template/handler';
@@ -57,7 +57,7 @@ describe('deleteTemplate', () => {
     expect(result.statusCode).toEqual(204);
     expect(result.body).toEqual('');
 
-    const templateAfterDeletion = await getById({ id: templateEntity.id, userId });
+    const templateAfterDeletion = await getByIdOrFail({ id: templateEntity.id, userId });
     expect(templateAfterDeletion).toEqual(null);
 
     const s3ClientArgs = s3ClientSpy.mock.calls[0][0];

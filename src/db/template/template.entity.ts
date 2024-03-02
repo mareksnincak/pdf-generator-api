@@ -63,4 +63,12 @@ export class TemplateEntity extends BaseEntity {
   public static getDynamoPartitionKey({ id, userId }: { id: string; userId: string }) {
     return marshall(this.getPartitionKey({ id, userId }));
   }
+
+  public toPublicJson() {
+    return {
+      id: this.id,
+      name: this.name,
+      type: this.type,
+    };
+  }
 }

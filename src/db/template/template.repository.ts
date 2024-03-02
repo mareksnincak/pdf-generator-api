@@ -25,7 +25,7 @@ export async function createOrReplace(template: Optional<Template, 'id'>) {
   return templateEntity;
 }
 
-export async function getById(params: { id: string; userId: string }) {
+export async function getByIdOrFail(params: { id: string; userId: string }) {
   logger.info(params, 'templateRepository.getById');
 
   const command = new GetItemCommand({
@@ -35,8 +35,9 @@ export async function getById(params: { id: string; userId: string }) {
 
   const { Item } = await getDynamoDbClient().send(command);
   if (!Item) {
-    logger.info('templateRepository.getById.notFound');
-    return null;
+    throw new NotFoundError({
+      message: ErrorMessage.templateNotFound,
+    });
   }
 
   const template = await TemplateEntity.fromDynamoItem(Item);
