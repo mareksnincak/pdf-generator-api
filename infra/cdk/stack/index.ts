@@ -11,6 +11,7 @@ import { createLambdas } from './lambdas';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
+import { createStringParameters } from './ssm-parameters';
 
 export class CdkStack extends Stack {
   constructor({
@@ -30,27 +31,38 @@ export class CdkStack extends Stack {
     const s3Bucket = createS3Bucket(this, id);
 
     const s3BucketName = s3Bucket.bucketName;
-    const apiUrlSsmParamName = `${id}-api-url`;
+    const openApiParamsSsmParamName = `${id}-open-api-params`;
 
     const lambdas = createLambdas({
       scope: this,
       s3BucketName,
-      apiUrlSsmParamName,
+      openApiParamsSsmParamName,
       cdkEnvVars,
       dynamoDbTable,
     });
 
     const cognito = createCognito({ scope: this, stackId: id, lambdas });
 
-    const api = createApi({ scope: this, lambdas, apiUrlSsmParamName, cognito });
+    const api = createApi({
+      scope: this,
+      lambdas,
+      cognito,
+    });
 
     grantPermissions({
       region: this.region,
       account: this.account,
       lambdas,
       s3Bucket,
-      apiUrlSsmParamName,
+      openApiParamsSsmParamName,
       dynamoDbTable,
+      cognito,
+    });
+
+    createStringParameters({
+      scope: this,
+      api,
+      openApiParamsSsmParamName,
       cognito,
     });
 

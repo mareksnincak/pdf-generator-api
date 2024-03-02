@@ -5,11 +5,13 @@ import { handleError } from '../../helpers/error.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { generateOpenApi } from '../../open-api/generate-open-api.schema';
 
+import { type OpenApiParamsSsmParam } from './types/input.type';
+
 let openApiDocument: ReturnType<typeof generateOpenApi>;
 const ssmClient = new SSMClient();
 
 async function getOpenApiDocument() {
-  const ssmParamName = process.env.API_URL_SSM_PARAM_NAME;
+  const ssmParamName = process.env.OPEN_API_SSM_PARAM_NAME;
 
   logger.debug(ssmParamName, 'getOpenApi.getOpenApiDocument.ssmParamName');
   const apiUrlSsmParam = await ssmClient.send(
@@ -18,9 +20,15 @@ async function getOpenApiDocument() {
     }),
   );
 
-  const apiUrl = apiUrlSsmParam.Parameter?.Value;
-  logger.debug(apiUrl, 'getOpenApi.getOpenApiDocument.apiUrl');
-  return generateOpenApi(apiUrl);
+  const value = apiUrlSsmParam.Parameter?.Value;
+  if (!value) {
+    throw new Error();
+  }
+
+  const openApiParams = JSON.parse(value) as OpenApiParamsSsmParam;
+
+  logger.debug(openApiParams, 'getOpenApi.getOpenApiDocument.apiUrl');
+  return generateOpenApi(openApiParams);
 }
 
 export async function getOpenApi(

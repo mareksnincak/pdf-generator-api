@@ -10,7 +10,7 @@ export function grantPermissions({
   account,
   lambdas,
   s3Bucket,
-  apiUrlSsmParamName,
+  openApiParamsSsmParamName,
   dynamoDbTable,
   cognito,
 }: {
@@ -18,7 +18,7 @@ export function grantPermissions({
   account: string;
   lambdas: ReturnType<typeof createLambdas>;
   s3Bucket: Bucket;
-  apiUrlSsmParamName: string;
+  openApiParamsSsmParamName: string;
   dynamoDbTable: Table;
   cognito: ReturnType<typeof createCognito>;
 }) {
@@ -30,7 +30,7 @@ export function grantPermissions({
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(
     new PolicyStatement({
-      resources: [`arn:aws:ssm:${region}:${account}:parameter/${apiUrlSsmParamName}`],
+      resources: [`arn:aws:ssm:${region}:${account}:parameter/${openApiParamsSsmParamName}`],
       actions: ['ssm:GetParameter'],
     }),
   );

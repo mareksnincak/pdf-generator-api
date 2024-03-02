@@ -98,7 +98,7 @@ export function createCognito({
     removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
   });
 
-  new UserPoolDomain(scope, 'user-pool-domain', {
+  const userPoolDomain = new UserPoolDomain(scope, 'user-pool-domain', {
     userPool,
     cognitoDomain: {
       domainPrefix: stackId,
@@ -140,5 +140,5 @@ export function createCognito({
     lambdas,
   });
 
-  return { userPool, userPoolClient, defaultUsersCredentialsSecret };
+  return { userPool, userPoolClient, userPoolDomain, defaultUsersCredentialsSecret };
 }

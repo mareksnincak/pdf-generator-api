@@ -4,7 +4,6 @@ import {
   LambdaIntegration,
   RestApi,
 } from 'aws-cdk-lib/aws-apigateway';
-import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { type Construct } from 'constructs';
 
 import { AuthorizationScope } from '../enums/authorization.enum';
@@ -15,12 +14,10 @@ import { type createLambdas } from './lambdas';
 export function createApi({
   scope,
   lambdas,
-  apiUrlSsmParamName,
   cognito,
 }: {
   scope: Construct;
   lambdas: ReturnType<typeof createLambdas>;
-  apiUrlSsmParamName: string;
   cognito: ReturnType<typeof createCognito>;
 }) {
   const api = new RestApi(scope, 'api', {
@@ -62,11 +59,6 @@ export function createApi({
   templateByIdResource.addMethod('DELETE', new LambdaIntegration(lambdas.deleteTemplate), {
     ...commonAuthorizationOptions,
     authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorWriteTemplates],
-  });
-
-  new StringParameter(scope, 'api-url', {
-    parameterName: apiUrlSsmParamName,
-    stringValue: api.url,
   });
 
   return api;

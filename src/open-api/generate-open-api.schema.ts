@@ -6,7 +6,13 @@ import { createTemplateRoute } from '../lambdas/create-template/open-api/open-ap
 import { deleteTemplateRoute } from '../lambdas/delete-template/open-api/open-api.route';
 import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/open-api.route';
 
-export function generateOpenApi(apiUrl = '/') {
+export function generateOpenApi({
+  apiUrl = '/',
+  authUrl = 'https://example.com',
+}: {
+  apiUrl?: string;
+  authUrl?: string;
+} = {}) {
   const registry = new OpenAPIRegistry();
 
   registry.registerPath(createTemplateRoute);
@@ -17,7 +23,7 @@ export function generateOpenApi(apiUrl = '/') {
     type: 'oauth2',
     flows: {
       implicit: {
-        authorizationUrl: '',
+        authorizationUrl: authUrl,
         scopes: {
           [AuthorizationScope.pdfGeneratorWriteTemplates]: 'Modify templates.',
         },
