@@ -13,14 +13,17 @@ import type {
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getSecret } from '../../helpers/secret-manager.helper';
 
-import { type SetDefaultUserPasswordResourceProperties } from './types/properties.type';
+import {
+  type SetDefaultUserPasswordResourceProperties,
+  type SetDefaultUserPasswordResourceCustomProperties,
+} from './types/properties.type';
 
 const cognitoIdentityProviderClient = new CognitoIdentityProviderClient();
 
 async function onCreate({
   userCredentialsSecretName,
   userPoolId,
-}: SetDefaultUserPasswordResourceProperties) {
+}: SetDefaultUserPasswordResourceCustomProperties) {
   logger.info('setDefaultUserPassword.onCreate');
 
   const rawUserCredentials = await getSecret({ secretId: userCredentialsSecretName });
@@ -45,9 +48,7 @@ export async function setDefaultUserPassword(
   setLoggerContext(event, context);
   logger.info(event, 'setDefaultUserPassword.event');
 
-  const resourceProperties = event.ResourceProperties as {
-    ServiceToken: string;
-  } & SetDefaultUserPasswordResourceProperties;
+  const resourceProperties = event.ResourceProperties as SetDefaultUserPasswordResourceProperties;
 
   const commonResponse: Omit<CloudFormationCustomResourceResponse, 'Status'> = {
     LogicalResourceId: event.LogicalResourceId,

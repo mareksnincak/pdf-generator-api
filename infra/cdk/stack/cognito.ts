@@ -4,8 +4,9 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { PhysicalResourceId, Provider } from 'aws-cdk-lib/custom-resources';
 import { type Construct } from 'constructs';
 
+import { type SetDefaultUserPasswordResourceCustomProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
+
 import { type createLambdas } from './lambdas';
-import { SetDefaultUserPasswordResourceProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
 
 function createDefaultUser({
   scope,
@@ -45,16 +46,22 @@ function createDefaultUser({
     onEventHandler: lambdas.setDefaultUserPassword,
   });
 
+  const physicalResourceId = PhysicalResourceId.of('set-default-user-password').id;
+
+  if (!physicalResourceId) {
+    throw new Error('cognito.createDefaultUser.missingPhysicalResourceId');
+  }
+
   const setDefaultUserPasswordCustomResource = new CustomResource(
     scope,
     'set-default-user-password-custom-resource',
     {
       serviceToken: setDefaultUserPasswordProvider.serviceToken,
       properties: {
-        physicalResourceId: PhysicalResourceId.of('set-default-user-password').id!,
+        physicalResourceId,
         userCredentialsSecretName: defaultUsersCredentialsSecret.secretName,
         userPoolId: userPool.userPoolId,
-      } satisfies SetDefaultUserPasswordResourceProperties,
+      } satisfies SetDefaultUserPasswordResourceCustomProperties,
     },
   );
 

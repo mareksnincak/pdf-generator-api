@@ -26,7 +26,6 @@ export async function deleteTemplate(
       throw new Error('deleteTemplate.missingS3Bucket');
     }
 
-    // TODO tests
     const deletedTemplate = await deleteById(id);
     await deleteObject({ bucket, key: deletedTemplate.s3Key });
 
