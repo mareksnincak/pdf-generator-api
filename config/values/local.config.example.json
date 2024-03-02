@@ -16,6 +16,7 @@
     "get-open-api": {},
     "get-url-for-template-upload": {
       "S3_BUCKET": "pdf-generator-api-local"
-    }
+    },
+    "set-default-user-password": {}
   }
 }

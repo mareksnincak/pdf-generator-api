@@ -14,7 +14,7 @@ const eventMockFactory = new CloudFormationCustomResourceEventMockFactory();
 const context = new ContextMockFactory().create();
 
 beforeAll(() => {
-  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.deleteTemplate);
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getUrlForTemplateUpload);
 });
 
 afterEach(() => {

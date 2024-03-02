@@ -22,6 +22,7 @@
     },
     "get-url-for-template-upload": {
       "S3_BUCKET": "pdf-generator-api-it-test"
-    }
+    },
+    "set-default-user-password": {}
   }
 }
