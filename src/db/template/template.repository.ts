@@ -25,8 +25,8 @@ export async function createOrReplace(template: Optional<Template, 'id'>) {
   return templateEntity;
 }
 
-export async function findById(params: { id: string; userId: string }) {
-  logger.info(params, 'templateRepository.findById');
+export async function getById(params: { id: string; userId: string }) {
+  logger.info(params, 'templateRepository.getById');
 
   const command = new GetItemCommand({
     TableName: getTableName(),
@@ -35,13 +35,13 @@ export async function findById(params: { id: string; userId: string }) {
 
   const { Item } = await getDynamoDbClient().send(command);
   if (!Item) {
-    logger.info('templateRepository.findById.notFound');
+    logger.info('templateRepository.getById.notFound');
     return null;
   }
 
   const template = await TemplateEntity.fromDynamoItem(Item);
 
-  logger.info('templateRepository.findById.success');
+  logger.info('templateRepository.getById.success');
   return template;
 }
 
