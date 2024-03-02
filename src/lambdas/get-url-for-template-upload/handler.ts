@@ -2,9 +2,14 @@ import { randomUUID } from 'node:crypto';
 
 import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import type {
+  APIGatewayProxyResult,
+  APIGatewayProxyWithCognitoAuthorizerEvent,
+  Context,
+} from 'aws-lambda';
 
 import { handleError } from '../../helpers/error.helper';
+import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getS3Client } from '../../helpers/s3.helper';
 import { validateQueryParams } from '../../helpers/validation.helper';
@@ -14,25 +19,27 @@ import { type GetUrlForTemplateUploadResponseDto } from './dtos/response.dto';
 
 async function createPresignedUrl({
   fileSizeBytes,
-  uploadId,
+  userId,
 }: {
   fileSizeBytes: number;
-  uploadId: string;
+  userId: string;
 }) {
+  const uploadId = randomUUID();
+
   const command = new PutObjectCommand({
     Bucket: process.env.S3_BUCKET,
-    Key: `templates/uploads/${uploadId}`,
+    Key: `${userId}/templates/uploads/${uploadId}`,
     ContentLength: fileSizeBytes,
   });
 
   const s3Client = getS3Client();
 
   const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-  return url;
+  return { url, uploadId };
 }
 
 export async function getUrlForTemplateUpload(
-  event: APIGatewayProxyEvent,
+  event: APIGatewayProxyWithCognitoAuthorizerEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
   try {
@@ -43,8 +50,9 @@ export async function getUrlForTemplateUpload(
     logger.info(validatedQueryParams, 'getUrlForTemplateUpload.validatedQueryParams');
 
     const { fileSizeBytes } = validatedQueryParams;
-    const uploadId = randomUUID();
-    const url = await createPresignedUrl({ fileSizeBytes, uploadId });
+
+    const userId = getUserIdFromEventOrFail(event);
+    const { url, uploadId } = await createPresignedUrl({ fileSizeBytes, userId });
 
     const response: GetUrlForTemplateUploadResponseDto = {
       uploadId,
