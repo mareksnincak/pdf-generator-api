@@ -23,10 +23,8 @@ afterEach(() => {
 
 describe('setDefaultUserPassword', () => {
   it('should set default user password on create', async () => {
-    const userCredentialsSecret = { username: 'sample-username', password: 'sample-password' };
-    jest
-      .spyOn(secretManagerHelper, 'getSecret')
-      .mockResolvedValue(JSON.stringify(userCredentialsSecret));
+    const userCredentials = { username: 'sample-username', password: 'sample-password' };
+    jest.spyOn(secretManagerHelper, 'getSecret').mockResolvedValue(JSON.stringify(userCredentials));
 
     jest.spyOn(CognitoIdentityProviderClient.prototype, 'send').mockImplementation();
 

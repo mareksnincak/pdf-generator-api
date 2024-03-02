@@ -49,9 +49,9 @@ describe('deleteTemplate', () => {
     const templateAfterDeletion = await findById(templateEntity.id);
     expect(templateAfterDeletion).toEqual(null);
 
-    const s3DeleteSpy = s3ClientSpy.mock.calls[0][0];
-    expect(s3DeleteSpy).toBeInstanceOf(DeleteObjectCommand);
-    expect(s3DeleteSpy.input).toEqual({
+    const s3ClientArgs = s3ClientSpy.mock.calls[0][0];
+    expect(s3ClientArgs).toBeInstanceOf(DeleteObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
       Key: templateEntity.s3Key,
     });
