@@ -7,9 +7,14 @@ import {
 import { getSecret } from '../../../src/helpers/secret-manager.helper';
 import { validate } from '../../../src/helpers/validation.helper';
 import { type UserCredentialsSecret } from '../../../src/lambdas/set-default-user-password/types/secret.type';
+import { LOCAL_E2E_BASE_URL } from '../constants/url.constant';
 import { type E2eEnvVarsDto, e2eEnvVarsDto } from '../dtos/env.dto';
 
-export async function getAccessToken(envVars: E2eEnvVarsDto) {
+export async function getAccessToken(envVars: E2eEnvVarsDto, isLocal: boolean) {
+  if (isLocal) {
+    return '';
+  }
+
   const rawCredentials = await getSecret(envVars.E2E_AUTH_USER_CREDENTIALS_SECRET_NAME);
   const credentials = JSON.parse(rawCredentials) as UserCredentialsSecret;
 
@@ -36,8 +41,13 @@ export async function getAccessToken(envVars: E2eEnvVarsDto) {
 
 export async function getE2eSetup() {
   const envVars = validate(process.env, e2eEnvVarsDto);
+  const isLocal = envVars.E2E_BASE_URL === LOCAL_E2E_BASE_URL;
 
-  const accessToken = await getAccessToken(envVars);
+  if (isLocal) {
+    process.env.IS_LOCAL = 'true';
+  }
+
+  const accessToken = await getAccessToken(envVars, isLocal);
 
   return {
     baseUrl: envVars.E2E_BASE_URL,
