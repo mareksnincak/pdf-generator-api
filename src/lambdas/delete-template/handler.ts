@@ -1,7 +1,12 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import type {
+  APIGatewayProxyResult,
+  APIGatewayProxyWithCognitoAuthorizerEvent,
+  Context,
+} from 'aws-lambda';
 
 import { deleteById } from '../../db/template/template.repository';
 import { handleError } from '../../helpers/error.helper';
+import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObject } from '../../helpers/s3.helper';
 import { validatePathParams } from '../../helpers/validation.helper';
@@ -9,7 +14,7 @@ import { validatePathParams } from '../../helpers/validation.helper';
 import { deleteTemplateRequestDto } from './dtos/request.dto';
 
 export async function deleteTemplate(
-  event: APIGatewayProxyEvent,
+  event: APIGatewayProxyWithCognitoAuthorizerEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
   try {
@@ -26,7 +31,8 @@ export async function deleteTemplate(
       throw new Error('deleteTemplate.missingS3Bucket');
     }
 
-    const deletedTemplate = await deleteById(id);
+    const userId = getUserIdFromEventOrFail(event);
+    const deletedTemplate = await deleteById({ id, userId });
     await deleteObject({ bucket, key: deletedTemplate.s3Key });
 
     logger.info('deleteTemplate.success');

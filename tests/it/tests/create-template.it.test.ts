@@ -12,7 +12,7 @@ import { mockLogger } from '../../../src/helpers/test.helper';
 import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';
 import { createTemplate } from '../../../src/lambdas/create-template/handler';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
-import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
+import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
 import { mockAwsCredentials } from '../helpers/credential.helper';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
@@ -25,7 +25,7 @@ jest.mock('node:crypto', () => {
 });
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
-const eventMockFactory = new ApiGatewayProxyEventMockFactory();
+const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const context = new ContextMockFactory().create();
 
 beforeAll(() => {
@@ -64,30 +64,33 @@ describe('createTemplate', () => {
       id: expect.any(String),
     });
 
+    const userId = event.requestContext.authorizer.claims.sub;
+
     const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
     expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
     expect(s3CopyArgs.input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
-      CopySource: `pdf-generator-api-it-test/templates/uploads/${requestBody.uploadId}`,
-      Key: `/templates/data/${dataId}`,
+      CopySource: `pdf-generator-api-it-test/${userId}/templates/uploads/${requestBody.uploadId}`,
+      Key: `${userId}/templates/data/${dataId}`,
     });
 
     const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3DeleteArgs.input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
-      Key: `templates/uploads/${requestBody.uploadId}`,
+      Key: `${userId}/templates/uploads/${requestBody.uploadId}`,
     });
 
     const { id } = body;
-    const createdTemplate = await templateRepository.findById(id);
+    const createdTemplate = await templateRepository.findById({ id, userId });
     expect(createdTemplate).toEqual({
-      PK: `TEMPLATE#${id}`,
+      PK: `TEMPLATE#${userId}#${id}`,
       SK: '#',
       id,
       name: requestBody.name,
-      s3Key: `/templates/data/${requestBody.uploadId}`,
+      s3Key: `${userId}/templates/data/${requestBody.uploadId}`,
       type: 'html/handlebars',
+      userId,
     });
   });
 

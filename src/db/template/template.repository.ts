@@ -25,12 +25,12 @@ export async function createOrReplace(template: Optional<Template, 'id'>) {
   return templateEntity;
 }
 
-export async function findById(id: string) {
-  logger.info({ id }, 'templateRepository.findById');
+export async function findById(params: { id: string; userId: string }) {
+  logger.info(params, 'templateRepository.findById');
 
   const command = new GetItemCommand({
     TableName: getTableName(),
-    Key: TemplateEntity.getDynamoPartitionKey({ id }),
+    Key: TemplateEntity.getDynamoPartitionKey(params),
   });
 
   const { Item } = await getDynamoDbClient().send(command);
@@ -45,12 +45,12 @@ export async function findById(id: string) {
   return template;
 }
 
-export async function deleteById(id: string) {
-  logger.info({ id }, 'templateRepository.deleteById');
+export async function deleteById(params: { id: string; userId: string }) {
+  logger.info(params, 'templateRepository.deleteById');
 
   const command = new DeleteItemCommand({
     TableName: getTableName(),
-    Key: TemplateEntity.getDynamoPartitionKey({ id }),
+    Key: TemplateEntity.getDynamoPartitionKey(params),
     ReturnValues: 'ALL_OLD',
   });
 

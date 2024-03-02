@@ -1,6 +1,8 @@
 import pino from 'pino';
 import { lambdaRequestTracker, pinoLambdaDestination } from 'pino-lambda';
 
+import { getUserIdFromEvent } from './event.helper';
+
 const destination = pinoLambdaDestination();
 
 export const logger = pino(
@@ -8,4 +10,10 @@ export const logger = pino(
   destination,
 );
 
-export const setLoggerContext = lambdaRequestTracker();
+export const setLoggerContext = lambdaRequestTracker({
+  requestMixin(event) {
+    return {
+      userId: getUserIdFromEvent(event),
+    };
+  },
+});

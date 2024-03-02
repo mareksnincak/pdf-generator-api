@@ -1,13 +1,18 @@
 import { randomUUID } from 'node:crypto';
 
 import { S3ServiceException } from '@aws-sdk/client-s3';
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import type {
+  APIGatewayProxyResult,
+  APIGatewayProxyWithCognitoAuthorizerEvent,
+  Context,
+} from 'aws-lambda';
 
 import { createOrReplace } from '../../db/template/template.repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
 import { NotFoundError } from '../../errors/not-found.error';
 import { handleError } from '../../helpers/error.helper';
+import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { moveObject } from '../../helpers/s3.helper';
 import { validateBody } from '../../helpers/validation.helper';
@@ -15,7 +20,13 @@ import { validateBody } from '../../helpers/validation.helper';
 import { createTemplateRequestDto } from './dtos/request.dto';
 import { type CreateTemplateResponseDto } from './dtos/response.dto';
 
-async function moveTemplateDataToPermanentLocation(uploadId: string) {
+async function moveTemplateDataToPermanentLocation({
+  uploadId,
+  userId,
+}: {
+  uploadId: string;
+  userId: string;
+}) {
   try {
     // TODO validate html
     const bucket = process.env.S3_BUCKET;
@@ -24,8 +35,8 @@ async function moveTemplateDataToPermanentLocation(uploadId: string) {
       throw new Error('createTemplate.moveTemplateDataToPermanentLocation.missingS3Bucket');
     }
 
-    const uploadedDataS3Key = `templates/uploads/${uploadId}`;
-    const storedDataS3Key = `/templates/data/${randomUUID()}`;
+    const uploadedDataS3Key = `${userId}/templates/uploads/${uploadId}`;
+    const storedDataS3Key = `${userId}/templates/data/${randomUUID()}`;
 
     await moveObject({
       sourceBucket: bucket,
@@ -47,7 +58,7 @@ async function moveTemplateDataToPermanentLocation(uploadId: string) {
 }
 
 export async function createTemplate(
-  event: APIGatewayProxyEvent,
+  event: APIGatewayProxyWithCognitoAuthorizerEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
   try {
@@ -59,8 +70,9 @@ export async function createTemplate(
 
     const { id, name, uploadId, type } = validatedData;
 
-    const s3Key = await moveTemplateDataToPermanentLocation(uploadId);
-    const template = await createOrReplace({ id, name, type, s3Key });
+    const userId = getUserIdFromEventOrFail(event);
+    const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId });
+    const template = await createOrReplace({ id, name, type, s3Key, userId });
 
     const response: CreateTemplateResponseDto = {
       id: template.id,

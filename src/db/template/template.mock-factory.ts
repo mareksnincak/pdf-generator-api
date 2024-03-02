@@ -10,6 +10,7 @@ export class TemplateEntityMockFactory {
       name: randomBytes(8).toString('hex'),
       type: TemplateType.htmlHandlebars,
       s3Key: randomBytes(8).toString('hex'),
+      userId: randomUUID(),
       ...overrides,
     });
   }

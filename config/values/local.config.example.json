@@ -1,6 +1,7 @@
 {
   "global": {
-    "LOG_LEVEL": "debug"
+    "LOG_LEVEL": "debug",
+    "IS_LOCAL": "true"
   },
   "lambda": {
     "create-template": {
