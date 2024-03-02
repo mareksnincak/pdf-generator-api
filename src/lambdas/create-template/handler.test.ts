@@ -8,14 +8,14 @@ import * as templateRepository from '../../db/template/template.repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import * as s3Helper from '../../helpers/s3.helper';
 import { mockLogger } from '../../helpers/test.helper';
-import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
+import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 
 import { createTemplate } from './handler';
 import { CreateTemplateRequestMockFactory } from './mock-factories/request.mock-factory';
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
-const eventMockFactory = new ApiGatewayProxyEventMockFactory();
+const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const templateEntity = new TemplateEntityMockFactory().create();
 const context = new ContextMockFactory().create();
 
