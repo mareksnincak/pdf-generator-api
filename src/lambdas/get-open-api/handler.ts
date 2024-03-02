@@ -3,7 +3,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-l
 
 import { handleError } from '../../helpers/error.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { generateOpenApi } from '../../open-api/generate-open-api.helper';
+import { generateOpenApi } from '../../open-api/generate-open-api.schema';
 
 let openApiDocument: ReturnType<typeof generateOpenApi>;
 const ssmClient = new SSMClient();

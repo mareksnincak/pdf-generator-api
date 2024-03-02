@@ -5,7 +5,7 @@ import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { ApiGatewayProxyEventMockFactory } from '../../mock-factories/api-gateway-proxy-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
-import * as generateOpenApiHelper from '../../open-api/generate-open-api.helper';
+import * as generateOpenApiHelper from '../../open-api/generate-open-api.schema';
 
 import { getOpenApi } from './handler';
 

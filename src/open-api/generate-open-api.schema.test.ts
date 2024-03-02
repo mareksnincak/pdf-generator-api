@@ -1,4 +1,4 @@
-import { generateOpenApi } from './generate-open-api.helper';
+import { generateOpenApi } from './generate-open-api.schema';
 
 describe('generateOpenApi', () => {
   it('should generate open-api', async () => {
