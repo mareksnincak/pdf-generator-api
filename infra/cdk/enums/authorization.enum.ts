@@ -1,5 +1,5 @@
 export enum PdfGeneratorCustomAuthorizationScope {
-  templateWrite = 'template:write',
+  writeTemplates = 'templates:write',
 }
 
 export enum ResourceServerIdentifier {
@@ -8,5 +8,5 @@ export enum ResourceServerIdentifier {
 
 export enum AuthorizationScope {
   admin = 'aws.cognito.signin.user.admin',
-  pdfGeneratorTemplateWrite = `${ResourceServerIdentifier.pdfGenerator}/${PdfGeneratorCustomAuthorizationScope.templateWrite}`,
+  pdfGeneratorWriteTemplates = `${ResourceServerIdentifier.pdfGenerator}/${PdfGeneratorCustomAuthorizationScope.writeTemplates}`,
 }

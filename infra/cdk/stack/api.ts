@@ -47,18 +47,21 @@ export function createApi({
     .addResource('upload-url')
     .addMethod('GET', new LambdaIntegration(lambdas.getUrlForTemplateUpload), {
       ...commonAuthorizationOptions,
-      authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorTemplateWrite],
+      authorizationScopes: [
+        AuthorizationScope.admin,
+        AuthorizationScope.pdfGeneratorWriteTemplates,
+      ],
     });
 
   templatesResource.addMethod('POST', new LambdaIntegration(lambdas.createTemplate), {
     ...commonAuthorizationOptions,
-    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorTemplateWrite],
+    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorWriteTemplates],
   });
 
   const templateByIdResource = templatesResource.addResource('{id}');
   templateByIdResource.addMethod('DELETE', new LambdaIntegration(lambdas.deleteTemplate), {
     ...commonAuthorizationOptions,
-    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorTemplateWrite],
+    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorWriteTemplates],
   });
 
   new StringParameter(scope, 'api-url', {
