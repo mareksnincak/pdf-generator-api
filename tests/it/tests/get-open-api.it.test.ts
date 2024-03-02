@@ -44,7 +44,7 @@ describe('getOpenApi', () => {
     );
 
     expect(ssmClientSpy.mock.lastCall?.[0].input).toEqual({
-      Name: 'pdf-generator-api-api-url-it-test',
+      Name: 'sample-open-api-ssm-param-name',
     });
   });
 });

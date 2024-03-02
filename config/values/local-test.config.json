@@ -16,7 +16,7 @@
       "S3_BUCKET": "pdf-generator-api-it-test"
     },
     "get-open-api": {
-      "OPEN_API_SSM_PARAM_NAME": "pdf-generator-api-api-url-it-test"
+      "OPEN_API_SSM_PARAM_NAME": "sample-open-api-ssm-param-name"
     },
     "get-url-for-template-upload": {
       "S3_BUCKET": "pdf-generator-api-it-test"
