@@ -45,7 +45,10 @@ jobs:
     # if: contains(github.event.head_commit.message, 'deploy')
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Commit Message: ${{ github.event.head_commit.message }}"
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
