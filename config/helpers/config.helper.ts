@@ -2,7 +2,6 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { Lambda } from '../../infra/cdk/enums/lambda.enum';
-import { logger } from '../../src/helpers/logger.helper';
 import { type EnvironmentName } from '../enums/config.enum';
 import { type EnvVars } from '../types/env.type';
 
@@ -21,9 +20,7 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
   for (const lambdaName of Object.values(Lambda)) {
     const lambdaConfig = config.lambda[lambdaName];
     if (!lambdaConfig) {
-      const errorMsg = 'configHelper.missingLambdaConfig';
-      logger.error({ lambdaName }, 'configHelper.missingLambdaConfig');
-      throw new Error(errorMsg);
+      throw new Error(`configHelper.missingLambdaConfig.${lambdaName}`);
     }
 
     const fullConfig = {

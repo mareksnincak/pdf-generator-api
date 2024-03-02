@@ -1,6 +1,7 @@
 import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 
 import { getSecret } from './secret-manager.helper';
+import { mockLogger } from './test.helper';
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -27,6 +28,7 @@ describe('getSecret', () => {
   });
 
   it('should throw error when value is undefined', async () => {
+    mockLogger();
     const secretId = 'sample-secret';
     const secretValue = undefined;
 
