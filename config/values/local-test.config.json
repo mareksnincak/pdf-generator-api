@@ -1,8 +1,6 @@
 {
   "global": {
-    "LOG_LEVEL": "warn",
-    "AWS_SECRET_ACCESS_KEY": "XXXXXXXX",
-    "AWS_ACCESS_KEY_ID": "XXXXXXXX"
+    "LOG_LEVEL": "warn"
   },
   "lambda": {
     "create-template": {

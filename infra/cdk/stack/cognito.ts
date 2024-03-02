@@ -99,6 +99,7 @@ export function createCognito({
     userPoolClientName: stackId,
     authFlows: {
       userSrp: true,
+      adminUserPassword: true,
     },
     preventUserExistenceErrors: true,
   });

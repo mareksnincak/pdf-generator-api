@@ -6,7 +6,7 @@ let secretManagerClient: SecretsManagerClient | undefined;
 
 export function getSecretManagerClient() {
   if (!secretManagerClient) {
-    secretManagerClient = new SecretsManagerClient({});
+    secretManagerClient = new SecretsManagerClient();
   }
 
   return secretManagerClient;
