@@ -42,9 +42,10 @@ jobs:
       - run: npm run test:it
   deploy:
     # TODO use OIDC provider https://docs.github.com/en/actions/deployment/security-hardening-your-deployments/configuring-openid-connect-in-amazon-web-services
-    if: contains(github.event.head_commit.message, 'deploy')
+    # if: contains(github.event.head_commit.message, 'deploy')
     runs-on: ubuntu-latest
     steps:
+      - run: echo "Commit Message: ${{ github.event.head_commit.message }}"
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
