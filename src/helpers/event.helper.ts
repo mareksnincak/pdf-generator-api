@@ -1,15 +1,15 @@
 import { type APIGatewayEvent, type APIGatewayProxyWithCognitoAuthorizerEvent } from 'aws-lambda';
-import { type LambdaEvent } from 'pino-lambda';
+import { type PartialDeep } from 'type-fest';
 
 // TODO tests
 export function getUserIdFromEvent(
-  event: APIGatewayProxyWithCognitoAuthorizerEvent | APIGatewayEvent | LambdaEvent,
+  event: PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent> | PartialDeep<APIGatewayEvent>,
 ): string | undefined {
-  return event.requestContext.authorizer?.claims?.sub;
+  return event.requestContext?.authorizer?.claims?.sub;
 }
 
 export function getUserIdFromEventOrFail(
-  event: APIGatewayProxyWithCognitoAuthorizerEvent | APIGatewayEvent | LambdaEvent,
+  event: PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent> | PartialDeep<APIGatewayEvent>,
 ) {
   const userId = getUserIdFromEvent(event);
 

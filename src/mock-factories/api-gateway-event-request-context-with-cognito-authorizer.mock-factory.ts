@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import {
   type APIGatewayEventRequestContextWithAuthorizer,
   type APIGatewayProxyCognitoAuthorizer,
@@ -13,7 +15,7 @@ export class ApiGatewayEventRequestContextWithCognitoAuthorizerMockFactory {
     return {
       authorizer: {
         claims: {
-          sub: '1ddad69f-d1c3-4b81-a291-67d588581ea0',
+          sub: randomUUID(),
         },
       },
       ...overrides,

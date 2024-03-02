@@ -7,7 +7,7 @@ import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { getUrlForTemplateUpload } from '../../../src/lambdas/get-url-for-template-upload/handler';
 import { GetUrlForTemplateUploadRequestMockFactory } from '../../../src/lambdas/get-url-for-template-upload/mock-factories/request.mock-factory';
-import { ApiGatewayProxyEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-event.mock-factory';
+import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
 
 jest.mock('@aws-sdk/s3-request-presigner', () => {
@@ -25,7 +25,7 @@ jest.mock('node:crypto', () => {
 });
 
 const requestMockFactory = new GetUrlForTemplateUploadRequestMockFactory();
-const eventMockFactory = new ApiGatewayProxyEventMockFactory();
+const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const context = new ContextMockFactory().create();
 
 beforeAll(async () => {
@@ -59,11 +59,12 @@ describe('getUrlForTemplateUpload', () => {
       url: presignedUrl,
     });
 
+    const userId = event.requestContext.authorizer.claims.sub;
     const getSignedUrlArgs = getSignedUrlSpy.mock.lastCall;
     expect(getSignedUrlArgs?.[1].input).toEqual({
       Bucket: 'pdf-generator-api-it-test',
       ContentLength: 1024,
-      Key: `templates/uploads/${uploadId}`,
+      Key: `${userId}/templates/uploads/${uploadId}`,
     });
   });
 });
