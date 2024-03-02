@@ -27,7 +27,6 @@ export class CdkStack extends Stack {
   }) {
     super(scope, id, props);
 
-    console.dir({ cdkEnvVars }, { depth: 3 });
     const removalPolicy = cdkEnvVars.RETAIN_STATEFUL_RESOURCES
       ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
       : RemovalPolicy.DESTROY;
