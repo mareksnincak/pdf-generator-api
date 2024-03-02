@@ -42,6 +42,8 @@ describe('createTemplate', () => {
     expect(result.statusCode).toEqual(200);
     expect(JSON.parse(result.body)).toEqual({
       id: templateEntity.id,
+      name: templateEntity.name,
+      type: templateEntity.type,
     });
   });
 

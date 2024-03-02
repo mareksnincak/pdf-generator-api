@@ -74,10 +74,8 @@ export async function createTemplate(
     const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId });
     const template = await createOrReplace({ id, name, type, s3Key, userId });
 
-    const response: CreateTemplateResponseDto = {
-      id: template.id,
-    };
-    logger.info(response, 'createTemplate.response');
+    const response: CreateTemplateResponseDto = template.toPublicJson();
+    logger.info('createTemplate.success');
     return {
       body: JSON.stringify(response),
       statusCode: 200,

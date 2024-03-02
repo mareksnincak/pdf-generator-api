@@ -1,14 +1,7 @@
-import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import { z } from 'zod';
+import { type z } from 'zod';
 
-extendZodWithOpenApi(z);
+import { templateIdDto } from '../../../dtos/template-id.dto';
 
-export const deleteTemplateRequestDto = z.object({
-  id: z
-    .string()
-    .min(1)
-    .max(64)
-    .openapi({ description: 'Template id.', example: 'customTemplateId' }),
-});
+export const deleteTemplateRequestDto = templateIdDto;
 
 export type DeleteTemplateRequestDto = z.infer<typeof deleteTemplateRequestDto>;

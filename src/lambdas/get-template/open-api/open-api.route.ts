@@ -1,7 +1,7 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
 
 import { templateIdDto } from '../../../dtos/template-id.dto';
-import { templateDto } from '../../../dtos/template.dto';
+import { templateResponseDto } from '../../../dtos/template-response.dto';
 import { ErrorMessage } from '../../../enums/error.enum';
 import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
 
@@ -19,7 +19,7 @@ export const getTemplateRoute: RouteConfig = {
       description: 'Success.',
       content: {
         'application/json': {
-          schema: templateDto,
+          schema: templateResponseDto,
         },
       },
     },

@@ -5,7 +5,7 @@ import { TemplateType } from '../db/template/template.enum';
 
 extendZodWithOpenApi(z);
 
-export const templateDto = z.object({
+export const templateResponseDto = z.object({
   id: z.string().min(1).max(64).openapi({ description: 'Template id.', example: 'templateId' }),
   name: z
     .string()
@@ -15,4 +15,4 @@ export const templateDto = z.object({
   type: z.nativeEnum(TemplateType).openapi({ description: 'Template type.' }),
 });
 
-export type TemplateDto = z.infer<typeof templateDto>;
+export type TemplateResponseDto = z.infer<typeof templateResponseDto>;

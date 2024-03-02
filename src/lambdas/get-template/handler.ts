@@ -5,11 +5,13 @@ import type {
 } from 'aws-lambda';
 
 import { getByIdOrFail } from '../../db/template/template.repository';
-import { templateIdDto } from '../../dtos/template-id.dto';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { validatePathParams } from '../../helpers/validation.helper';
+
+import { getTemplateRequestDto } from './dtos/request.dto';
+import { type GetTemplateResponseDto } from './dtos/response.dto';
 
 export async function getTemplate(
   event: APIGatewayProxyWithCognitoAuthorizerEvent,
@@ -19,7 +21,7 @@ export async function getTemplate(
     setLoggerContext(event, context);
     logger.info('getTemplate.starting');
 
-    const validatedParams = validatePathParams(event, templateIdDto);
+    const validatedParams = validatePathParams(event, getTemplateRequestDto);
     logger.info(validatedParams, 'getTemplate.validatedParams');
 
     const { id } = validatedParams;
@@ -30,12 +32,13 @@ export async function getTemplate(
     }
 
     const userId = getUserIdFromEventOrFail(event);
-    const templateEntity = await getByIdOrFail({ id, userId });
+    const template = await getByIdOrFail({ id, userId });
 
+    const response: GetTemplateResponseDto = template.toPublicJson();
     logger.info('deleteTemplate.success');
     return {
       statusCode: 200,
-      body: JSON.stringify(templateEntity.toPublicJson()),
+      body: JSON.stringify(response),
     };
   } catch (error) {
     return handleError({ error, logPrefix: 'deleteTemplate' });
