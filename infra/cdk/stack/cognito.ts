@@ -87,15 +87,17 @@ export function createCognito({
   scope,
   stackId,
   lambdas,
+  removalPolicy,
 }: {
   scope: Construct;
   stackId: string;
   lambdas: ReturnType<typeof createLambdas>;
+  removalPolicy: RemovalPolicy;
 }) {
   const userPool = new UserPool(scope, 'user-pool', {
     userPoolName: stackId,
     selfSignUpEnabled: false,
-    removalPolicy: RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+    removalPolicy,
   });
 
   const userPoolDomain = new UserPoolDomain(scope, 'user-pool-domain', {
@@ -105,7 +107,7 @@ export function createCognito({
     },
   });
 
-  new UserPoolResourceServer(scope, 'user-pool-resource-server', {
+  const userPoolResourceServer = new UserPoolResourceServer(scope, 'user-pool-resource-server', {
     userPool,
     identifier: ResourceServerIdentifier.pdfGenerator,
     scopes: [
@@ -132,6 +134,8 @@ export function createCognito({
       ],
     },
   });
+
+  userPoolClient.node.addDependency(userPoolResourceServer);
 
   const { defaultUsersCredentialsSecret } = createDefaultUser({
     scope,

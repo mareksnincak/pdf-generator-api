@@ -1,4 +1,4 @@
-import { Stack } from 'aws-cdk-lib';
+import { RemovalPolicy, Stack } from 'aws-cdk-lib';
 import type { StackProps } from 'aws-cdk-lib';
 import type { Construct } from 'constructs';
 
@@ -27,8 +27,13 @@ export class CdkStack extends Stack {
   }) {
     super(scope, id, props);
 
-    const dynamoDbTable = createDynamoDbTable(this, id);
-    const s3Bucket = createS3Bucket(this, id);
+    console.dir({ cdkEnvVars }, { depth: 3 });
+    const removalPolicy = cdkEnvVars.RETAIN_STATEFUL_RESOURCES
+      ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
+      : RemovalPolicy.DESTROY;
+
+    const dynamoDbTable = createDynamoDbTable({ scope: this, stackId: id, removalPolicy });
+    const s3Bucket = createS3Bucket({ scope: this, stackId: id, removalPolicy });
 
     const s3BucketName = s3Bucket.bucketName;
     const openApiParamsSsmParamName = `${id}-open-api-params`;
@@ -41,7 +46,7 @@ export class CdkStack extends Stack {
       dynamoDbTable,
     });
 
-    const cognito = createCognito({ scope: this, stackId: id, lambdas });
+    const cognito = createCognito({ scope: this, stackId: id, lambdas, removalPolicy });
 
     const api = createApi({
       scope: this,
