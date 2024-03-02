@@ -1,17 +1,27 @@
-import { LambdaIntegration, RestApi } from 'aws-cdk-lib/aws-apigateway';
+import {
+  AuthorizationType,
+  CognitoUserPoolsAuthorizer,
+  LambdaIntegration,
+  RestApi,
+} from 'aws-cdk-lib/aws-apigateway';
 import { StringParameter } from 'aws-cdk-lib/aws-ssm';
 import { type Construct } from 'constructs';
 
+import { AuthorizationScope } from '../enums/authorization.enum';
+
+import { type createCognito } from './cognito';
 import { type createLambdas } from './lambdas';
 
 export function createApi({
   scope,
   lambdas,
   apiUrlSsmParamName,
+  cognito,
 }: {
   scope: Construct;
   lambdas: ReturnType<typeof createLambdas>;
   apiUrlSsmParamName: string;
+  cognito: ReturnType<typeof createCognito>;
 }) {
   const api = new RestApi(scope, 'api', {
     cloudWatchRole: false,
@@ -20,17 +30,36 @@ export function createApi({
     },
   });
 
+  const authorizer = new CognitoUserPoolsAuthorizer(scope, 'user-pool-authorizer', {
+    cognitoUserPools: [cognito.userPool],
+  });
+
+  const commonAuthorizationOptions = {
+    authorizer,
+    authorizationType: AuthorizationType.COGNITO,
+  } as const;
+
   api.root.addMethod('GET', new LambdaIntegration(lambdas.getOpenApi));
 
   const templatesResource = api.root.addResource('templates');
-  templatesResource.addMethod('POST', new LambdaIntegration(lambdas.createTemplate));
-
-  const templateByIdResource = templatesResource.addResource('{id}');
-  templateByIdResource.addMethod('DELETE', new LambdaIntegration(lambdas.deleteTemplate));
 
   templatesResource
     .addResource('upload-url')
-    .addMethod('GET', new LambdaIntegration(lambdas.getUrlForTemplateUpload));
+    .addMethod('GET', new LambdaIntegration(lambdas.getUrlForTemplateUpload), {
+      ...commonAuthorizationOptions,
+      authorizationScopes: [AuthorizationScope.templateWrite],
+    });
+
+  templatesResource.addMethod('POST', new LambdaIntegration(lambdas.createTemplate), {
+    ...commonAuthorizationOptions,
+    authorizationScopes: [AuthorizationScope.templateWrite],
+  });
+
+  const templateByIdResource = templatesResource.addResource('{id}');
+  templateByIdResource.addMethod('DELETE', new LambdaIntegration(lambdas.deleteTemplate), {
+    ...commonAuthorizationOptions,
+    authorizationScopes: [AuthorizationScope.templateWrite],
+  });
 
   new StringParameter(scope, 'api-url', {
     parameterName: apiUrlSsmParamName,

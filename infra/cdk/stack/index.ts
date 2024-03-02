@@ -42,7 +42,7 @@ export class CdkStack extends Stack {
 
     const cognito = createCognito({ scope: this, stackId: id, lambdas });
 
-    const api = createApi({ scope: this, lambdas, apiUrlSsmParamName });
+    const api = createApi({ scope: this, lambdas, apiUrlSsmParamName, cognito });
 
     grantPermissions({
       region: this.region,

@@ -1,10 +1,20 @@
 import { CustomResource, RemovalPolicy } from 'aws-cdk-lib';
-import { CfnUserPoolUser, UserPool, UserPoolClient, UserPoolDomain } from 'aws-cdk-lib/aws-cognito';
+import {
+  CfnUserPoolUser,
+  UserPool,
+  UserPoolClient,
+  UserPoolDomain,
+  UserPoolResourceServer,
+} from 'aws-cdk-lib/aws-cognito';
 import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { PhysicalResourceId, Provider } from 'aws-cdk-lib/custom-resources';
 import { type Construct } from 'constructs';
 
 import { type SetDefaultUserPasswordResourceCustomProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
+import {
+  PdfGeneratorAuthorizationScope,
+  ResourceServerIdentifier,
+} from '../enums/authorization.enum';
 
 import { type createLambdas } from './lambdas';
 
@@ -91,6 +101,17 @@ export function createCognito({
     cognitoDomain: {
       domainPrefix: stackId,
     },
+  });
+
+  new UserPoolResourceServer(scope, 'user-pool-resource-server', {
+    userPool,
+    identifier: ResourceServerIdentifier.pdfGenerator,
+    scopes: [
+      {
+        scopeName: PdfGeneratorAuthorizationScope.templateWrite,
+        scopeDescription: 'Modify templates',
+      },
+    ],
   });
 
   const userPoolClient = new UserPoolClient(scope, 'user-pool-client', {
