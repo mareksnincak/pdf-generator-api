@@ -62,7 +62,7 @@ describe('getUrlForTemplateUpload', () => {
     const userId = event.requestContext.authorizer.claims.sub;
     const getSignedUrlArgs = getSignedUrlSpy.mock.lastCall;
     expect(getSignedUrlArgs?.[1].input).toEqual({
-      Bucket: 'pdf-generator-api-it-test',
+      Bucket: 'pdf-generator-api-test',
       ContentLength: 1024,
       Key: `${userId}/templates/uploads/${uploadId}`,
     });

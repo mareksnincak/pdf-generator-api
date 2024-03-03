@@ -7,25 +7,25 @@
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
-      "S3_BUCKET": "pdf-generator-api-it-test"
+      "S3_BUCKET": "pdf-generator-api-test"
     },
     "get-template": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
-      "S3_BUCKET": "pdf-generator-api-it-test"
+      "S3_BUCKET": "pdf-generator-api-test"
     },
     "delete-template": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
-      "S3_BUCKET": "pdf-generator-api-it-test"
+      "S3_BUCKET": "pdf-generator-api-test"
     },
     "get-open-api": {
       "OPEN_API_SSM_PARAM_NAME": "sample-open-api-ssm-param-name"
     },
     "get-url-for-template-upload": {
-      "S3_BUCKET": "pdf-generator-api-it-test"
+      "S3_BUCKET": "pdf-generator-api-test"
     },
     "set-default-user-password": {}
   }

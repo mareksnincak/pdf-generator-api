@@ -63,7 +63,7 @@ describe('deleteTemplate', () => {
     const s3ClientArgs = s3ClientSpy.mock.calls[0][0];
     expect(s3ClientArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3ClientArgs.input).toEqual({
-      Bucket: 'pdf-generator-api-it-test',
+      Bucket: 'pdf-generator-api-test',
       Key: templateEntity.s3Key,
     });
   });

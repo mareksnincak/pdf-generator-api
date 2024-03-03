@@ -75,15 +75,15 @@ describe('createTemplate', () => {
     const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
     expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
     expect(s3CopyArgs.input).toEqual({
-      Bucket: 'pdf-generator-api-it-test',
-      CopySource: `pdf-generator-api-it-test/${userId}/templates/uploads/${requestBody.uploadId}`,
+      Bucket: 'pdf-generator-api-test',
+      CopySource: `pdf-generator-api-test/${userId}/templates/uploads/${requestBody.uploadId}`,
       Key: `${userId}/templates/data/${dataId}`,
     });
 
     const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3DeleteArgs.input).toEqual({
-      Bucket: 'pdf-generator-api-it-test',
+      Bucket: 'pdf-generator-api-test',
       Key: `${userId}/templates/uploads/${requestBody.uploadId}`,
     });
 
@@ -153,7 +153,7 @@ describe('createTemplate', () => {
     const s3ClientLastCallArgs = s3ClientSpy.mock.lastCall?.[0];
     expect(s3ClientLastCallArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3ClientLastCallArgs?.input).toEqual({
-      Bucket: 'pdf-generator-api-it-test',
+      Bucket: 'pdf-generator-api-test',
       Key: `${userId}/templates/data/${dataId}`,
     });
   });

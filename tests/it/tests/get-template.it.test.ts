@@ -76,7 +76,7 @@ describe('getTemplate', () => {
     const getSignedUrlArgs = getSignedUrlSpy.mock.calls[0];
     expect(getSignedUrlArgs[1]).toBeInstanceOf(GetObjectCommand);
     expect(getSignedUrlArgs[1].input).toEqual({
-      Bucket: 'pdf-generator-api-it-test',
+      Bucket: 'pdf-generator-api-test',
       Key: templateEntity.s3Key,
     });
   });
