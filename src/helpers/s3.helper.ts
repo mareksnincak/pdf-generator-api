@@ -61,7 +61,6 @@ export async function moveObject({
   await deleteObject({ bucket: sourceBucket, key: sourceKey });
 }
 
-// TODO tests
 export async function getPresignedShareUrl({ bucket, key }: { bucket: string; key: string }) {
   const client = getS3Client();
 
