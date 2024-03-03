@@ -2,6 +2,7 @@ export enum Lambda {
   getOpenApi = 'get-open-api',
   getUrlForTemplateUpload = 'get-url-for-template-upload',
   createTemplate = 'create-template',
+  getTemplate = 'get-template',
   deleteTemplate = 'delete-template',
   setDefaultUserPassword = 'set-default-user-password',
 }

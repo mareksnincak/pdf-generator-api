@@ -1,6 +1,26 @@
-import { CopyObjectCommand, DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 
-import { copyObject, deleteObject, moveObject } from './s3.helper';
+import {
+  copyObject,
+  deleteObject,
+  getPresignedShareUrl,
+  getPresignedUploadUrl,
+  moveObject,
+} from './s3.helper';
+
+jest.mock('@aws-sdk/s3-request-presigner', () => {
+  return {
+    __esModule: true,
+    ...jest.requireActual('@aws-sdk/s3-request-presigner'),
+  };
+});
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -69,6 +89,54 @@ describe('moveObject', () => {
     expect(s3DeleteArgs.input).toEqual({
       Bucket: sourceBucket,
       Key: sourceKey,
+    });
+  });
+});
+
+describe('getPresignedShareUrl', () => {
+  it('should return presigned getObject url', async () => {
+    const mockedUrl = 'http://mocked.example.com/path';
+    const getSignedUrlSpy = jest
+      .spyOn(requestPresigner, 'getSignedUrl')
+      .mockResolvedValue(mockedUrl);
+
+    const bucket = 'sample-bucket';
+    const key = 'sample-key';
+
+    const result = await getPresignedShareUrl({ bucket, key });
+
+    expect(result).toEqual(mockedUrl);
+
+    const getSignedUrlArgs = getSignedUrlSpy.mock.calls[0];
+    expect(getSignedUrlArgs[1]).toBeInstanceOf(GetObjectCommand);
+    expect(getSignedUrlArgs[1].input).toEqual({
+      Bucket: bucket,
+      Key: key,
+    });
+  });
+});
+
+describe('getPresignedUploadUrl', () => {
+  it('should return presigned putObject url', async () => {
+    const mockedUrl = 'http://mocked.example.com/path';
+    const getSignedUrlSpy = jest
+      .spyOn(requestPresigner, 'getSignedUrl')
+      .mockResolvedValue(mockedUrl);
+
+    const bucket = 'sample-bucket';
+    const key = 'sample-key';
+    const fileSizeBytes = 1;
+
+    const result = await getPresignedUploadUrl({ bucket, key, fileSizeBytes });
+
+    expect(result).toEqual(mockedUrl);
+
+    const getSignedUrlArgs = getSignedUrlSpy.mock.calls[0];
+    expect(getSignedUrlArgs[1]).toBeInstanceOf(PutObjectCommand);
+    expect(getSignedUrlArgs[1].input).toEqual({
+      Bucket: bucket,
+      Key: key,
+      ContentLength: fileSizeBytes,
     });
   });
 });

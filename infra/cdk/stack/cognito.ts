@@ -112,6 +112,10 @@ export function createCognito({
     identifier: ResourceServerIdentifier.pdfGenerator,
     scopes: [
       {
+        scopeName: PdfGeneratorCustomAuthorizationScope.readTemplates,
+        scopeDescription: 'Read templates',
+      },
+      {
         scopeName: PdfGeneratorCustomAuthorizationScope.writeTemplates,
         scopeDescription: 'Modify templates',
       },
@@ -130,6 +134,7 @@ export function createCognito({
     oAuth: {
       scopes: [
         OAuthScope.COGNITO_ADMIN,
+        OAuthScope.custom(AuthorizationScope.pdfGeneratorReadTemplates),
         OAuthScope.custom(AuthorizationScope.pdfGeneratorWriteTemplates),
       ],
     },

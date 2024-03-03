@@ -76,6 +76,16 @@ export function createLambdas({
     },
   });
 
+  const getTemplate = new NodejsFunction(scope, Lambda.getTemplate, {
+    ...getCommonNodeJsFunctionProps(Lambda.getTemplate, cdkEnvVars),
+    handler: 'getTemplate',
+    environment: {
+      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+      S3_BUCKET: s3BucketName,
+      ...envVars.get(Lambda.getTemplate),
+    },
+  });
+
   const deleteTemplate = new NodejsFunction(scope, Lambda.deleteTemplate, {
     ...getCommonNodeJsFunctionProps(Lambda.deleteTemplate, cdkEnvVars),
     handler: 'deleteTemplate',
@@ -98,6 +108,7 @@ export function createLambdas({
     getOpenApi,
     getUrlForTemplateUpload,
     createTemplate,
+    getTemplate,
     deleteTemplate,
     setDefaultUserPassword,
   };

@@ -5,6 +5,6 @@ import { templateIdDto } from '../../../dtos/template-id.dto';
 
 extendZodWithOpenApi(z);
 
-export const deleteTemplateRequestDto = templateIdDto;
+export const getTemplateRequestDto = templateIdDto;
 
-export type DeleteTemplateRequestDto = z.infer<typeof deleteTemplateRequestDto>;
+export type GetTemplateRequestDto = z.infer<typeof getTemplateRequestDto>;

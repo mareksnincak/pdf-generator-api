@@ -4,6 +4,7 @@
   },
   "lambda": {
     "create-template": {},
+    "get-template": {},
     "delete-template": {},
     "get-open-api": {},
     "get-url-for-template-upload": {},

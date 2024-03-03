@@ -5,6 +5,8 @@ import { templateResponseDto } from '../../../dtos/template-response.dto';
 
 extendZodWithOpenApi(z);
 
-export const createTemplateResponseDto = templateResponseDto;
+export const getTemplateResponseDto = templateResponseDto.extend({
+  dataUrl: z.string(),
+});
 
-export type CreateTemplateResponseDto = z.infer<typeof createTemplateResponseDto>;
+export type GetTemplateResponseDto = z.infer<typeof getTemplateResponseDto>;

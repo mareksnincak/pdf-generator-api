@@ -63,6 +63,17 @@ describe('Template', () => {
     templateId = createTemplateResponse.id;
   });
 
+  it('should return template', async () => {
+    expect(templateId).toBeDefined();
+
+    const { body } = await request(baseUrl)
+      .get(`/templates/${templateId}`)
+      .auth(accessToken, { type: 'bearer' })
+      .expect(200);
+
+    expect(body).toHaveProperty('id', templateId);
+  });
+
   it('should delete template', async () => {
     expect(templateId).toBeDefined();
 

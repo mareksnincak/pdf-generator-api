@@ -9,7 +9,11 @@ import { type OpenApiParamsSsmParam } from './types/input.type';
 
 let openApiDocument: ReturnType<typeof generateOpenApi>;
 
-async function getOpenApiDocument() {
+async function getOpenApiParams() {
+  if (process.env.IS_LOCAL === 'true') {
+    return;
+  }
+
   const ssmParamName = process.env.OPEN_API_SSM_PARAM_NAME;
   if (!ssmParamName) {
     throw new Error('getOpenApi.getOpenApiDocument.missingSsmParamName');
@@ -18,8 +22,13 @@ async function getOpenApiDocument() {
   const value = await getSsmParam(ssmParamName);
 
   const openApiParams = JSON.parse(value) as OpenApiParamsSsmParam;
+  logger.debug(openApiParams, 'getOpenApi.getOpenApiParams.openApiParams');
 
-  logger.debug(openApiParams, 'getOpenApi.getOpenApiDocument.openApiParams');
+  return openApiParams;
+}
+
+async function getOpenApiDocument() {
+  const openApiParams = await getOpenApiParams();
   return generateOpenApi(openApiParams);
 }
 
