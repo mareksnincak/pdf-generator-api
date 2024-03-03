@@ -3,6 +3,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "cSpell.words": [
     "asteasolutions",
+    "Ciphertext",
     "dtos",
     "linebreak",
     "nvmrc",

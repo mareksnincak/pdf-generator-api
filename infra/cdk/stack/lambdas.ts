@@ -2,6 +2,7 @@ import { join } from 'node:path';
 
 import { Duration } from 'aws-cdk-lib';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
+import { type Key } from 'aws-cdk-lib/aws-kms';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
@@ -39,12 +40,14 @@ export function createLambdas({
   openApiParamsSsmParamName,
   s3BucketName,
   dynamoDbTable,
+  kmsKey,
 }: {
   scope: Construct;
   cdkEnvVars: CdkEnvVarsDto;
   openApiParamsSsmParamName: string;
   s3BucketName: string;
   dynamoDbTable: Table;
+  kmsKey: Key;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
 
@@ -91,6 +94,7 @@ export function createLambdas({
     handler: 'getTemplates',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+      KMS_KEY_ID: kmsKey.keyId,
       ...envVars.get(Lambda.getTemplates),
     },
   });

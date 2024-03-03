@@ -18,7 +18,8 @@
     "get-templates": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
-      "DYNAMODB_TABLE_NAME": "PdfGenerator"
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
+      "KMS_KEY_ID": "sample-kms-key-id"
     },
     "delete-template": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
