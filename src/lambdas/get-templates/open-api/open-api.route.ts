@@ -1,6 +1,6 @@
 import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
 
-import { templateIdDto } from '../../../dtos/template-id.dto';
+import { getTemplatesRequestDto } from '../dtos/request.dto';
 import { getTemplatesResponseDto } from '../dtos/response.dto';
 
 export const getTemplatesRoute: RouteConfig = {
@@ -10,7 +10,7 @@ export const getTemplatesRoute: RouteConfig = {
   summary: 'Get templates',
   description: 'Get templates.',
   request: {
-    params: templateIdDto,
+    query: getTemplatesRequestDto,
   },
   responses: {
     200: {

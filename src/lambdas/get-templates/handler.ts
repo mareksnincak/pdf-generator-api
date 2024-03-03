@@ -8,7 +8,9 @@ import { getMany } from '../../db/template/template.repository';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { validateQueryParams } from '../../helpers/validation.helper';
 
+import { getTemplatesRequestDto } from './dtos/request.dto';
 import { type GetTemplatesResponseDto } from './dtos/response.dto';
 
 export async function getTemplates(
@@ -19,10 +21,17 @@ export async function getTemplates(
     setLoggerContext(event, context);
     logger.info('getTemplates.starting');
 
-    const userId = getUserIdFromEventOrFail(event);
-    const templates = await getMany({ userId });
+    const validatedQueryParams = validateQueryParams(event, getTemplatesRequestDto);
+    logger.info(validatedQueryParams, 'getUrlForTemplateUpload.validatedQueryParams');
 
-    const response: GetTemplatesResponseDto = templates.map((template) => template.toPublicJson());
+    const userId = getUserIdFromEventOrFail(event);
+    const { limit, paginationToken } = validatedQueryParams;
+    const { templates, nextPaginationToken } = await getMany({ userId, limit, paginationToken });
+
+    const response: GetTemplatesResponseDto = {
+      nextPaginationToken,
+      templates: templates.map((template) => template.toPublicJson()),
+    };
     logger.info('getTemplates.success');
     return {
       statusCode: 200,

@@ -14,6 +14,7 @@ import { NotFoundError } from '../../errors/not-found.error';
 import { logger } from '../../helpers/logger.helper';
 import { DynamoIndex } from '../common/enums/dynamo.enum';
 import { getDynamoDbClient, getTableName } from '../common/helpers/connection.helper';
+import { decodePaginationToken, encodePaginationToken } from '../common/helpers/pagination.helper';
 
 import { TemplateEntity } from './template.entity';
 import { type Template } from './template.type';
@@ -79,23 +80,35 @@ export async function getByIdOrFail(params: { id: string; userId: string }) {
   return template;
 }
 
-export async function getMany({ userId }: { userId: string }) {
+export async function getMany({
+  userId,
+  limit,
+  paginationToken,
+}: {
+  userId: string;
+  limit?: number;
+  paginationToken?: string;
+}) {
   logger.info({ userId }, 'templateRepository.getMany');
 
+  const ExclusiveStartKey = decodePaginationToken(paginationToken);
   const partitionKey = TemplateEntity.getGsi1PartitionKey({ userId });
 
   const command = new QueryCommand({
     TableName: getTableName(),
     IndexName: DynamoIndex.GSI1,
-    // TODO pagination
-    Limit: 10,
+    ExclusiveStartKey,
+    Limit: limit,
     KeyConditionExpression: 'GSI1PK = :GSI1PK',
     ExpressionAttributeValues: marshall({ ':GSI1PK': partitionKey }),
   });
 
-  const { Items = [] } = await getDynamoDbClient().send(command);
+  const { Items = [], LastEvaluatedKey } = await getDynamoDbClient().send(command);
 
   const templates = Items.map((item) => TemplateEntity.fromDynamoItem(item));
+
+  // TODO encrypt
+  const nextPaginationToken = encodePaginationToken(LastEvaluatedKey);
 
   logger.info(
     {
@@ -103,7 +116,10 @@ export async function getMany({ userId }: { userId: string }) {
     },
     'templateRepository.getMany.success',
   );
-  return templates;
+  return {
+    templates,
+    nextPaginationToken,
+  };
 }
 
 export async function deleteById(params: { id: string; userId: string }) {
