@@ -14,27 +14,23 @@ import { NotFoundError } from '../../errors/not-found.error';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { moveObject } from '../../helpers/s3.helper';
+import { deleteObject, moveObject } from '../../helpers/s3.helper';
 import { validateBody } from '../../helpers/validation.helper';
 
-import { createTemplateRequestDto } from './dtos/request.dto';
+import { type CreateTemplateRequestDto, createTemplateRequestDto } from './dtos/request.dto';
 import { type CreateTemplateResponseDto } from './dtos/response.dto';
 
 async function moveTemplateDataToPermanentLocation({
+  bucket,
   uploadId,
   userId,
 }: {
+  bucket: string;
   uploadId: string;
   userId: string;
 }) {
   try {
     // TODO validate html
-    const bucket = process.env.S3_BUCKET;
-
-    if (!bucket) {
-      throw new Error('createTemplate.moveTemplateDataToPermanentLocation.missingS3Bucket');
-    }
-
     const uploadedDataS3Key = `${userId}/templates/uploads/${uploadId}`;
     const storedDataS3Key = `${userId}/templates/data/${randomUUID()}`;
 
@@ -57,6 +53,30 @@ async function moveTemplateDataToPermanentLocation({
   }
 }
 
+export async function createTemplateWithData({
+  userId,
+  requestData: { id, name, uploadId, type },
+}: {
+  userId: string;
+  requestData: CreateTemplateRequestDto;
+}) {
+  const bucket = process.env.S3_BUCKET;
+  if (!bucket) {
+    throw new Error('createTemplate.moveTemplateDataToPermanentLocation.missingS3Bucket');
+  }
+
+  const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId, bucket });
+
+  try {
+    const template = await createOrReplace({ id, name, type, s3Key, userId });
+    return template;
+  } catch (error) {
+    await deleteObject({ bucket, key: s3Key });
+
+    throw error;
+  }
+}
+
 export async function createTemplate(
   event: APIGatewayProxyWithCognitoAuthorizerEvent,
   context: Context,
@@ -68,11 +88,8 @@ export async function createTemplate(
     const validatedData = validateBody(event, createTemplateRequestDto);
     logger.info(validatedData, 'createTemplate.validatedData');
 
-    const { id, name, uploadId, type } = validatedData;
-
     const userId = getUserIdFromEventOrFail(event);
-    const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId });
-    const template = await createOrReplace({ id, name, type, s3Key, userId });
+    const template = await createTemplateWithData({ userId, requestData: validatedData });
 
     const response: CreateTemplateResponseDto = template.toPublicJson();
     logger.info('createTemplate.success');

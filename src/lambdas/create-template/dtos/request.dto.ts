@@ -11,12 +11,12 @@ export const createTemplateRequestDto = z.object({
     .min(1)
     .max(64)
     .optional()
-    .openapi({ description: 'Template id.', example: 'customTemplateId' }),
+    .openapi({ description: 'Template id.', example: 'templateId' }),
   name: z
     .string()
     .min(1)
     .max(64)
-    .openapi({ description: 'Template name.', example: 'Custom template name' }),
+    .openapi({ description: 'Template name.', example: 'Template name' }),
   uploadId: z
     .string()
     .uuid()

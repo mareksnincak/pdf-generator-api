@@ -1,4 +1,5 @@
 import { BadRequestError } from '../errors/bad-request.error';
+import { ConflictError } from '../errors/conflict.error';
 import { NotFoundError } from '../errors/not-found.error';
 
 import { handleError } from './error.helper';
@@ -12,6 +13,7 @@ describe('handleError', () => {
   it.each([
     [400, BadRequestError],
     [404, NotFoundError],
+    [409, ConflictError],
   ])('should return %i response on HttpError', (statusCode, HttpError) => {
     mockLogger();
     const error = new HttpError({

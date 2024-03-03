@@ -38,5 +38,13 @@ export const createTemplateRoute: RouteConfig = {
         },
       },
     },
+    409: {
+      description: ErrorMessage.templateAlreadyExists,
+      content: {
+        'application/json': {
+          schema: httpErrorDto,
+        },
+      },
+    },
   },
 };

@@ -1,7 +1,13 @@
-import { DeleteItemCommand, GetItemCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import {
+  ConditionalCheckFailedException,
+  DeleteItemCommand,
+  GetItemCommand,
+  PutItemCommand,
+} from '@aws-sdk/client-dynamodb';
 import { type Optional } from 'utility-types';
 
 import { ErrorMessage } from '../../enums/error.enum';
+import { ConflictError } from '../../errors/conflict.error';
 import { NotFoundError } from '../../errors/not-found.error';
 import { logger } from '../../helpers/logger.helper';
 import { getDynamoDbClient, getTableName } from '../common/helpers/connection.helper';
@@ -10,19 +16,30 @@ import { TemplateEntity } from './template.entity';
 import { type Template } from './template.type';
 
 export async function createOrReplace(template: Optional<Template, 'id'>) {
-  logger.info('templateRepository.createOrReplace');
+  try {
+    logger.info('templateRepository.createOrReplace');
 
-  const templateEntity = new TemplateEntity(template);
-  const item = await templateEntity.toDynamoItem();
-  const command = new PutItemCommand({
-    TableName: getTableName(),
-    Item: item,
-  });
+    const templateEntity = new TemplateEntity(template);
+    const item = await templateEntity.toDynamoItem();
+    const command = new PutItemCommand({
+      TableName: getTableName(),
+      Item: item,
+      ConditionExpression: 'attribute_not_exists(PK)',
+    });
 
-  await getDynamoDbClient().send(command);
+    await getDynamoDbClient().send(command);
 
-  logger.info(templateEntity.primaryKey, 'templateRepository.createOrReplace.success');
-  return templateEntity;
+    logger.info(templateEntity.primaryKey, 'templateRepository.createOrReplace.success');
+    return templateEntity;
+  } catch (error) {
+    if (error instanceof ConditionalCheckFailedException) {
+      throw new ConflictError({
+        message: ErrorMessage.templateAlreadyExists,
+      });
+    }
+
+    throw error;
+  }
 }
 
 export async function getById(params: { id: string; userId: string }) {
