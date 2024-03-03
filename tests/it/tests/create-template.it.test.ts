@@ -6,6 +6,7 @@ import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aw
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
 import * as templateRepository from '../../../src/db/template/template.repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
@@ -27,6 +28,7 @@ jest.mock('node:crypto', () => {
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const context = new ContextMockFactory().create();
+const templateEntityMockFactory = new TemplateEntityMockFactory();
 
 beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.createTemplate);
@@ -99,6 +101,7 @@ describe('createTemplate', () => {
 
   it('should return 404 when template data does not exist', async () => {
     mockLogger();
+
     jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
       throw new NoSuchKey({ message: 'No such key', $metadata: {} });
     });
@@ -113,6 +116,45 @@ describe('createTemplate', () => {
     expect(result.statusCode).toEqual(404);
     expect(JSON.parse(result.body)).toEqual({
       message: ErrorMessage.templateDataNotFound,
+    });
+  });
+
+  it('should return 409 and delete s3 data when template already exists', async () => {
+    mockLogger();
+
+    const id = randomUUID();
+    const dataId = randomUUID();
+
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue(dataId);
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+
+    const requestBody = requestMockFactory.create({
+      id,
+    });
+    const event = eventMockFactory.create({
+      body: JSON.stringify(requestBody),
+    });
+
+    const userId = event.requestContext.authorizer.claims.sub;
+    const templateEntity = templateEntityMockFactory.create({
+      id,
+      userId,
+    });
+
+    await templateRepository.createOrReplace(templateEntity);
+
+    const result = await createTemplate(event, context);
+
+    expect(result.statusCode).toEqual(409);
+    expect(JSON.parse(result.body)).toEqual({
+      message: ErrorMessage.templateAlreadyExists,
+    });
+
+    const s3ClientLastCallArgs = s3ClientSpy.mock.lastCall?.[0];
+    expect(s3ClientLastCallArgs).toBeInstanceOf(DeleteObjectCommand);
+    expect(s3ClientLastCallArgs?.input).toEqual({
+      Bucket: 'pdf-generator-api-it-test',
+      Key: `${userId}/templates/data/${dataId}`,
     });
   });
 });

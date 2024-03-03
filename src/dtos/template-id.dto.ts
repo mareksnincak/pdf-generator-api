@@ -4,11 +4,7 @@ import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 export const templateIdDto = z.object({
-  id: z
-    .string()
-    .min(1)
-    .max(64)
-    .openapi({ description: 'Template id.', example: 'customTemplateId' }),
+  id: z.string().min(1).max(64).openapi({ description: 'Template id.', example: 'templateId' }),
 });
 
 export type TemplateIdDto = z.infer<typeof templateIdDto>;
