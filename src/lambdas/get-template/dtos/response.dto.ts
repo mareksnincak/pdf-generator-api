@@ -1,12 +1,10 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import z from 'zod';
 
-import { templateResponseDto } from '../../../dtos/template-response.dto';
+import { templateWithDataResponseDto } from '../../../dtos/template-with-data-response.dto';
 
 extendZodWithOpenApi(z);
 
-export const getTemplateResponseDto = templateResponseDto.extend({
-  dataUrl: z.string(),
-});
+export const getTemplateResponseDto = templateWithDataResponseDto;
 
 export type GetTemplateResponseDto = z.infer<typeof getTemplateResponseDto>;
