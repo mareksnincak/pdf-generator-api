@@ -27,7 +27,7 @@ export async function encryptPaginationToken(
     },
     'commonDb.paginationHelper.encryptPaginationToken.result',
   );
-  return encryptedData.toString('base64url');
+  return encodedData;
 }
 
 export async function decryptPaginationToken(paginationToken?: string) {
