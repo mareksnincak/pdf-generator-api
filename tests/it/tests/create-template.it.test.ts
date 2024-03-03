@@ -44,11 +44,13 @@ afterEach(() => {
 describe('createTemplate', () => {
   it('should create template', async () => {
     const dataId = randomUUID();
+    const id = randomUUID();
 
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(dataId);
     const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
 
     const requestBody = requestMockFactory.create({
+      id,
       name: 'sample template',
     });
     const event = eventMockFactory.create({
@@ -61,7 +63,9 @@ describe('createTemplate', () => {
 
     const body = JSON.parse(result.body) as CreateTemplateResponseDto;
     expect(body).toEqual({
-      id: expect.any(String),
+      id,
+      name: requestBody.name,
+      type: requestBody.type,
     });
 
     const userId = event.requestContext.authorizer.claims.sub;
@@ -81,7 +85,6 @@ describe('createTemplate', () => {
       Key: `${userId}/templates/uploads/${requestBody.uploadId}`,
     });
 
-    const { id } = body;
     const createdTemplate = await templateRepository.getByIdOrFail({ id, userId });
     expect(createdTemplate).toEqual({
       PK: `TEMPLATE#${userId}#${id}`,

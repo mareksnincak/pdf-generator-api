@@ -21,28 +21,41 @@ export async function createOrReplace(template: Optional<Template, 'id'>) {
 
   await getDynamoDbClient().send(command);
 
-  logger.info('templateRepository.createOrReplace.success');
+  logger.info(templateEntity.primaryKey, 'templateRepository.createOrReplace.success');
   return templateEntity;
 }
 
-export async function getByIdOrFail(params: { id: string; userId: string }) {
+export async function getById(params: { id: string; userId: string }) {
   logger.info(params, 'templateRepository.getById');
 
   const command = new GetItemCommand({
     TableName: getTableName(),
-    Key: TemplateEntity.getDynamoPartitionKey(params),
+    Key: TemplateEntity.getDynamoPrimaryKey(params),
   });
 
   const { Item } = await getDynamoDbClient().send(command);
   if (!Item) {
+    logger.info('templateRepository.getById.notFound');
+    return null;
+  }
+
+  const template = await TemplateEntity.fromDynamoItem(Item);
+
+  logger.info(template.primaryKey, 'templateRepository.getById.success');
+  return template;
+}
+
+export async function getByIdOrFail(params: { id: string; userId: string }) {
+  logger.info(params, 'templateRepository.getByIdOrFail');
+
+  const template = await getById(params);
+  if (!template) {
     throw new NotFoundError({
       message: ErrorMessage.templateNotFound,
     });
   }
 
-  const template = await TemplateEntity.fromDynamoItem(Item);
-
-  logger.info('templateRepository.getById.success');
+  logger.info(template.primaryKey, 'templateRepository.getByIdOrFail.success');
   return template;
 }
 
@@ -51,7 +64,7 @@ export async function deleteById(params: { id: string; userId: string }) {
 
   const command = new DeleteItemCommand({
     TableName: getTableName(),
-    Key: TemplateEntity.getDynamoPartitionKey(params),
+    Key: TemplateEntity.getDynamoPrimaryKey(params),
     ReturnValues: 'ALL_OLD',
   });
 
