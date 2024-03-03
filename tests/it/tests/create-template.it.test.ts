@@ -157,4 +157,32 @@ describe('createTemplate', () => {
       Key: `${userId}/templates/data/${dataId}`,
     });
   });
+
+  it('should not return 409 when id exists under other user', async () => {
+    mockLogger();
+
+    const id = randomUUID();
+    const dataId = randomUUID();
+
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue(dataId);
+    jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+
+    const requestBody = requestMockFactory.create({
+      id,
+    });
+    const event = eventMockFactory.create({
+      body: JSON.stringify(requestBody),
+    });
+
+    const templateEntity = templateEntityMockFactory.create({
+      id,
+      userId: 'other-user-id',
+    });
+
+    await templateRepository.createOrReplace(templateEntity);
+
+    const result = await createTemplate(event, context);
+
+    expect(result.statusCode).toEqual(200);
+  });
 });
