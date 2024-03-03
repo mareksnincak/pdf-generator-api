@@ -17,6 +17,10 @@ export function createOutputs({
     value: api.url,
   });
 
+  new CfnOutput(scope, 'authUrl', {
+    value: cognito.userPoolDomain.baseUrl(),
+  });
+
   new CfnOutput(scope, 'userPoolId', {
     value: cognito.userPool.userPoolId,
   });

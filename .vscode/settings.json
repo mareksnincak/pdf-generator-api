@@ -11,8 +11,8 @@
     "pino",
     "presigner",
     "presynth",
+    "signin",
     "singleline",
-    "trpc",
     "unmarshall"
   ],
   "jestrunner.configPath": ".jest/jest.common.config.ts",
