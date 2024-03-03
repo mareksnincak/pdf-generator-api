@@ -3,13 +3,16 @@ import {
   DeleteItemCommand,
   GetItemCommand,
   PutItemCommand,
+  QueryCommand,
 } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { type Optional } from 'utility-types';
 
 import { ErrorMessage } from '../../enums/error.enum';
 import { ConflictError } from '../../errors/conflict.error';
 import { NotFoundError } from '../../errors/not-found.error';
 import { logger } from '../../helpers/logger.helper';
+import { DynamoIndex } from '../common/enums/dynamo.enum';
 import { getDynamoDbClient, getTableName } from '../common/helpers/connection.helper';
 
 import { TemplateEntity } from './template.entity';
@@ -56,7 +59,7 @@ export async function getById(params: { id: string; userId: string }) {
     return null;
   }
 
-  const template = await TemplateEntity.fromDynamoItem(Item);
+  const template = TemplateEntity.fromDynamoItem(Item);
 
   logger.info(template.primaryKey, 'templateRepository.getById.success');
   return template;
@@ -76,6 +79,33 @@ export async function getByIdOrFail(params: { id: string; userId: string }) {
   return template;
 }
 
+export async function getMany({ userId }: { userId: string }) {
+  logger.info({ userId }, 'templateRepository.getMany');
+
+  const partitionKey = TemplateEntity.getGsi1PartitionKey({ userId });
+
+  const command = new QueryCommand({
+    TableName: getTableName(),
+    IndexName: DynamoIndex.GSI1,
+    // TODO pagination
+    Limit: 10,
+    KeyConditionExpression: 'GSI1PK = :GSI1PK',
+    ExpressionAttributeValues: marshall({ ':GSI1PK': partitionKey }),
+  });
+
+  const { Items = [] } = await getDynamoDbClient().send(command);
+
+  const templates = Items.map((item) => TemplateEntity.fromDynamoItem(item));
+
+  logger.info(
+    {
+      foundTemplates: templates.length,
+    },
+    'templateRepository.getMany.success',
+  );
+  return templates;
+}
+
 export async function deleteById(params: { id: string; userId: string }) {
   logger.info(params, 'templateRepository.deleteById');
 
@@ -92,7 +122,7 @@ export async function deleteById(params: { id: string; userId: string }) {
       message: ErrorMessage.templateNotFound,
     });
   }
-  const deletedTemplate = await TemplateEntity.fromDynamoItem(Attributes);
+  const deletedTemplate = TemplateEntity.fromDynamoItem(Attributes);
 
   logger.info('templateRepository.deleteById.success');
   return deletedTemplate;

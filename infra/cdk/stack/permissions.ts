@@ -39,6 +39,7 @@ export function grantPermissions({
   dynamoDbTable.grantWriteData(lambdas.createTemplate);
   dynamoDbTable.grantWriteData(lambdas.deleteTemplate);
   dynamoDbTable.grantReadData(lambdas.getTemplate);
+  dynamoDbTable.grantReadData(lambdas.getTemplates);
 
   cognito.defaultUsersCredentialsSecret.grantRead(lambdas.setDefaultUserPassword);
   cognito.userPool.grant(lambdas.setDefaultUserPassword, 'cognito-idp:AdminSetUserPassword');
