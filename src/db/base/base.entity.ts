@@ -1,21 +1,40 @@
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 
-import { type PrimaryKey } from '../common/types/entity.type';
+import { type Gsi1Key, type PrimaryKey } from '../common/types/entity.type';
 
 export abstract class BaseEntity {
   private readonly PK: string;
 
   private readonly SK: string;
 
-  constructor({ PK, SK }: PrimaryKey) {
+  private readonly GSI1PK?: string;
+
+  private readonly GSI1SK?: string;
+
+  constructor({
+    primaryKey: { PK, SK },
+    gsi1Key: { GSI1PK, GSI1SK } = {},
+  }: {
+    primaryKey: PrimaryKey;
+    gsi1Key?: Gsi1Key;
+  }) {
     this.PK = PK;
     this.SK = SK;
+    this.GSI1PK = GSI1PK;
+    this.GSI1SK = GSI1SK;
   }
 
   public get primaryKey(): PrimaryKey {
     return {
       PK: this.PK,
       SK: this.SK,
+    };
+  }
+
+  public get gsi1Key(): Gsi1Key {
+    return {
+      GSI1PK: this.GSI1PK,
+      GSI1SK: this.GSI1SK,
     };
   }
 

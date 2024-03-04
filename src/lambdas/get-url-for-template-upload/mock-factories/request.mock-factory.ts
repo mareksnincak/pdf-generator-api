@@ -1,20 +1,11 @@
-import { type APIGatewayProxyEventQueryStringParameters } from 'aws-lambda';
+import { type Schema } from 'type-fest';
 
 import { type GetUrlForTemplateUploadRequestDto } from '../dtos/request.dto';
 
 export class GetUrlForTemplateUploadRequestMockFactory {
   create(
-    overrides: Partial<GetUrlForTemplateUploadRequestDto> = {},
-  ): GetUrlForTemplateUploadRequestDto {
-    return {
-      fileSizeBytes: 1024,
-      ...overrides,
-    };
-  }
-
-  createRaw(
-    overrides: Partial<APIGatewayProxyEventQueryStringParameters> = {},
-  ): APIGatewayProxyEventQueryStringParameters {
+    overrides: Partial<Schema<GetUrlForTemplateUploadRequestDto, string>> = {},
+  ): Schema<GetUrlForTemplateUploadRequestDto, string> {
     return {
       fileSizeBytes: '1024',
       ...overrides,

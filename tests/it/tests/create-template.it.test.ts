@@ -89,8 +89,10 @@ describe('createTemplate', () => {
 
     const createdTemplate = await templateRepository.getByIdOrFail({ id, userId });
     expect(createdTemplate).toEqual({
-      PK: `TEMPLATE#${userId}#${id}`,
+      PK: `TEMPLATE#USER#${userId}#ID#${id}`,
       SK: '#',
+      GSI1PK: `TEMPLATE#USER#${userId}`,
+      GSI1SK: `NAME#${requestBody.name}`,
       id,
       name: requestBody.name,
       s3Key: `${userId}/templates/data/${requestBody.uploadId}`,

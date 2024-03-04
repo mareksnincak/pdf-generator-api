@@ -1,6 +1,8 @@
 import { type RemovalPolicy } from 'aws-cdk-lib';
-import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, ProjectionType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { type Construct } from 'constructs';
+
+import { DynamoIndex } from '../../../src/db/common/enums/dynamo.enum';
 
 export function createDynamoDbTable({
   scope,
@@ -22,6 +24,19 @@ export function createDynamoDbTable({
       type: AttributeType.STRING,
     },
     removalPolicy,
+  });
+
+  table.addGlobalSecondaryIndex({
+    indexName: DynamoIndex.GSI1,
+    partitionKey: {
+      name: 'GSI1PK',
+      type: AttributeType.STRING,
+    },
+    sortKey: {
+      name: 'GSI1SK',
+      type: AttributeType.STRING,
+    },
+    projectionType: ProjectionType.ALL,
   });
 
   return table;

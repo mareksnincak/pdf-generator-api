@@ -46,7 +46,7 @@ describe('getUrlForTemplateUpload', () => {
       .spyOn(s3RequestPresigner, 'getSignedUrl')
       .mockResolvedValue(presignedUrl);
 
-    const queryStringParameters = requestMockFactory.createRaw();
+    const queryStringParameters = requestMockFactory.create();
     const event = eventMockFactory.create({
       queryStringParameters,
     });

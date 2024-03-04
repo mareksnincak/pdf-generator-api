@@ -3,19 +3,26 @@ import {
   DeleteItemCommand,
   GetItemCommand,
   PutItemCommand,
+  QueryCommand,
 } from '@aws-sdk/client-dynamodb';
-import { type Optional } from 'utility-types';
+import { marshall } from '@aws-sdk/util-dynamodb';
+import { type SetOptional } from 'type-fest';
 
 import { ErrorMessage } from '../../enums/error.enum';
 import { ConflictError } from '../../errors/conflict.error';
 import { NotFoundError } from '../../errors/not-found.error';
 import { logger } from '../../helpers/logger.helper';
+import { DynamoIndex } from '../common/enums/dynamo.enum';
 import { getDynamoDbClient, getTableName } from '../common/helpers/connection.helper';
+import {
+  decryptPaginationToken,
+  encryptPaginationToken,
+} from '../common/helpers/pagination.helper';
 
 import { TemplateEntity } from './template.entity';
 import { type Template } from './template.type';
 
-export async function createOrReplace(template: Optional<Template, 'id'>) {
+export async function createOrReplace(template: SetOptional<Template, 'id'>) {
   try {
     logger.info('templateRepository.createOrReplace');
 
@@ -56,7 +63,7 @@ export async function getById(params: { id: string; userId: string }) {
     return null;
   }
 
-  const template = await TemplateEntity.fromDynamoItem(Item);
+  const template = TemplateEntity.fromDynamoItem(Item);
 
   logger.info(template.primaryKey, 'templateRepository.getById.success');
   return template;
@@ -76,6 +83,53 @@ export async function getByIdOrFail(params: { id: string; userId: string }) {
   return template;
 }
 
+export async function getMany({
+  userId,
+  limit,
+  paginationToken,
+}: {
+  userId: string;
+  limit?: number;
+  paginationToken?: string;
+}) {
+  logger.info({ userId }, 'templateRepository.getMany');
+
+  const ExclusiveStartKey = await decryptPaginationToken({
+    userId,
+    paginationToken,
+  });
+  const partitionKey = TemplateEntity.getGsi1PartitionKey({ userId });
+
+  const command = new QueryCommand({
+    TableName: getTableName(),
+    IndexName: DynamoIndex.GSI1,
+    ExclusiveStartKey,
+    Limit: limit,
+    KeyConditionExpression: 'GSI1PK = :GSI1PK',
+    ExpressionAttributeValues: marshall({ ':GSI1PK': partitionKey }),
+  });
+
+  const { Items = [], LastEvaluatedKey } = await getDynamoDbClient().send(command);
+
+  const templates = Items.map((item) => TemplateEntity.fromDynamoItem(item));
+
+  const nextPaginationToken = await encryptPaginationToken({
+    userId,
+    paginationToken: LastEvaluatedKey,
+  });
+
+  logger.info(
+    {
+      foundTemplates: templates.length,
+    },
+    'templateRepository.getMany.success',
+  );
+  return {
+    templates,
+    nextPaginationToken,
+  };
+}
+
 export async function deleteById(params: { id: string; userId: string }) {
   logger.info(params, 'templateRepository.deleteById');
 
@@ -92,7 +146,7 @@ export async function deleteById(params: { id: string; userId: string }) {
       message: ErrorMessage.templateNotFound,
     });
   }
-  const deletedTemplate = await TemplateEntity.fromDynamoItem(Attributes);
+  const deletedTemplate = TemplateEntity.fromDynamoItem(Attributes);
 
   logger.info('templateRepository.deleteById.success');
   return deletedTemplate;

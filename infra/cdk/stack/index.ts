@@ -7,6 +7,7 @@ import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { createApi } from './api';
 import { createCognito } from './cognito';
 import { createDynamoDbTable } from './dynamo';
+import { createKmsKey } from './kms';
 import { createLambdas } from './lambdas';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
@@ -33,6 +34,7 @@ export class CdkStack extends Stack {
 
     const dynamoDbTable = createDynamoDbTable({ scope: this, stackId: id, removalPolicy });
     const s3Bucket = createS3Bucket({ scope: this, stackId: id, removalPolicy });
+    const kmsKey = createKmsKey({ scope: this, stackId: id, removalPolicy });
 
     const s3BucketName = s3Bucket.bucketName;
     const openApiParamsSsmParamName = `${id}-open-api-params`;
@@ -43,6 +45,7 @@ export class CdkStack extends Stack {
       openApiParamsSsmParamName,
       cdkEnvVars,
       dynamoDbTable,
+      kmsKey,
     });
 
     const cognito = createCognito({ scope: this, stackId: id, lambdas, removalPolicy });
@@ -61,6 +64,7 @@ export class CdkStack extends Stack {
       openApiParamsSsmParamName,
       dynamoDbTable,
       cognito,
+      kmsKey,
     });
 
     createStringParameters({

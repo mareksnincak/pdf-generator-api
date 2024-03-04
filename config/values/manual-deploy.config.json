@@ -5,6 +5,7 @@
   "lambda": {
     "create-template": {},
     "get-template": {},
+    "get-templates": {},
     "delete-template": {},
     "get-open-api": {},
     "get-url-for-template-upload": {},
