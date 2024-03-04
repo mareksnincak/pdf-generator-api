@@ -1,6 +1,6 @@
-import { randomBytes, randomUUID } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 
-import { EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
+import { DecryptCommand, EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
 
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
@@ -93,8 +93,6 @@ describe('getTemplates', () => {
   });
 
   it('should return nextPaginationToken when limit is reached', async () => {
-    const id = randomUUID();
-
     const queryStringParameters = requestMockFactory.create({
       limit: '1',
     });
@@ -104,7 +102,6 @@ describe('getTemplates', () => {
 
     const userId = event.requestContext.authorizer.claims.sub;
     const templateEntity = templateEntityMockFactory.create({
-      id,
       userId,
     });
 
@@ -137,7 +134,67 @@ describe('getTemplates', () => {
     });
   });
 
-  // it('should return correct page when paginationToken is provided', async () => {});
+  it('should return correct page when paginationToken is provided', async () => {
+    const paginationToken = randomBytes(8).toString('base64url');
+    const queryStringParameters = requestMockFactory.create({
+      limit: '2',
+      paginationToken,
+    });
+    const event = eventMockFactory.create({
+      queryStringParameters,
+    });
+
+    const userId = event.requestContext.authorizer.claims.sub;
+    const templateEntityA = templateEntityMockFactory.create({
+      userId,
+      name: 'a',
+    });
+
+    const templateEntityB = templateEntityMockFactory.create({
+      userId,
+      name: 'b',
+    });
+
+    const templateEntityC = templateEntityMockFactory.create({
+      userId,
+      name: 'c',
+    });
+
+    await Promise.all([
+      createOrReplace(templateEntityA),
+      createOrReplace(templateEntityB),
+      createOrReplace(templateEntityC),
+    ]);
+
+    const kmsClientSpy = jest.spyOn(KMSClient.prototype, 'send').mockImplementation(() => ({
+      Plaintext: Buffer.from(
+        JSON.stringify({
+          userId,
+          token: {
+            SK: '#',
+            PK: `TEMPLATE#USER#${userId}#ID#${templateEntityB.id}`,
+            GSI1PK: `TEMPLATE#USER#${userId}`,
+            GSI1SK: `NAME#${templateEntityB.name}`,
+          },
+        }),
+      ),
+    }));
+
+    const result = await getTemplates(event, context);
+
+    expect(result.statusCode).toEqual(200);
+
+    const { templates } = JSON.parse(result.body) as GetTemplatesResponseDto;
+    expect(templates).toHaveLength(1);
+    expect(templates[0].name).toEqual(templateEntityC.name);
+
+    const kmsClientArgs = kmsClientSpy.mock.calls[0][0];
+    expect(kmsClientArgs).toBeInstanceOf(DecryptCommand);
+    const decryptCommandInput = (kmsClientArgs as DecryptCommand).input;
+    expect(Buffer.from(decryptCommandInput.CiphertextBlob ?? '').toString('base64url')).toEqual(
+      paginationToken,
+    );
+  });
 
   // it('should not return other user template', async () => {});
 
