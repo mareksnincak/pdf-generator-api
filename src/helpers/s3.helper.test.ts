@@ -18,6 +18,7 @@ import {
   getPresignedShareUrl,
   getPresignedUploadUrl,
   moveObject,
+  putObject,
 } from './s3.helper';
 import { mockLogger } from './test.helper';
 
@@ -53,6 +54,26 @@ describe('getObject', () => {
     expect(s3ClientArgs.input).toEqual({
       Bucket: bucket,
       Key: key,
+    });
+  });
+});
+
+describe('putObject', () => {
+  it('should upload object', async () => {
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+
+    const bucket = 'sample-bucket';
+    const key = 'sample-key';
+    const data = Buffer.from(randomUUID());
+
+    await putObject({ bucket, key, data });
+
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(PutObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
+      Bucket: bucket,
+      Key: key,
+      Body: data,
     });
   });
 });
