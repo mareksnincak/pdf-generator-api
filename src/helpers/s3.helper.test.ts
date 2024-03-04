@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
@@ -10,6 +12,7 @@ import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 import {
   copyObject,
   deleteObject,
+  getObject,
   getPresignedShareUrl,
   getPresignedUploadUrl,
   moveObject,
@@ -26,6 +29,29 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
+describe('getObject', () => {
+  it('should return object', async () => {
+    const data = randomUUID();
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({
+      Body: data,
+    }));
+
+    const bucket = 'sample-bucket';
+    const key = 'sample-key';
+
+    const result = await getObject({ bucket, key });
+
+    expect(result).toEqual({ data });
+
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(GetObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
+      Bucket: bucket,
+      Key: key,
+    });
+  });
+});
+
 describe('deleteObject', () => {
   it('should delete object', async () => {
     const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
@@ -35,9 +61,9 @@ describe('deleteObject', () => {
 
     await deleteObject({ bucket, key });
 
-    const s3DeleteArgs = s3ClientSpy.mock.calls[0]?.[0];
-    expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
-    expect(s3ClientSpy.mock.lastCall?.[0].input).toEqual({
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(DeleteObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
       Bucket: bucket,
       Key: key,
     });

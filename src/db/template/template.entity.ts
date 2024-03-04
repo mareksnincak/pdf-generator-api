@@ -89,7 +89,7 @@ export class TemplateEntity extends BaseEntity {
     };
   }
 
-  public async toPublicJsonWithData() {
+  public async toPublicJsonWithDataUrl() {
     const bucket = process.env.S3_BUCKET;
 
     if (!bucket) {

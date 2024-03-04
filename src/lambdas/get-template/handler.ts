@@ -34,7 +34,7 @@ export async function getTemplate(
     const userId = getUserIdFromEventOrFail(event);
     const template = await getByIdOrFail({ id, userId });
 
-    const response: GetTemplateResponseDto = await template.toPublicJsonWithData();
+    const response: GetTemplateResponseDto = await template.toPublicJsonWithDataUrl();
     logger.info('getTemplate.success');
     return {
       statusCode: 200,

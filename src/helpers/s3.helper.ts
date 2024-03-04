@@ -17,6 +17,17 @@ export function getS3Client() {
   return s3Client;
 }
 
+export async function getObject({ bucket, key }: { bucket: string; key: string }) {
+  const result = await getS3Client().send(
+    new GetObjectCommand({
+      Bucket: bucket,
+      Key: key,
+    }),
+  );
+
+  return { data: result.Body };
+}
+
 export async function deleteObject({ bucket, key }: { bucket: string; key: string }) {
   await getS3Client().send(
     new DeleteObjectCommand({
