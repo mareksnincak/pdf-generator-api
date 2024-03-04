@@ -7,6 +7,8 @@ import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
 import { createOrReplace } from '../../../src/db/template/template.repository';
+import { ErrorMessage } from '../../../src/enums/error.enum';
+import { mockLogger } from '../../../src/helpers/test.helper';
 import { type GetTemplatesResponseDto } from '../../../src/lambdas/get-templates/dtos/response.dto';
 import { getTemplates } from '../../../src/lambdas/get-templates/handler';
 import { GetTemplatesRequestMockFactory } from '../../../src/lambdas/get-templates/mock-factories/request.mock-factory';
@@ -196,7 +198,46 @@ describe('getTemplates', () => {
     );
   });
 
-  // it('should not return other user template', async () => {});
+  it('should not return other user template', async () => {
+    const queryStringParameters = requestMockFactory.create();
+    const event = eventMockFactory.create({
+      queryStringParameters,
+    });
 
-  // it('should return 400 when wrong paginationToken is provided', async () => {});
+    const templateEntity = templateEntityMockFactory.create({
+      userId: 'other-user-id',
+    });
+
+    await createOrReplace(templateEntity);
+
+    const result = await getTemplates(event, context);
+
+    expect(result.statusCode).toEqual(200);
+
+    const { templates } = JSON.parse(result.body) as GetTemplatesResponseDto;
+    expect(templates).toHaveLength(0);
+  });
+
+  it('should return 400 when wrong paginationToken is provided', async () => {
+    mockLogger();
+    const paginationToken = randomBytes(8).toString('base64url');
+    const queryStringParameters = requestMockFactory.create({
+      paginationToken,
+    });
+
+    const event = eventMockFactory.create({
+      queryStringParameters,
+    });
+
+    jest.spyOn(KMSClient.prototype, 'send').mockImplementation(() => {
+      throw new Error('getTemplatesIt.expectedError');
+    });
+
+    const result = await getTemplates(event, context);
+
+    expect(result.statusCode).toEqual(400);
+    expect(JSON.parse(result.body)).toEqual({
+      message: ErrorMessage.invalidPaginationToken,
+    });
+  });
 });
