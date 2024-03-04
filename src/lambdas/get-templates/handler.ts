@@ -29,7 +29,7 @@ export async function getTemplates(
     const { templates, nextPaginationToken } = await getMany({ userId, limit, paginationToken });
 
     const response: GetTemplatesResponseDto = {
-      nextPaginationToken,
+      nextPaginationToken: nextPaginationToken ?? null,
       templates: templates.map((template) => template.toPublicJson()),
     };
     logger.info('getTemplates.success');

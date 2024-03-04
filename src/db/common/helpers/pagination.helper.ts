@@ -9,7 +9,7 @@ export async function encryptPaginationToken(
 ) {
   logger.debug({ lastEvaluatedKey }, 'commonDb.paginationHelper.encryptPaginationToken.input');
   if (!lastEvaluatedKey) {
-    return null;
+    return;
   }
 
   const kmsKeyId = process.env.KMS_KEY_ID;

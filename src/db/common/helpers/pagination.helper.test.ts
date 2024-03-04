@@ -22,12 +22,12 @@ describe('encryptPaginationToken', () => {
     expect(Buffer.from(result ?? '', 'base64url').toString()).toEqual(encryptedValue);
   });
 
-  it('should return null when lastEvaluatedKey is undefined', async () => {
+  it('should return undefined when lastEvaluatedKey is undefined', async () => {
     const lastEvaluatedKey = undefined;
 
     const result = await encryptPaginationToken(lastEvaluatedKey);
 
-    expect(result).toEqual(null);
+    expect(result).toEqual(undefined);
   });
 
   it('should throw error when kms key id is not set', async () => {
