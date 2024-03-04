@@ -25,7 +25,30 @@ export async function getObject({ bucket, key }: { bucket: string; key: string }
     }),
   );
 
-  return { data: result.Body };
+  if (!result.Body) {
+    throw new Error('s3Helper.getObject.missingBody');
+  }
+
+  const data = await result.Body.transformToByteArray();
+  return { data: Buffer.from(data) };
+}
+
+export async function putObject({
+  bucket,
+  key,
+  data,
+}: {
+  bucket: string;
+  key: string;
+  data: Buffer;
+}) {
+  await getS3Client().send(
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      Body: data,
+    }),
+  );
 }
 
 export async function deleteObject({ bucket, key }: { bucket: string; key: string }) {
@@ -72,7 +95,15 @@ export async function moveObject({
   await deleteObject({ bucket: sourceBucket, key: sourceKey });
 }
 
-export async function getPresignedShareUrl({ bucket, key }: { bucket: string; key: string }) {
+export async function getPresignedShareUrl({
+  bucket,
+  key,
+  expiresInSeconds = 3600,
+}: {
+  bucket: string;
+  key: string;
+  expiresInSeconds?: number;
+}) {
   const client = getS3Client();
 
   const command = new GetObjectCommand({
@@ -80,17 +111,19 @@ export async function getPresignedShareUrl({ bucket, key }: { bucket: string; ke
     Key: key,
   });
 
-  return await getSignedUrl(client, command, { expiresIn: 3600 });
+  return await getSignedUrl(client, command, { expiresIn: expiresInSeconds });
 }
 
 export async function getPresignedUploadUrl({
   bucket,
   key,
   fileSizeBytes,
+  expiresInSeconds = 3600,
 }: {
   bucket: string;
   key: string;
   fileSizeBytes: number;
+  expiresInSeconds?: number;
 }) {
   const client = getS3Client();
 
@@ -101,6 +134,6 @@ export async function getPresignedUploadUrl({
   });
 
   return await getSignedUrl(client, command, {
-    expiresIn: 3600,
+    expiresIn: expiresInSeconds,
   });
 }
