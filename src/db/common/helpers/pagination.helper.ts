@@ -1,6 +1,8 @@
 import { type AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
+import { ErrorMessage } from '../../../enums/error.enum';
+import { BadRequestError } from '../../../errors/bad-request.error';
 import { decrypt, encrypt } from '../../../helpers/kms.helper';
 import { logger } from '../../../helpers/logger.helper';
 
@@ -31,15 +33,22 @@ export async function encryptPaginationToken(
 }
 
 export async function decryptPaginationToken(paginationToken?: string) {
-  logger.debug({ paginationToken }, 'commonDb.paginationHelper.decryptPaginationToken.input');
-  if (!paginationToken) {
-    return;
+  try {
+    logger.debug({ paginationToken }, 'commonDb.paginationHelper.decryptPaginationToken.input');
+    if (!paginationToken) {
+      return;
+    }
+
+    const decryptedData = await decrypt({ data: Buffer.from(paginationToken, 'base64url') });
+    const decodedData = decryptedData.toString('utf-8');
+    const parsedData = marshall(JSON.parse(decodedData));
+
+    logger.debug({ parsedData }, 'commonDb.paginationHelper.decryptPaginationToken.result');
+    return parsedData;
+  } catch (error) {
+    logger.warn(error, 'commonDb.paginationHelper.decryptPaginationToken.error');
+    throw new BadRequestError({
+      message: ErrorMessage.invalidPaginationToken,
+    });
   }
-
-  const decryptedData = await decrypt({ data: Buffer.from(paginationToken, 'base64url') });
-  const decodedData = decryptedData.toString('utf-8');
-  const parsedData = marshall(JSON.parse(decodedData));
-
-  logger.debug({ parsedData }, 'commonDb.paginationHelper.decryptPaginationToken.result');
-  return parsedData;
 }

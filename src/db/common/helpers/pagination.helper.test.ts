@@ -1,3 +1,5 @@
+import { ErrorMessage } from '../../../enums/error.enum';
+import { BadRequestError } from '../../../errors/bad-request.error';
 import * as kmsHelper from '../../../helpers/kms.helper';
 
 import { decryptPaginationToken, encryptPaginationToken } from './pagination.helper';
@@ -65,5 +67,17 @@ describe('decryptPaginationToken', () => {
     const result = await decryptPaginationToken(paginationToken);
 
     expect(result).toEqual(undefined);
+  });
+
+  it('should throw BadRequestError when wrong token is provided', async () => {
+    const paginationToken = 'sample-invalid-token';
+
+    try {
+      await decryptPaginationToken(paginationToken);
+      expect(true).toEqual(false);
+    } catch (error) {
+      expect(error).toBeInstanceOf(BadRequestError);
+      expect((error as BadRequestError).message).toEqual(ErrorMessage.invalidPaginationToken);
+    }
   });
 });
