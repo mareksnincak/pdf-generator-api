@@ -16,7 +16,15 @@ function getLambdaEntryPath(lambda: Lambda) {
   return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, 'handler.ts');
 }
 
-function getCommonNodeJsFunctionProps(lambda: Lambda, cdkEnvVars: CdkEnvVarsDto) {
+function getCommonNodeJsFunctionProps({
+  lambda,
+  cdkEnvVars,
+  retainStatefulResources,
+}: {
+  lambda: Lambda;
+  cdkEnvVars: CdkEnvVarsDto;
+  retainStatefulResources: boolean;
+}) {
   return {
     runtime: Runtime.NODEJS_20_X,
     architecture: Architecture.ARM_64,
@@ -29,7 +37,7 @@ function getCommonNodeJsFunctionProps(lambda: Lambda, cdkEnvVars: CdkEnvVarsDto)
        */
       assetHash: cdkEnvVars.FORCE_STATIC_HASH ? lambda : undefined,
     },
-    logRetention: RetentionDays.ONE_YEAR,
+    logRetention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
     timeout: Duration.seconds(30),
   };
 }
@@ -41,6 +49,7 @@ export function createLambdas({
   s3BucketName,
   dynamoDbTable,
   kmsKey,
+  retainStatefulResources,
 }: {
   scope: Construct;
   cdkEnvVars: CdkEnvVarsDto;
@@ -48,11 +57,16 @@ export function createLambdas({
   s3BucketName: string;
   dynamoDbTable: Table;
   kmsKey: Key;
+  retainStatefulResources: boolean;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
 
   const getOpenApi = new NodejsFunction(scope, Lambda.getOpenApi, {
-    ...getCommonNodeJsFunctionProps(Lambda.getOpenApi, cdkEnvVars),
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.getOpenApi,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
     handler: 'getOpenApi',
     environment: {
       OPEN_API_SSM_PARAM_NAME: openApiParamsSsmParamName,
@@ -61,7 +75,11 @@ export function createLambdas({
   });
 
   const getUrlForTemplateUpload = new NodejsFunction(scope, Lambda.getUrlForTemplateUpload, {
-    ...getCommonNodeJsFunctionProps(Lambda.getUrlForTemplateUpload, cdkEnvVars),
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.getUrlForTemplateUpload,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
     handler: 'getUrlForTemplateUpload',
     environment: {
       S3_BUCKET: s3BucketName,
@@ -70,7 +88,11 @@ export function createLambdas({
   });
 
   const createTemplate = new NodejsFunction(scope, Lambda.createTemplate, {
-    ...getCommonNodeJsFunctionProps(Lambda.createTemplate, cdkEnvVars),
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.createTemplate,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
     handler: 'createTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
@@ -80,7 +102,11 @@ export function createLambdas({
   });
 
   const getTemplate = new NodejsFunction(scope, Lambda.getTemplate, {
-    ...getCommonNodeJsFunctionProps(Lambda.getTemplate, cdkEnvVars),
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.getTemplate,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
     handler: 'getTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
@@ -90,7 +116,11 @@ export function createLambdas({
   });
 
   const getTemplates = new NodejsFunction(scope, Lambda.getTemplates, {
-    ...getCommonNodeJsFunctionProps(Lambda.getTemplates, cdkEnvVars),
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.getTemplates,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
     handler: 'getTemplates',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
@@ -100,7 +130,11 @@ export function createLambdas({
   });
 
   const deleteTemplate = new NodejsFunction(scope, Lambda.deleteTemplate, {
-    ...getCommonNodeJsFunctionProps(Lambda.deleteTemplate, cdkEnvVars),
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.deleteTemplate,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
     handler: 'deleteTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
@@ -110,7 +144,11 @@ export function createLambdas({
   });
 
   const setDefaultUserPassword = new NodejsFunction(scope, Lambda.setDefaultUserPassword, {
-    ...getCommonNodeJsFunctionProps(Lambda.setDefaultUserPassword, cdkEnvVars),
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.setDefaultUserPassword,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
     handler: 'setDefaultUserPassword',
     environment: {
       ...envVars.get(Lambda.setDefaultUserPassword),
