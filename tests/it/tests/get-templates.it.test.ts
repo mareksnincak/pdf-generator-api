@@ -1,3 +1,7 @@
+import { randomBytes, randomUUID } from 'node:crypto';
+
+import { EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
+
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
@@ -88,38 +92,50 @@ describe('getTemplates', () => {
     expect(templates[1].name).toEqual(templateEntityB.name);
   });
 
-  // it('should return nextPaginationToken when limit is reached', async () => {
-  //   const kmsClienySpy = jest.spyOn(KMSClient.prototype, 'send');
-  //   const id = randomUUID();
-  //   const queryStringParameters = requestMockFactory.create({
-  //     limit: '1',
-  //   });
-  //   const event = eventMockFactory.create({
-  //     queryStringParameters,
-  //   });
+  it('should return nextPaginationToken when limit is reached', async () => {
+    const id = randomUUID();
 
-  //   const userId = event.requestContext.authorizer.claims.sub;
-  //   const templateEntity = templateEntityMockFactory.create({
-  //     id,
-  //     userId,
-  //   });
+    const queryStringParameters = requestMockFactory.create({
+      limit: '1',
+    });
+    const event = eventMockFactory.create({
+      queryStringParameters,
+    });
 
-  //   await createOrReplace(templateEntity);
+    const userId = event.requestContext.authorizer.claims.sub;
+    const templateEntity = templateEntityMockFactory.create({
+      id,
+      userId,
+    });
 
-  //   const result = await getTemplates(event, context);
+    await createOrReplace(templateEntity);
 
-  //   expect(result.statusCode).toEqual(200);
-  //   expect(JSON.parse(result.body)).toEqual({
-  //     templates: [
-  //       {
-  //         id: templateEntity.id,
-  //         name: templateEntity.name,
-  //         type: templateEntity.type,
-  //       },
-  //     ],
-  //     nextPaginationToken: null,
-  //   });
-  // });
+    const paginationToken = randomBytes(8).toString();
+    const kmsClientSpy = jest.spyOn(KMSClient.prototype, 'send').mockImplementation(() => ({
+      CiphertextBlob: Buffer.from(paginationToken),
+    }));
+
+    const result = await getTemplates(event, context);
+
+    expect(result.statusCode).toEqual(200);
+
+    const { nextPaginationToken } = JSON.parse(result.body) as GetTemplatesResponseDto;
+    expect(Buffer.from(nextPaginationToken ?? '', 'base64url').toString()).toEqual(paginationToken);
+
+    const kmsClientArgs = kmsClientSpy.mock.calls[0][0];
+    expect(kmsClientArgs).toBeInstanceOf(EncryptCommand);
+    const encryptCommandInput = (kmsClientArgs as EncryptCommand).input;
+    expect(encryptCommandInput.KeyId).toEqual('sample-kms-key-id');
+    expect(JSON.parse(Buffer.from(encryptCommandInput.Plaintext ?? '').toString())).toEqual({
+      userId,
+      token: {
+        SK: '#',
+        PK: `TEMPLATE#USER#${userId}#ID#${templateEntity.id}`,
+        GSI1PK: `TEMPLATE#USER#${userId}`,
+        GSI1SK: `NAME#${templateEntity.name}`,
+      },
+    });
+  });
 
   // it('should return correct page when paginationToken is provided', async () => {});
 
