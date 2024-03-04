@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto';
 
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import type {
   APIGatewayProxyResult,
   APIGatewayProxyWithCognitoAuthorizerEvent,
@@ -14,6 +13,7 @@ import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getPresignedShareUrl, putObject } from '../../helpers/s3.helper';
+import { sendSqsMessage } from '../../helpers/sqs.helper';
 import { validateBody } from '../../helpers/validation.helper';
 
 import { generateDocumentRequestDto } from './dtos/request.dto';
@@ -28,6 +28,7 @@ async function renderHtmlTemplate(template: TemplateEntity, data: Record<string,
 }
 
 async function transformPdfToHtml(html: string) {
+  // Will be implemented in next MR
   return await Promise.resolve(Buffer.from(html));
 }
 
@@ -43,15 +44,11 @@ async function scheduleObjectDeletion({
     throw new Error('generateDocument.scheduleObjectDeletion.missingQueueUrl');
   }
 
-  // TODO move to sqs helper
-  const sqsClient = new SQSClient();
-  await sqsClient.send(
-    new SendMessageCommand({
-      MessageBody: key,
-      QueueUrl: queueUrl,
-      DelaySeconds: deleteInSeconds,
-    }),
-  );
+  await sendSqsMessage({
+    queueUrl,
+    body: key,
+    delaySeconds: deleteInSeconds,
+  });
 }
 
 export async function getShareableUrl({

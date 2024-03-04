@@ -130,8 +130,8 @@ export async function getMany({
   };
 }
 
-export async function deleteById(params: { id: string; userId: string }) {
-  logger.info(params, 'templateRepository.deleteById');
+export async function deleteByIdOrFail(params: { id: string; userId: string }) {
+  logger.info(params, 'templateRepository.deleteByIdOrFail');
 
   const command = new DeleteItemCommand({
     TableName: getTableName(),
@@ -148,6 +148,6 @@ export async function deleteById(params: { id: string; userId: string }) {
   }
   const deletedTemplate = TemplateEntity.fromDynamoItem(Attributes);
 
-  logger.info('templateRepository.deleteById.success');
+  logger.info('templateRepository.deleteByIdOrFail.success');
   return deletedTemplate;
 }
