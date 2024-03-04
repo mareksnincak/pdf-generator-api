@@ -68,7 +68,6 @@ export async function deleteObject({ bucket, key }: { bucket: string; key: strin
   logger.info({ bucket, key }, 's3Helper.deleteObject.success');
 }
 
-// TODO tests
 export async function deleteObjects({ bucket, keys }: { bucket: string; keys: string[] }) {
   logger.info({ bucket, keys }, 's3Helper.deleteObjects');
   const objectsToDelete: ObjectIdentifier[] = keys.map((key) => ({
@@ -84,7 +83,7 @@ export async function deleteObjects({ bucket, keys }: { bucket: string; keys: st
     }),
   );
 
-  if (result.Errors) {
+  if (result.Errors?.length) {
     const errorMsg = 's3Helper.deleteObjects.deletionErrors';
     logger.error({ errors: result.Errors }, errorMsg);
     throw new Error(errorMsg);

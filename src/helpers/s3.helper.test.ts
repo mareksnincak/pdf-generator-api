@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -12,11 +13,13 @@ import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 import {
   copyObject,
   deleteObject,
+  deleteObjects,
   getObject,
   getPresignedShareUrl,
   getPresignedUploadUrl,
   moveObject,
 } from './s3.helper';
+import { mockLogger } from './test.helper';
 
 jest.mock('@aws-sdk/s3-request-presigner', () => {
   return {
@@ -67,6 +70,55 @@ describe('deleteObject', () => {
       Bucket: bucket,
       Key: key,
     });
+  });
+});
+
+describe('deleteObjects', () => {
+  it('should delete objects', async () => {
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({}));
+
+    const bucket = 'sample-bucket';
+    const keys = ['sample-key-1', 'sample-key-2'];
+
+    await deleteObjects({ bucket, keys });
+
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(DeleteObjectsCommand);
+    expect(s3ClientArgs.input).toEqual({
+      Bucket: bucket,
+      Delete: {
+        Objects: [
+          {
+            Key: keys[0],
+          },
+          {
+            Key: keys[1],
+          },
+        ],
+      },
+    });
+  });
+
+  it('should throw error if there is some error in response', async () => {
+    mockLogger();
+    const bucket = 'sample-bucket';
+    const keys = ['sample-key-1'];
+
+    jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({
+      Errors: [
+        {
+          Key: keys[0],
+        },
+      ],
+    }));
+
+    try {
+      await deleteObjects({ bucket, keys });
+      expect(true).toEqual(false);
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toEqual('s3Helper.deleteObjects.deletionErrors');
+    }
   });
 });
 
