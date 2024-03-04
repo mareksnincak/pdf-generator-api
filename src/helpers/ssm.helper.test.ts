@@ -22,9 +22,9 @@ describe('getSsmParam', () => {
 
     expect(ssmParam).toEqual(value);
 
-    const secretManagerClientArgs = ssmClientSpy.mock.calls[0]?.[0];
-    expect(secretManagerClientArgs).toBeInstanceOf(GetParameterCommand);
-    expect(secretManagerClientArgs.input).toEqual({
+    const ssmClientArgs = ssmClientSpy.mock.calls[0]?.[0];
+    expect(ssmClientArgs).toBeInstanceOf(GetParameterCommand);
+    expect(ssmClientArgs.input).toEqual({
       Name: name,
     });
   });

@@ -12,7 +12,6 @@ export function getSqsClient() {
   return sqsClient;
 }
 
-// TODO tests
 export async function sendSqsMessage(params: {
   body: string;
   queueUrl: string;
