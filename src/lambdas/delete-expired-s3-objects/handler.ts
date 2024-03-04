@@ -3,7 +3,6 @@ import type { Context, SQSEvent } from 'aws-lambda';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObjects } from '../../helpers/s3.helper';
 
-// TODO tests
 export async function deleteExpiredS3Objects(event: SQSEvent, context: Context): Promise<void> {
   try {
     setLoggerContext(event, context);
