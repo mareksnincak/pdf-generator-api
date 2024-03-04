@@ -6,7 +6,7 @@ import {
   QueryCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
-import { type Optional } from 'utility-types';
+import { type SetOptional } from 'type-fest';
 
 import { ErrorMessage } from '../../enums/error.enum';
 import { ConflictError } from '../../errors/conflict.error';
@@ -22,7 +22,7 @@ import {
 import { TemplateEntity } from './template.entity';
 import { type Template } from './template.type';
 
-export async function createOrReplace(template: Optional<Template, 'id'>) {
+export async function createOrReplace(template: SetOptional<Template, 'id'>) {
   try {
     logger.info('templateRepository.createOrReplace');
 

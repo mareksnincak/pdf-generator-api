@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import { type Optional } from 'utility-types';
+import { type SetOptional } from 'type-fest';
 
 import { getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
@@ -12,7 +12,7 @@ import { type TemplateType } from './template.enum';
 import { type Template, type StoredTemplate } from './template.type';
 
 export class TemplateEntity extends BaseEntity {
-  constructor({ id = randomUUID(), name, type, s3Key, userId }: Optional<Template, 'id'>) {
+  constructor({ id = randomUUID(), name, type, s3Key, userId }: SetOptional<Template, 'id'>) {
     const primaryKey = TemplateEntity.getPrimaryKey({ id, userId });
     const gsi1Key = TemplateEntity.getGsi1Key({ userId, name });
 
