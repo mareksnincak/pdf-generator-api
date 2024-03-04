@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import type {
   APIGatewayProxyResult,
   APIGatewayProxyWithCognitoAuthorizerEvent,
@@ -30,43 +31,57 @@ async function transformPdfToHtml(html: string) {
   return await Promise.resolve(Buffer.from(html));
 }
 
-// function scheduleObjectDeletion({
-//   bucket,
-//   key,
-//   deleteInSeconds,
-// }: {
-//   bucket: string;
-//   key: string;
-//   deleteInSeconds?: number;
-// }) {}
+async function scheduleObjectDeletion({
+  key,
+  deleteInSeconds,
+}: {
+  key: string;
+  deleteInSeconds?: number;
+}) {
+  const queueUrl = process.env.DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL;
+  if (!queueUrl) {
+    throw new Error('generateDocument.scheduleObjectDeletion.missingQueueUrl');
+  }
+
+  // TODO move to sqs helper
+  const sqsClient = new SQSClient();
+  await sqsClient.send(
+    new SendMessageCommand({
+      MessageBody: key,
+      QueueUrl: queueUrl,
+      DelaySeconds: deleteInSeconds,
+    }),
+  );
+}
 
 export async function getShareableUrl({
   bucket,
   keyPrefix,
   data,
-  expiresInSeconds = 3600,
 }: {
   bucket: string;
   keyPrefix: string;
   data: Buffer;
-  expiresInSeconds?: number;
 }) {
-  const bufferSeconds = 60;
-  // TODO move to date helper
-  const expiresAt = new Date();
-  expiresAt.setSeconds(expiresAt.getSeconds() + expiresInSeconds + bufferSeconds);
+  const expiresInSeconds = 60;
 
   const key = `${keyPrefix}/${randomUUID()}`;
 
   const [url] = await Promise.all([
     getPresignedShareUrl({ bucket, key, expiresInSeconds }),
-    // TODO schedule lambda to delete file
     putObject({
       bucket,
       key,
       data,
     }),
-    // scheduleObjectDeletion({}),
+    scheduleObjectDeletion({
+      key,
+      /**
+       * We are adding 30s as a safety buffer to make sure
+       * object isn't deleted before presigned url expires.
+       */
+      deleteInSeconds: expiresInSeconds + 30,
+    }),
   ]);
 
   return url;
