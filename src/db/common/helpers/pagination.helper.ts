@@ -6,11 +6,19 @@ import { BadRequestError } from '../../../errors/bad-request.error';
 import { decrypt, encrypt } from '../../../helpers/kms.helper';
 import { logger } from '../../../helpers/logger.helper';
 
-export async function encryptPaginationToken(
-  lastEvaluatedKey: Record<string, AttributeValue> | undefined,
-) {
-  logger.debug({ lastEvaluatedKey }, 'commonDb.paginationHelper.encryptPaginationToken.input');
-  if (!lastEvaluatedKey) {
+type PaginationTokenData = {
+  userId: string;
+  token: Record<string, unknown>;
+};
+
+export async function encryptPaginationToken(params: {
+  userId: string;
+  paginationToken: Record<string, AttributeValue> | undefined;
+}) {
+  logger.debug(params, 'commonDb.paginationHelper.encryptPaginationToken.input');
+  const { userId, paginationToken } = params;
+
+  if (!paginationToken) {
     return;
   }
 
@@ -19,8 +27,14 @@ export async function encryptPaginationToken(
     throw new Error('commonDb.paginationHelper.encryptPaginationToken.missingKmsKeyId');
   }
 
-  const rawData = JSON.stringify(unmarshall(lastEvaluatedKey));
-  const encryptedData = await encrypt({ data: Buffer.from(rawData), keyId: kmsKeyId });
+  const data: PaginationTokenData = {
+    userId,
+    token: unmarshall(paginationToken),
+  };
+  const encryptedData = await encrypt({
+    data: Buffer.from(JSON.stringify(data)),
+    keyId: kmsKeyId,
+  });
   const encodedData = encryptedData.toString('base64url');
 
   logger.debug(
@@ -32,19 +46,28 @@ export async function encryptPaginationToken(
   return encodedData;
 }
 
-export async function decryptPaginationToken(paginationToken?: string) {
+export async function decryptPaginationToken(params: { userId: string; paginationToken?: string }) {
   try {
-    logger.debug({ paginationToken }, 'commonDb.paginationHelper.decryptPaginationToken.input');
+    logger.debug(params, 'commonDb.paginationHelper.decryptPaginationToken.input');
+    const { userId, paginationToken } = params;
+
     if (!paginationToken) {
       return;
     }
 
     const decryptedData = await decrypt({ data: Buffer.from(paginationToken, 'base64url') });
     const decodedData = decryptedData.toString('utf-8');
-    const parsedData = marshall(JSON.parse(decodedData));
+    const parsedData: PaginationTokenData = JSON.parse(decodedData);
 
-    logger.debug({ parsedData }, 'commonDb.paginationHelper.decryptPaginationToken.result');
-    return parsedData;
+    if (userId !== parsedData.userId) {
+      const errorMsg = 'commonDb.paginationHelper.decryptPaginationToken.userMismatch';
+      logger.warn({ currentUserId: userId, tokenUserId: parsedData.userId }, errorMsg);
+      throw new Error(errorMsg);
+    }
+
+    const result = marshall(parsedData.token);
+    logger.debug({ result }, 'commonDb.paginationHelper.decryptPaginationToken.result');
+    return result;
   } catch (error) {
     logger.warn(error, 'commonDb.paginationHelper.decryptPaginationToken.error');
     throw new BadRequestError({

@@ -94,7 +94,10 @@ export async function getMany({
 }) {
   logger.info({ userId }, 'templateRepository.getMany');
 
-  const ExclusiveStartKey = await decryptPaginationToken(paginationToken);
+  const ExclusiveStartKey = await decryptPaginationToken({
+    userId,
+    paginationToken,
+  });
   const partitionKey = TemplateEntity.getGsi1PartitionKey({ userId });
 
   const command = new QueryCommand({
@@ -110,7 +113,10 @@ export async function getMany({
 
   const templates = Items.map((item) => TemplateEntity.fromDynamoItem(item));
 
-  const nextPaginationToken = await encryptPaginationToken(LastEvaluatedKey);
+  const nextPaginationToken = await encryptPaginationToken({
+    userId,
+    paginationToken: LastEvaluatedKey,
+  });
 
   logger.info(
     {
