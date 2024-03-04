@@ -22,7 +22,7 @@ export const createTemplateRoute: RouteConfig = {
     },
   },
   responses: {
-    200: {
+    201: {
       description: 'Success.',
       content: {
         'application/json': {

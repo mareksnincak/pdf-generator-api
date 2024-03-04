@@ -61,7 +61,7 @@ describe('createTemplate', () => {
 
     const result = await createTemplate(event, context);
 
-    expect(result.statusCode).toEqual(200);
+    expect(result.statusCode).toEqual(201);
 
     const body = JSON.parse(result.body) as CreateTemplateResponseDto;
     expect(body).toEqual({
@@ -185,6 +185,6 @@ describe('createTemplate', () => {
 
     const result = await createTemplate(event, context);
 
-    expect(result.statusCode).toEqual(200);
+    expect(result.statusCode).toEqual(201);
   });
 });
