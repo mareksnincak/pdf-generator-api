@@ -17,7 +17,7 @@ const context = new ContextMockFactory().create();
 const templateResponseMockFactory = new TemplateResponseMockFactory();
 
 beforeAll(() => {
-  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getTemplate);
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getTemplates);
 });
 
 afterEach(() => {
@@ -32,9 +32,9 @@ describe('getTemplates', () => {
       .mockResolvedValue({ templates: [templateEntity], nextPaginationToken: undefined });
     jest.spyOn(templateEntity, 'toPublicJson').mockReturnValue(template);
 
-    const queryParameters = requestMockFactory.create();
+    const queryStringParameters = requestMockFactory.create();
     const event = eventMockFactory.create({
-      queryStringParameters: queryParameters,
+      queryStringParameters,
     });
 
     const result = await getTemplates(event, context);
