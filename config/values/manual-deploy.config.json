@@ -9,6 +9,7 @@
     "delete-template": {},
     "get-open-api": {},
     "get-url-for-template-upload": {},
-    "set-default-user-password": {}
+    "set-default-user-password": {},
+    "generate-document": {}
   }
 }

@@ -38,6 +38,7 @@ export function createApi({
 
   api.root.addMethod('GET', new LambdaIntegration(lambdas.getOpenApi));
 
+  // TEMPLATES
   const templatesResource = api.root.addResource('templates');
 
   templatesResource
@@ -71,6 +72,19 @@ export function createApi({
     ...commonAuthorizationOptions,
     authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorWriteTemplates],
   });
+
+  // DOCUMENTS
+  const documentResource = api.root.addResource('documents');
+
+  documentResource
+    .addResource('generate')
+    .addMethod('POST', new LambdaIntegration(lambdas.generateDocument), {
+      ...commonAuthorizationOptions,
+      authorizationScopes: [
+        AuthorizationScope.admin,
+        AuthorizationScope.pdfGeneratorGenerateDocuments,
+      ],
+    });
 
   return api;
 }

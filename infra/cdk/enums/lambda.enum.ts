@@ -6,4 +6,5 @@ export enum Lambda {
   getTemplates = 'get-templates',
   deleteTemplate = 'delete-template',
   setDefaultUserPassword = 'set-default-user-password',
+  generateDocument = 'generate-document',
 }

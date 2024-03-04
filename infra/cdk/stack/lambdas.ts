@@ -155,6 +155,20 @@ export function createLambdas({
     },
   });
 
+  const generateDocument = new NodejsFunction(scope, Lambda.generateDocument, {
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.generateDocument,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
+    handler: 'generateDocument',
+    environment: {
+      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+      S3_BUCKET: s3BucketName,
+      ...envVars.get(Lambda.generateDocument),
+    },
+  });
+
   return {
     getOpenApi,
     getUrlForTemplateUpload,
@@ -163,5 +177,6 @@ export function createLambdas({
     getTemplates,
     deleteTemplate,
     setDefaultUserPassword,
+    generateDocument,
   };
 }
