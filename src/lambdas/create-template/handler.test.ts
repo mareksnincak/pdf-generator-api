@@ -40,7 +40,7 @@ describe('createTemplate', () => {
 
     const result = await createTemplate(event, context);
 
-    expect(result.statusCode).toEqual(200);
+    expect(result.statusCode).toEqual(201);
     expect(JSON.parse(result.body)).toEqual({
       id: templateEntity.id,
       name: templateEntity.name,

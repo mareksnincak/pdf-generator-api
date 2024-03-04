@@ -58,7 +58,7 @@ describe('Template', () => {
         }),
       )
       .auth(accessToken, { type: 'bearer' })
-      .expect(200);
+      .expect(201);
 
     expect(createTemplateResponse).toHaveProperty('id');
     templateId = createTemplateResponse.id;

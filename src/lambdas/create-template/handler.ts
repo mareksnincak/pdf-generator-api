@@ -95,7 +95,7 @@ export async function createTemplate(
     logger.info('createTemplate.success');
     return {
       body: JSON.stringify(response),
-      statusCode: 200,
+      statusCode: 201,
     };
   } catch (error) {
     return handleError({ error, logPrefix: 'createTemplate' });
