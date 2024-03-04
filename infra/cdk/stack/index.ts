@@ -12,6 +12,7 @@ import { createLambdas } from './lambdas';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
+import { createSqsEventSources, createSqsQueues } from './sqs';
 import { createStringParameters } from './ssm-parameters';
 
 export class CdkStack extends Stack {
@@ -45,6 +46,7 @@ export class CdkStack extends Stack {
     const s3BucketName = s3Bucket.bucketName;
     const openApiParamsSsmParamName = `${id}-open-api-params`;
 
+    const sqsQueues = createSqsQueues({ scope: this, stackId: id });
     const lambdas = createLambdas({
       scope: this,
       s3BucketName,
@@ -53,6 +55,7 @@ export class CdkStack extends Stack {
       dynamoDbTable,
       kmsKey,
       retainStatefulResources,
+      sqsQueues,
     });
 
     const cognito = createCognito({ scope: this, stackId: id, lambdas, removalPolicy });
@@ -61,6 +64,11 @@ export class CdkStack extends Stack {
       scope: this,
       lambdas,
       cognito,
+    });
+
+    createSqsEventSources({
+      sqsQueues,
+      lambdas,
     });
 
     grantPermissions({
@@ -72,6 +80,7 @@ export class CdkStack extends Stack {
       dynamoDbTable,
       cognito,
       kmsKey,
+      sqsQueues,
     });
 
     createStringParameters({
@@ -81,6 +90,6 @@ export class CdkStack extends Stack {
       cognito,
     });
 
-    createOutputs({ scope: this, api, cognito });
+    createOutputs({ scope: this, api, cognito, sqsQueues });
   }
 }

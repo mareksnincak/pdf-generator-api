@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import request from 'supertest';
 
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
@@ -27,9 +29,9 @@ afterAll(async () => {
   }
 });
 
-describe('Template', () => {
+describe('PDF Generator', () => {
   it('should create template', async () => {
-    const templateData = '<html>test template</html>';
+    const templateData = 'hello {{name}}';
 
     // Get url for template upload
     const { body: getUrlForTemplateUploadResponse } = await request(baseUrl)
@@ -87,6 +89,31 @@ describe('Template', () => {
     expect(body).toHaveProperty('templates');
     expect((body as GetTemplatesResponseDto).templates).toHaveLength(1);
     expect(body).toHaveProperty('nextPaginationToken', expect.any(String));
+  });
+
+  it('should generate document', async () => {
+    expect(templateId).toBeDefined();
+    const name = randomUUID();
+
+    const { body: generateDocumentResponse } = await request(baseUrl)
+      .post('/documents/generate')
+      .send({
+        templateId,
+        data: {
+          name,
+        },
+      })
+      .auth(accessToken, { type: 'bearer' })
+      .expect(200);
+
+    expect(generateDocumentResponse).toHaveProperty('url', expect.any(String));
+
+    const { body: generatedData } = await request(generateDocumentResponse.url as string)
+      .get('')
+      .responseType('blob')
+      .expect(200);
+
+    expect((generatedData as Buffer).toString()).toEqual(`hello ${name}`);
   });
 
   it('should delete template', async () => {

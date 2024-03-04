@@ -28,6 +28,15 @@
     "get-url-for-template-upload": {
       "S3_BUCKET": "pdf-generator-api-local"
     },
-    "set-default-user-password": {}
+    "set-default-user-password": {},
+    "generate-document": {
+      "DYNAMODB_ENDPOINT": "http://host.docker.internal:8000",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
+      "S3_BUCKET": "pdf-generator-api-local",
+      "DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL": "https://sqs.example.com/sample-delete-expired-s3-objects-queue"
+    },
+    "delete-expired-s3-objects": {
+      "S3_BUCKET": "pdf-generator-api-local"
+    }
   }
 }

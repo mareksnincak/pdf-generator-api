@@ -4,6 +4,7 @@ import { AuthorizationScope } from '../../infra/cdk/enums/authorization.enum';
 import * as packageJson from '../../package.json';
 import { createTemplateRoute } from '../lambdas/create-template/open-api/open-api.route';
 import { deleteTemplateRoute } from '../lambdas/delete-template/open-api/open-api.route';
+import { generateDocumentsRoute } from '../lambdas/generate-document/open-api/open-api.route';
 import { getTemplateRoute } from '../lambdas/get-template/open-api/open-api.route';
 import { getTemplatesRoute } from '../lambdas/get-templates/open-api/open-api.route';
 import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/open-api.route';
@@ -22,6 +23,7 @@ export function generateOpenApi({
   registry.registerPath(getTemplatesRoute);
   registry.registerPath(deleteTemplateRoute);
   registry.registerPath(getUrlForTemplateUploadRoute);
+  registry.registerPath(generateDocumentsRoute);
 
   const oauth2Auth = registry.registerComponent('securitySchemes', 'oauth2Auth', {
     type: 'oauth2',
@@ -31,6 +33,7 @@ export function generateOpenApi({
         scopes: {
           [AuthorizationScope.pdfGeneratorReadTemplates]: 'Read templates.',
           [AuthorizationScope.pdfGeneratorWriteTemplates]: 'Modify templates.',
+          [AuthorizationScope.pdfGeneratorGenerateDocuments]: 'Generate documents.',
         },
       },
     },
@@ -51,6 +54,7 @@ export function generateOpenApi({
         [oauth2Auth.name]: [
           AuthorizationScope.pdfGeneratorReadTemplates,
           AuthorizationScope.pdfGeneratorWriteTemplates,
+          AuthorizationScope.pdfGeneratorGenerateDocuments,
         ],
       },
     ],

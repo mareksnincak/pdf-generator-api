@@ -12,6 +12,8 @@ import { getEnvVars } from '../../../config/helpers/config.helper';
 import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { Lambda } from '../enums/lambda.enum';
 
+import { type createSqsQueues } from './sqs';
+
 function getLambdaEntryPath(lambda: Lambda) {
   return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, 'handler.ts');
 }
@@ -50,6 +52,7 @@ export function createLambdas({
   dynamoDbTable,
   kmsKey,
   retainStatefulResources,
+  sqsQueues,
 }: {
   scope: Construct;
   cdkEnvVars: CdkEnvVarsDto;
@@ -58,6 +61,7 @@ export function createLambdas({
   dynamoDbTable: Table;
   kmsKey: Key;
   retainStatefulResources: boolean;
+  sqsQueues: ReturnType<typeof createSqsQueues>;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
 
@@ -155,6 +159,34 @@ export function createLambdas({
     },
   });
 
+  const generateDocument = new NodejsFunction(scope, Lambda.generateDocument, {
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.generateDocument,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
+    handler: 'generateDocument',
+    environment: {
+      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+      S3_BUCKET: s3BucketName,
+      DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
+      ...envVars.get(Lambda.generateDocument),
+    },
+  });
+
+  const deleteExpiredS3Objects = new NodejsFunction(scope, Lambda.deleteExpiredS3Objects, {
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.deleteExpiredS3Objects,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
+    handler: 'deleteExpiredS3Objects',
+    environment: {
+      S3_BUCKET: s3BucketName,
+      ...envVars.get(Lambda.deleteExpiredS3Objects),
+    },
+  });
+
   return {
     getOpenApi,
     getUrlForTemplateUpload,
@@ -163,5 +195,7 @@ export function createLambdas({
     getTemplates,
     deleteTemplate,
     setDefaultUserPassword,
+    generateDocument,
+    deleteExpiredS3Objects,
   };
 }

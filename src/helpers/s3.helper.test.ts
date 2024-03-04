@@ -1,6 +1,9 @@
+import { randomUUID } from 'node:crypto';
+
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -10,10 +13,14 @@ import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 import {
   copyObject,
   deleteObject,
+  deleteObjects,
+  getObject,
   getPresignedShareUrl,
   getPresignedUploadUrl,
   moveObject,
+  putObject,
 } from './s3.helper';
+import { mockLogger } from './test.helper';
 
 jest.mock('@aws-sdk/s3-request-presigner', () => {
   return {
@@ -26,6 +33,51 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
+describe('getObject', () => {
+  it('should return object', async () => {
+    const data = randomUUID();
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({
+      Body: {
+        transformToByteArray: () => data,
+      },
+    }));
+
+    const bucket = 'sample-bucket';
+    const key = 'sample-key';
+
+    const result = await getObject({ bucket, key });
+
+    expect(result.toString()).toEqual(data);
+
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(GetObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
+      Bucket: bucket,
+      Key: key,
+    });
+  });
+});
+
+describe('putObject', () => {
+  it('should upload object', async () => {
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+
+    const bucket = 'sample-bucket';
+    const key = 'sample-key';
+    const data = Buffer.from(randomUUID());
+
+    await putObject({ bucket, key, data });
+
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(PutObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
+      Bucket: bucket,
+      Key: key,
+      Body: data,
+    });
+  });
+});
+
 describe('deleteObject', () => {
   it('should delete object', async () => {
     const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
@@ -35,12 +87,61 @@ describe('deleteObject', () => {
 
     await deleteObject({ bucket, key });
 
-    const s3DeleteArgs = s3ClientSpy.mock.calls[0]?.[0];
-    expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
-    expect(s3ClientSpy.mock.lastCall?.[0].input).toEqual({
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(DeleteObjectCommand);
+    expect(s3ClientArgs.input).toEqual({
       Bucket: bucket,
       Key: key,
     });
+  });
+});
+
+describe('deleteObjects', () => {
+  it('should delete objects', async () => {
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({}));
+
+    const bucket = 'sample-bucket';
+    const keys = ['sample-key-1', 'sample-key-2'];
+
+    await deleteObjects({ bucket, keys });
+
+    const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3ClientArgs).toBeInstanceOf(DeleteObjectsCommand);
+    expect(s3ClientArgs.input).toEqual({
+      Bucket: bucket,
+      Delete: {
+        Objects: [
+          {
+            Key: keys[0],
+          },
+          {
+            Key: keys[1],
+          },
+        ],
+      },
+    });
+  });
+
+  it('should throw error if there is some error in response', async () => {
+    mockLogger();
+    const bucket = 'sample-bucket';
+    const keys = ['sample-key-1'];
+
+    jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({
+      Errors: [
+        {
+          Key: keys[0],
+        },
+      ],
+    }));
+
+    try {
+      await deleteObjects({ bucket, keys });
+      expect(true).toEqual(false);
+    } catch (error) {
+      expect(error).toBeInstanceOf(Error);
+      expect((error as Error).message).toEqual('s3Helper.deleteObjects.deletionErrors');
+    }
   });
 });
 
