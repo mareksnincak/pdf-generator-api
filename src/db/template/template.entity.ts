@@ -113,7 +113,7 @@ export class TemplateEntity extends BaseEntity {
       throw new Error('templateEntity.toPublicJsonWithData.missingBucket');
     }
 
-    const { data } = await getObject({ bucket, key: this.s3Key });
+    const data = await getObject({ bucket, key: this.s3Key });
     return data;
   }
 }

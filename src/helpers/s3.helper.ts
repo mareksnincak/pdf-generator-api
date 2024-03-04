@@ -34,7 +34,7 @@ export async function getObject({ bucket, key }: { bucket: string; key: string }
   }
 
   const data = await result.Body.transformToByteArray();
-  return { data: Buffer.from(data) };
+  return Buffer.from(data);
 }
 
 export async function putObject({

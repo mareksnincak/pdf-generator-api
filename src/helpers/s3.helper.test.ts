@@ -36,7 +36,9 @@ describe('getObject', () => {
   it('should return object', async () => {
     const data = randomUUID();
     const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({
-      Body: data,
+      Body: {
+        transformToByteArray: () => data,
+      },
     }));
 
     const bucket = 'sample-bucket';
@@ -44,7 +46,7 @@ describe('getObject', () => {
 
     const result = await getObject({ bucket, key });
 
-    expect(result).toEqual({ data });
+    expect(result.toString()).toEqual(data);
 
     const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
     expect(s3ClientArgs).toBeInstanceOf(GetObjectCommand);

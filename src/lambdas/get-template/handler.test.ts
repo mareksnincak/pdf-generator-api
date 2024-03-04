@@ -31,7 +31,7 @@ describe('getTemplate', () => {
   it('should return template', async () => {
     const templateWithData = responseMockFactory.create();
     jest.spyOn(templateRepository, 'getByIdOrFail').mockResolvedValue(templateEntity);
-    jest.spyOn(templateEntity, 'toPublicJsonWithData').mockResolvedValue(templateWithData);
+    jest.spyOn(templateEntity, 'toPublicJsonWithDataUrl').mockResolvedValue(templateWithData);
 
     const pathParameters = requestMockFactory.create();
     const event = eventMockFactory.create({
