@@ -39,6 +39,9 @@
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
       "S3_BUCKET": "pdf-generator-api-test"
+    },
+    "delete-expired-s3-objects": {
+      "S3_BUCKET": "pdf-generator-api-test"
     }
   }
 }

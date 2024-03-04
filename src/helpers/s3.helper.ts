@@ -1,11 +1,15 @@
 import {
   CopyObjectCommand,
   DeleteObjectCommand,
+  DeleteObjectsCommand,
   GetObjectCommand,
+  type ObjectIdentifier,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+import { logger } from './logger.helper';
 
 let s3Client: S3Client | undefined;
 
@@ -52,12 +56,41 @@ export async function putObject({
 }
 
 export async function deleteObject({ bucket, key }: { bucket: string; key: string }) {
+  logger.info({ bucket, key }, 's3Helper.deleteObject');
+
   await getS3Client().send(
     new DeleteObjectCommand({
       Bucket: bucket,
       Key: key,
     }),
   );
+
+  logger.info({ bucket, key }, 's3Helper.deleteObject.success');
+}
+
+// TODO tests
+export async function deleteObjects({ bucket, keys }: { bucket: string; keys: string[] }) {
+  logger.info({ bucket, keys }, 's3Helper.deleteObjects');
+  const objectsToDelete: ObjectIdentifier[] = keys.map((key) => ({
+    Key: key,
+  }));
+
+  const result = await getS3Client().send(
+    new DeleteObjectsCommand({
+      Bucket: bucket,
+      Delete: {
+        Objects: objectsToDelete,
+      },
+    }),
+  );
+
+  if (result.Errors) {
+    const errorMsg = 's3Helper.deleteObjects.deletionErrors';
+    logger.error({ errors: result.Errors }, errorMsg);
+    throw new Error(errorMsg);
+  }
+
+  logger.info({ bucket, keys }, 's3Helper.deleteObjects.success');
 }
 
 export async function copyObject({

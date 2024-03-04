@@ -169,6 +169,19 @@ export function createLambdas({
     },
   });
 
+  const deleteExpiredS3Objects = new NodejsFunction(scope, Lambda.deleteExpiredS3Objects, {
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.deleteExpiredS3Objects,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
+    handler: 'deleteExpiredS3Objects',
+    environment: {
+      S3_BUCKET: s3BucketName,
+      ...envVars.get(Lambda.deleteExpiredS3Objects),
+    },
+  });
+
   return {
     getOpenApi,
     getUrlForTemplateUpload,
@@ -178,5 +191,6 @@ export function createLambdas({
     deleteTemplate,
     setDefaultUserPassword,
     generateDocument,
+    deleteExpiredS3Objects,
   };
 }

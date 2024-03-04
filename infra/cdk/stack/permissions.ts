@@ -30,6 +30,7 @@ export function grantPermissions({
   s3Bucket.grantDelete(lambdas.createTemplate);
   s3Bucket.grantDelete(lambdas.deleteTemplate);
   s3Bucket.grantRead(lambdas.getTemplate);
+  s3Bucket.grantDelete(lambdas.deleteExpiredS3Objects);
 
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(

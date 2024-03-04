@@ -30,6 +30,16 @@ async function transformPdfToHtml(html: string) {
   return await Promise.resolve(Buffer.from(html));
 }
 
+// function scheduleObjectDeletion({
+//   bucket,
+//   key,
+//   deleteInSeconds,
+// }: {
+//   bucket: string;
+//   key: string;
+//   deleteInSeconds?: number;
+// }) {}
+
 export async function getShareableUrl({
   bucket,
   keyPrefix,
@@ -56,6 +66,7 @@ export async function getShareableUrl({
       key,
       data,
     }),
+    // scheduleObjectDeletion({}),
   ]);
 
   return url;
