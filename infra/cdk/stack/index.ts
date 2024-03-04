@@ -80,6 +80,7 @@ export class CdkStack extends Stack {
       dynamoDbTable,
       cognito,
       kmsKey,
+      sqsQueues,
     });
 
     createStringParameters({

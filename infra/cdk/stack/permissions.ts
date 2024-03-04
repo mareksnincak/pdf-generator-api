@@ -5,6 +5,7 @@ import { type Bucket } from 'aws-cdk-lib/aws-s3';
 
 import { type createCognito } from './cognito';
 import { type createLambdas } from './lambdas';
+import { type createSqsQueues } from './sqs';
 
 export function grantPermissions({
   region,
@@ -15,6 +16,7 @@ export function grantPermissions({
   dynamoDbTable,
   cognito,
   kmsKey,
+  sqsQueues,
 }: {
   region: string;
   account: string;
@@ -24,6 +26,7 @@ export function grantPermissions({
   dynamoDbTable: Table;
   cognito: ReturnType<typeof createCognito>;
   kmsKey: Key;
+  sqsQueues: ReturnType<typeof createSqsQueues>;
 }) {
   s3Bucket.grantPut(lambdas.getUrlForTemplateUpload);
   s3Bucket.grantReadWrite(lambdas.createTemplate);
@@ -31,6 +34,7 @@ export function grantPermissions({
   s3Bucket.grantDelete(lambdas.deleteTemplate);
   s3Bucket.grantRead(lambdas.getTemplate);
   s3Bucket.grantDelete(lambdas.deleteExpiredS3Objects);
+  s3Bucket.grantReadWrite(lambdas.generateDocument);
 
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(
@@ -44,9 +48,12 @@ export function grantPermissions({
   dynamoDbTable.grantWriteData(lambdas.deleteTemplate);
   dynamoDbTable.grantReadData(lambdas.getTemplate);
   dynamoDbTable.grantReadData(lambdas.getTemplates);
+  dynamoDbTable.grantReadData(lambdas.generateDocument);
 
   cognito.defaultUsersCredentialsSecret.grantRead(lambdas.setDefaultUserPassword);
   cognito.userPool.grant(lambdas.setDefaultUserPassword, 'cognito-idp:AdminSetUserPassword');
 
   kmsKey.grantEncryptDecrypt(lambdas.getTemplates);
+
+  sqsQueues.deleteExpiredS3ObjectsQueue.grantSendMessages(lambdas.generateDocument);
 }
