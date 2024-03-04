@@ -1,6 +1,7 @@
 import request from 'supertest';
 
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
+import { type GetTemplatesResponseDto } from '../../../src/lambdas/get-templates/dtos/response.dto';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
 import { getE2eSetup } from '../helpers/setup.helper';
 
@@ -72,6 +73,20 @@ describe('Template', () => {
       .expect(200);
 
     expect(body).toHaveProperty('id', templateId);
+  });
+
+  it('should return templates', async () => {
+    const { body } = await request(baseUrl)
+      .get('/templates')
+      .query({
+        limit: '1',
+      })
+      .auth(accessToken, { type: 'bearer' })
+      .expect(200);
+
+    expect(body).toHaveProperty('templates');
+    expect((body as GetTemplatesResponseDto).templates).toHaveLength(1);
+    expect(body).toHaveProperty('nextPaginationToken', expect.any(String));
   });
 
   it('should delete template', async () => {
