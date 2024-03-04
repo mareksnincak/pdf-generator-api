@@ -28,12 +28,18 @@ export class CdkStack extends Stack {
   }) {
     super(scope, id, props);
 
-    const removalPolicy = cdkEnvVars.RETAIN_STATEFUL_RESOURCES
+    const retainStatefulResources = cdkEnvVars.RETAIN_STATEFUL_RESOURCES;
+    const removalPolicy = retainStatefulResources
       ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
       : RemovalPolicy.DESTROY;
 
     const dynamoDbTable = createDynamoDbTable({ scope: this, stackId: id, removalPolicy });
-    const s3Bucket = createS3Bucket({ scope: this, stackId: id, removalPolicy });
+    const s3Bucket = createS3Bucket({
+      scope: this,
+      stackId: id,
+      removalPolicy,
+      autoDeleteObjects: !retainStatefulResources,
+    });
     const kmsKey = createKmsKey({ scope: this, stackId: id, removalPolicy });
 
     const s3BucketName = s3Bucket.bucketName;
@@ -46,6 +52,7 @@ export class CdkStack extends Stack {
       cdkEnvVars,
       dynamoDbTable,
       kmsKey,
+      retainStatefulResources,
     });
 
     const cognito = createCognito({ scope: this, stackId: id, lambdas, removalPolicy });
