@@ -24,12 +24,14 @@ function getCommonNodeJsFunctionProps({
   retainStatefulResources,
   nodeModules,
   architecture = Architecture.ARM_64,
+  memorySize,
 }: {
   lambda: Lambda;
   cdkEnvVars: CdkEnvVarsDto;
   retainStatefulResources: boolean;
   nodeModules?: string[];
   architecture?: Architecture;
+  memorySize?: number;
 }) {
   return {
     runtime: Runtime.NODEJS_20_X,
@@ -46,7 +48,7 @@ function getCommonNodeJsFunctionProps({
     },
     logRetention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
     timeout: Duration.seconds(30),
-    memorySize: 2048,
+    memorySize,
   } satisfies NodejsFunctionProps;
 }
 
@@ -168,9 +170,10 @@ export function createLambdas({
   const generateDocument = new NodejsFunction(scope, Lambda.generateDocument, {
     ...getCommonNodeJsFunctionProps({
       lambda: Lambda.generateDocument,
-      architecture: Architecture.X86_64,
       cdkEnvVars,
       retainStatefulResources,
+      architecture: Architecture.X86_64,
+      memorySize: 2048,
       nodeModules: ['@sparticuz/chromium'],
     }),
     handler: 'generateDocument',
