@@ -58,7 +58,7 @@ export async function getShareableUrl({
 }) {
   const expiresInSeconds = 60;
 
-  const key = `${keyPrefix}/${randomUUID()}`;
+  const key = `${keyPrefix}/${randomUUID()}.pdf`;
 
   const [url] = await Promise.all([
     getPresignedShareUrl({ bucket, key, expiresInSeconds }),
