@@ -7,7 +7,7 @@
     "deploy": "ENVIRONMENT_NAME=manual-deploy RETAIN_STATEFUL_RESOURCES=false npm run deploy:prod",
     "deploy:prod": "npm run synth && cd ./infra/cdk && cdk deploy --require-approval ${REQUIRE_APPROVAL:-broadening} --outputs-file ./cdk.output.json",
     "destroy": "export ENVIRONMENT_NAME=manual-deploy && export RETAIN_STATEFUL_RESOURCES=false && npm run synth && cd ./infra/cdk && cdk destroy",
-    "find-asset-by-lambda-name": "echo 'Enter lambda name: \\c' && read lambda_name && grep -rl \"${lambda_name}/handler.ts\" ./infra/cdk/cdk.out/*/index.js",
+    "get-asset-by-lambda-name": "echo 'Enter lambda name: \\c' && read lambda_name && grep -rl \"${lambda_name}/handler.ts\" ./infra/cdk/cdk.out/*/index.js",
     "infra:down": "docker compose -f ./infra/local/docker-compose-app.yml down",
     "infra:up": "docker compose -f ./infra/local/docker-compose-app.yml up --wait -d && npm run init:db",
     "init:db": "npx ts-node ./scripts/init-db.ts",

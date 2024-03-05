@@ -4,7 +4,11 @@ import { Duration } from 'aws-cdk-lib';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import { type Key } from 'aws-cdk-lib/aws-kms';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { NodejsFunction, type NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
+import {
+  type BundlingOptions,
+  NodejsFunction,
+  type NodejsFunctionProps,
+} from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { type Construct } from 'constructs';
 
@@ -22,16 +26,16 @@ function getCommonNodeJsFunctionProps({
   lambda,
   cdkEnvVars,
   retainStatefulResources,
-  nodeModules,
   architecture = Architecture.ARM_64,
   memorySize,
+  bundlingOptions,
 }: {
   lambda: Lambda;
   cdkEnvVars: CdkEnvVarsDto;
   retainStatefulResources: boolean;
-  nodeModules?: string[];
   architecture?: Architecture;
   memorySize?: number;
+  bundlingOptions?: BundlingOptions;
 }) {
   return {
     runtime: Runtime.NODEJS_20_X,
@@ -44,7 +48,7 @@ function getCommonNodeJsFunctionProps({
        * up new lambda changes
        */
       assetHash: cdkEnvVars.FORCE_STATIC_HASH ? lambda : undefined,
-      nodeModules,
+      ...bundlingOptions,
     },
     logRetention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
     timeout: Duration.seconds(30),
@@ -174,7 +178,12 @@ export function createLambdas({
       retainStatefulResources,
       architecture: Architecture.X86_64,
       memorySize: 2048,
-      nodeModules: ['@sparticuz/chromium'],
+      bundlingOptions: {
+        nodeModules: ['@sparticuz/chromium'],
+        loader: {
+          '.ttf': 'file',
+        },
+      },
     }),
     handler: 'generateDocument',
     environment: {
