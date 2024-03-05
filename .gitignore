@@ -3,6 +3,7 @@ node_modules
 dist
 cdk.out
 infra/local/volumes
+infra/local/chromium
 src/open-api/open-api.json
 config/values/local.config.json
 events/*

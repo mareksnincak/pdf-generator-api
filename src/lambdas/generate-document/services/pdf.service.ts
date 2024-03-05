@@ -13,12 +13,16 @@ async function getExecutablePath() {
     return executablePath;
   }
 
-  executablePath = await chromium.executablePath();
+  executablePath = process.env.CHROMIUM_LOCAL_EXECUTABLE_PATH;
+  if (!executablePath) {
+    executablePath = await chromium.executablePath();
+  }
+
   return executablePath;
 }
 
-export async function transformPdfToHtml(html: string) {
-  logger.info('generateDocument.pdfTransformer.transformPdfToHtml.start');
+export async function createPdfFromHtml(html: string) {
+  logger.info('generateDocument.pdfService.createPdfFromHtml.start');
 
   const browser = await puppeteer.launch({
     args: chromium.args,
@@ -27,7 +31,7 @@ export async function transformPdfToHtml(html: string) {
     headless: true,
   });
 
-  logger.debug('generateDocument.pdfTransformer.transformPdfToHtml.initialized');
+  logger.debug('generateDocument.pdfService.createPdfFromHtml.initialized');
 
   const page = await browser.newPage();
   await Promise.all([page.setOfflineMode(true), page.setJavaScriptEnabled(false)]);
@@ -39,6 +43,6 @@ export async function transformPdfToHtml(html: string) {
 
   await browser.close();
 
-  logger.info('generateDocument.pdfTransformer.transformPdfToHtml.success');
+  logger.info('generateDocument.pdfService.createPdfFromHtml.success');
   return pdf;
 }

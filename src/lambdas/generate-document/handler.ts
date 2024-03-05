@@ -18,7 +18,7 @@ import { validateBody } from '../../helpers/validation.helper';
 
 import { generateDocumentRequestDto } from './dtos/request.dto';
 import { type GenerateDocumentResponseDto } from './dtos/response.dto';
-import { transformPdfToHtml } from './transformers/pdf.transformer';
+import { createPdfFromHtml } from './services/pdf.service';
 
 async function renderHtmlTemplate(template: TemplateEntity, data: Record<string, unknown>) {
   logger.info('generateDocument.renderHtmlTemplate.start');
@@ -104,7 +104,7 @@ export async function generateDocument(
     const userId = getUserIdFromEventOrFail(event);
     const template = await getByIdOrFail({ id: templateId, userId });
     const renderedTemplate = await renderHtmlTemplate(template, data);
-    const pdf = await transformPdfToHtml(renderedTemplate);
+    const pdf = await createPdfFromHtml(renderedTemplate);
     const url = await getShareableUrl({
       bucket,
       keyPrefix: `${userId}/documents`,
