@@ -15,6 +15,7 @@ import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 
 import { generateDocument } from './handler';
 import { GenerateDocumentMockFactory } from './mock-factories/request.mock-factory';
+import * as pdfTransformer from './transformers/pdf.transformer';
 
 const requestMockFactory = new GenerateDocumentMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
@@ -42,12 +43,12 @@ describe('generateDocument', () => {
     });
 
     const mockedUrl = 'https://mocked.example.com/path';
-    const templateData = 'hello {{name}}';
     jest.spyOn(templateRepository, 'getByIdOrFail').mockResolvedValue(templateEntity);
-    jest.spyOn(templateEntity, 'getData').mockResolvedValue(Buffer.from(templateData));
+    jest.spyOn(templateEntity, 'getData').mockResolvedValue(Buffer.from('hello {{name}}'));
     jest.spyOn(s3Helper, 'getPresignedShareUrl').mockResolvedValue(mockedUrl);
     jest.spyOn(s3Helper, 'putObject').mockResolvedValue();
     jest.spyOn(sqsHelper, 'sendSqsMessage').mockResolvedValue();
+    jest.spyOn(pdfTransformer, 'transformPdfToHtml').mockResolvedValue(Buffer.from(randomUUID()));
 
     const result = await generateDocument(event, context);
 
