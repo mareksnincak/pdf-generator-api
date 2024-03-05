@@ -18,13 +18,16 @@ import { validateBody } from '../../helpers/validation.helper';
 
 import { generateDocumentRequestDto } from './dtos/request.dto';
 import { type GenerateDocumentResponseDto } from './dtos/response.dto';
-import { transformPdfToHtml } from './services/puppeteer';
+import { transformPdfToHtml } from './transformers/pdf.transformer';
 
 async function renderHtmlTemplate(template: TemplateEntity, data: Record<string, unknown>) {
+  logger.info('generateDocument.renderHtmlTemplate.start');
+
   const templateData = await template.getData();
   const compiledTemplate = compile(templateData.toString());
   const renderedTemplate = compiledTemplate(data);
 
+  logger.info('generateDocument.renderHtmlTemplate.success');
   return renderedTemplate;
 }
 
