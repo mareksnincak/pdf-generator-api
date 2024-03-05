@@ -18,6 +18,7 @@ import { validateBody } from '../../helpers/validation.helper';
 
 import { generateDocumentRequestDto } from './dtos/request.dto';
 import { type GenerateDocumentResponseDto } from './dtos/response.dto';
+import { transformPdfToHtml } from './services/puppeteer';
 
 async function renderHtmlTemplate(template: TemplateEntity, data: Record<string, unknown>) {
   const templateData = await template.getData();
@@ -25,11 +26,6 @@ async function renderHtmlTemplate(template: TemplateEntity, data: Record<string,
   const renderedTemplate = compiledTemplate(data);
 
   return renderedTemplate;
-}
-
-async function transformPdfToHtml(html: string) {
-  // Will be implemented in next MR
-  return await Promise.resolve(Buffer.from(html));
 }
 
 async function scheduleObjectDeletion({

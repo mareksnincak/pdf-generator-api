@@ -6,6 +6,7 @@
     "Ciphertext",
     "dtos",
     "linebreak",
+    "metafile",
     "nvmrc",
     "openapi",
     "paren",
@@ -14,6 +15,7 @@
     "presynth",
     "signin",
     "singleline",
+    "sparticuz",
     "unmarshall"
   ],
   "jestrunner.configPath": ".jest/jest.common.config.ts",

@@ -4,7 +4,7 @@ import { Duration } from 'aws-cdk-lib';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import { type Key } from 'aws-cdk-lib/aws-kms';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { NodejsFunction, type NodejsFunctionProps } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { type Construct } from 'constructs';
 
@@ -22,14 +22,18 @@ function getCommonNodeJsFunctionProps({
   lambda,
   cdkEnvVars,
   retainStatefulResources,
+  nodeModules,
+  architecture = Architecture.ARM_64,
 }: {
   lambda: Lambda;
   cdkEnvVars: CdkEnvVarsDto;
   retainStatefulResources: boolean;
+  nodeModules?: string[];
+  architecture?: Architecture;
 }) {
   return {
     runtime: Runtime.NODEJS_20_X,
-    architecture: Architecture.ARM_64,
+    architecture,
     entry: getLambdaEntryPath(lambda),
     bundling: {
       /**
@@ -38,10 +42,12 @@ function getCommonNodeJsFunctionProps({
        * up new lambda changes
        */
       assetHash: cdkEnvVars.FORCE_STATIC_HASH ? lambda : undefined,
+      nodeModules,
     },
     logRetention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
     timeout: Duration.seconds(30),
-  };
+    memorySize: 2048,
+  } satisfies NodejsFunctionProps;
 }
 
 export function createLambdas({
@@ -162,8 +168,10 @@ export function createLambdas({
   const generateDocument = new NodejsFunction(scope, Lambda.generateDocument, {
     ...getCommonNodeJsFunctionProps({
       lambda: Lambda.generateDocument,
+      architecture: Architecture.X86_64,
       cdkEnvVars,
       retainStatefulResources,
+      nodeModules: ['@sparticuz/chromium'],
     }),
     handler: 'generateDocument',
     environment: {
