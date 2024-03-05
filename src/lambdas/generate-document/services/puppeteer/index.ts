@@ -1,19 +1,24 @@
 import chromium from '@sparticuz/chromium';
-import { launch as launchPuppeteer } from 'puppeteer-core';
+import puppeteer from 'puppeteer-core';
 
 import { logger } from '../../../../helpers/logger.helper';
 
 export async function transformPdfToHtml(html: string) {
-  const browser = await launchPuppeteer({
+  chromium.setHeadlessMode = true;
+  chromium.setGraphicsMode = false;
+
+  const browser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
     executablePath: await chromium.executablePath(),
-    headless: 'shell',
+    headless: true,
   });
 
   logger.debug('puppeteerService.transformPdfToHtml.initialized');
 
   const page = await browser.newPage();
+  await Promise.all([page.setOfflineMode(true), page.setJavaScriptEnabled(false)]);
+
   await page.setContent(html);
   const pdf = await page.pdf({
     format: 'A4',
