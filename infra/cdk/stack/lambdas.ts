@@ -180,9 +180,6 @@ export function createLambdas({
       memorySize: 2048,
       bundlingOptions: {
         nodeModules: ['@sparticuz/chromium'],
-        loader: {
-          '.ttf': 'file',
-        },
       },
     }),
     handler: 'generateDocument',

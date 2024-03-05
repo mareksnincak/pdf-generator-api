@@ -1,10 +1,7 @@
-import { join } from 'node:path';
-
 import chromium from '@sparticuz/chromium';
 import puppeteer from 'puppeteer-core';
 
 import { logger } from '../../../helpers/logger.helper';
-import robotoFont from '../fonts/roboto-regular.ttf';
 
 chromium.setHeadlessMode = true;
 chromium.setGraphicsMode = false;
@@ -22,8 +19,6 @@ async function getExecutablePath() {
 
 export async function transformPdfToHtml(html: string) {
   logger.info('generateDocument.pdfTransformer.transformPdfToHtml.start');
-
-  await chromium.font(join('/var', 'task', robotoFont));
 
   const browser = await puppeteer.launch({
     args: chromium.args,
