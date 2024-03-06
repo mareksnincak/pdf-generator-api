@@ -1,5 +1,7 @@
 import * as crypto from 'node:crypto';
 import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
@@ -16,6 +18,8 @@ import { generateDocument } from '../../../src/lambdas/generate-document/handler
 import { GenerateDocumentMockFactory } from '../../../src/lambdas/generate-document/mock-factories/request.mock-factory';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
+import { documentMockName } from '../../common/constants/document.constant';
+import { isSamePdfFile } from '../../common/helpers/pdf.helper';
 import { mockAwsCredentials } from '../helpers/credential.helper';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
 
@@ -53,24 +57,24 @@ afterEach(() => {
 
 describe('generateDocument', () => {
   it('should generate document', async () => {
-    const templateData = 'hello {{name}}';
+    const mocksPath = join(__dirname, '..', '..', 'common', 'mocks');
+    const htmlTemplate = await readFile(join(mocksPath, 'document.mock.html'));
 
     const s3ClientSpy = jest
       .spyOn(S3Client.prototype, 'send')
       .mockImplementationOnce(() => ({
         Body: {
-          transformToByteArray: () => templateData,
+          transformToByteArray: () => htmlTemplate,
         },
       }))
       .mockImplementation();
     const sqsClientSpy = jest.spyOn(SQSClient.prototype, 'send').mockImplementation();
 
     const templateId = randomUUID();
-    const name = randomUUID();
     const body = requestMockFactory.create({
       templateId,
       data: {
-        name,
+        name: documentMockName,
       },
     });
 
@@ -101,35 +105,38 @@ describe('generateDocument', () => {
       url: mockedUrl,
     });
 
-    const expectedBucket = 'pdf-generator-api-test';
-    const s3GetObjectArgs = s3ClientSpy.mock.calls[0]?.[0];
-    expect(s3GetObjectArgs).toBeInstanceOf(GetObjectCommand);
-    expect(s3GetObjectArgs.input).toEqual({
-      Bucket: expectedBucket,
-      Key: templateEntity.s3Key,
-    });
-
-    const expectedS3Key = `${userId}/documents/${uploadId}`;
+    const expectedUploadBucket = 'pdf-generator-api-test';
+    const expectedUploadS3Key = `${userId}/documents/${uploadId}.pdf`;
     const s3PutObjectArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3PutObjectArgs).toBeInstanceOf(PutObjectCommand);
     expect(s3PutObjectArgs.input).toEqual({
-      Bucket: expectedBucket,
-      Key: expectedS3Key,
+      Bucket: expectedUploadBucket,
+      Key: expectedUploadS3Key,
       Body: expect.any(Buffer),
     });
-    expect((s3PutObjectArgs as PutObjectCommand).input.Body?.toString()).toEqual(`hello ${name}`);
+
+    const generatedDocument = (s3PutObjectArgs as PutObjectCommand).input.Body as Buffer;
+    const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
+    expect(await isSamePdfFile(generatedDocument, expectedDocument)).toEqual(true);
+
+    const s3GetObjectArgs = s3ClientSpy.mock.calls[0]?.[0];
+    expect(s3GetObjectArgs).toBeInstanceOf(GetObjectCommand);
+    expect(s3GetObjectArgs.input).toEqual({
+      Bucket: expectedUploadBucket,
+      Key: templateEntity.s3Key,
+    });
 
     const getSignedUrlArgs = getSignedUrlSpy.mock.calls[0];
     expect(getSignedUrlArgs[1]).toBeInstanceOf(GetObjectCommand);
     expect(getSignedUrlArgs[1].input).toEqual({
-      Bucket: expectedBucket,
-      Key: expectedS3Key,
+      Bucket: expectedUploadBucket,
+      Key: expectedUploadS3Key,
     });
 
     const sqsClientArgs = sqsClientSpy.mock.calls[0]?.[0];
     expect(sqsClientArgs).toBeInstanceOf(SendMessageCommand);
     expect(sqsClientArgs.input).toEqual({
-      MessageBody: expectedS3Key,
+      MessageBody: expectedUploadS3Key,
       QueueUrl: 'https://sqs.example.com/sample-delete-expired-s3-objects-queue',
       DelaySeconds: 90,
     });
