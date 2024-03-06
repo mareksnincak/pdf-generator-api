@@ -39,7 +39,8 @@
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
       "S3_BUCKET": "pdf-generator-api-test",
-      "DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL": "https://sqs.example.com/sample-delete-expired-s3-objects-queue"
+      "DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL": "https://sqs.example.com/sample-delete-expired-s3-objects-queue",
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "delete-expired-s3-objects": {
       "S3_BUCKET": "pdf-generator-api-test"

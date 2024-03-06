@@ -56,7 +56,7 @@ export async function getShareableUrl({
   keyPrefix: string;
   data: Buffer;
 }) {
-  const expiresInSeconds = 60;
+  const expiresInSeconds = Number(getEnvVariableOrFail('PRESIGNED_URL_EXPIRATION_SECONDS'));
 
   const key = `${keyPrefix}/${randomUUID()}.pdf`;
 

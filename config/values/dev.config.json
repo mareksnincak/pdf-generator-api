@@ -10,7 +10,9 @@
     "get-open-api": {},
     "get-url-for-template-upload": {},
     "set-default-user-password": {},
-    "generate-document": {},
+    "generate-document": {
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "360"
+    },
     "delete-expired-s3-objects": {}
   }
 }
