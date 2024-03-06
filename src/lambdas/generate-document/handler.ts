@@ -9,6 +9,7 @@ import { compile } from 'handlebars';
 
 import { type TemplateEntity } from '../../db/template/template.entity';
 import { getByIdOrFail } from '../../db/template/template.repository';
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
@@ -38,11 +39,7 @@ async function scheduleObjectDeletion({
   key: string;
   deleteInSeconds?: number;
 }) {
-  const queueUrl = process.env.DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL;
-  if (!queueUrl) {
-    throw new Error('generateDocument.scheduleObjectDeletion.missingQueueUrl');
-  }
-
+  const queueUrl = getEnvVariableOrFail('DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL');
   await sendSqsMessage({
     queueUrl,
     body: key,
@@ -96,11 +93,7 @@ export async function generateDocument(
 
     const { templateId, data } = validatedData;
 
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) {
-      throw new Error('generateDocument.addDataToTemplate.missingBucket');
-    }
-
+    const bucket = getEnvVariableOrFail('S3_BUCKET');
     const userId = getUserIdFromEventOrFail(event);
     const template = await getByIdOrFail({ id: templateId, userId });
     const renderedTemplate = await renderHtmlTemplate(template, data);

@@ -14,7 +14,7 @@ describe('createPdfFromHtml', () => {
   it('should create pdf document from html string', async () => {
     const mocksPath = join(__dirname, '..', '..', '..', '..', 'tests', 'common', 'mocks');
     const htmlTemplate = await readFile(join(mocksPath, 'document.mock.html'));
-    const html = htmlTemplate.toString('utf-8').replace('{{name}}', documentMockName);
+    const html = htmlTemplate.toString('utf8').replace('{{name}}', documentMockName);
 
     const result = await createPdfFromHtml(html);
 

@@ -5,6 +5,7 @@ import type {
 } from 'aws-lambda';
 
 import { deleteByIdOrFail } from '../../db/template/template.repository';
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
@@ -26,11 +27,7 @@ export async function deleteTemplate(
 
     const { id } = validatedData;
 
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) {
-      throw new Error('deleteTemplate.missingS3Bucket');
-    }
-
+    const bucket = getEnvVariableOrFail('S3_BUCKET');
     const userId = getUserIdFromEventOrFail(event);
     const deletedTemplate = await deleteByIdOrFail({ id, userId });
     await deleteObject({ bucket, key: deletedTemplate.s3Key });

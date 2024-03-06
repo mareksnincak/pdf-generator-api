@@ -3,6 +3,7 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
 import { ErrorMessage } from '../../../enums/error.enum';
 import { BadRequestError } from '../../../errors/bad-request.error';
+import { getEnvVariableOrFail } from '../../../helpers/env.helper';
 import { decrypt, encrypt } from '../../../helpers/kms.helper';
 import { logger } from '../../../helpers/logger.helper';
 
@@ -22,21 +23,18 @@ export async function encryptPaginationToken(params: {
     return;
   }
 
-  const kmsKeyId = process.env.KMS_KEY_ID;
-  if (!kmsKeyId) {
-    throw new Error('commonDb.paginationHelper.encryptPaginationToken.missingKmsKeyId');
-  }
-
   const data: PaginationTokenData = {
     userId,
     token: unmarshall(paginationToken),
   };
+
+  const kmsKeyId = getEnvVariableOrFail('KMS_KEY_ID');
   const encryptedData = await encrypt({
     data: Buffer.from(JSON.stringify(data)),
     keyId: kmsKeyId,
   });
-  const encodedData = encryptedData.toString('base64url');
 
+  const encodedData = encryptedData.toString('base64url');
   logger.debug(
     {
       encodedData,
@@ -56,7 +54,7 @@ export async function decryptPaginationToken(params: { userId: string; paginatio
     }
 
     const decryptedData = await decrypt({ data: Buffer.from(paginationToken, 'base64url') });
-    const decodedData = decryptedData.toString('utf-8');
+    const decodedData = decryptedData.toString('utf8');
     const parsedData: PaginationTokenData = JSON.parse(decodedData);
 
     if (userId !== parsedData.userId) {

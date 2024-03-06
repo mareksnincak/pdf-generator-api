@@ -4,6 +4,7 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { getObject, getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
 import { type Gsi1Key, type PrimaryKey } from '../common/types/entity.type';
@@ -90,11 +91,7 @@ export class TemplateEntity extends BaseEntity {
   }
 
   public async toPublicJsonWithDataUrl() {
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) {
-      throw new Error('templateEntity.toPublicJsonWithData.missingBucket');
-    }
-
+    const bucket = getEnvVariableOrFail('S3_BUCKET');
     const dataUrl = await getPresignedShareUrl({
       bucket,
       key: this.s3Key,
@@ -107,12 +104,7 @@ export class TemplateEntity extends BaseEntity {
   }
 
   public async getData() {
-    // TODO add bucket to template data
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) {
-      throw new Error('templateEntity.toPublicJsonWithData.missingBucket');
-    }
-
+    const bucket = getEnvVariableOrFail('S3_BUCKET');
     const data = await getObject({ bucket, key: this.s3Key });
     return data;
   }

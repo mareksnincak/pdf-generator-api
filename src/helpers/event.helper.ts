@@ -3,6 +3,8 @@ import { type PartialDeep } from 'type-fest';
 
 import { LOCAL_USER_ID } from '../constants/user.constant';
 
+import { isLocal } from './env.helper';
+
 export function getUserIdFromEvent(
   event: PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent> | PartialDeep<APIGatewayEvent>,
 ): string | undefined {
@@ -12,7 +14,7 @@ export function getUserIdFromEvent(
     return userId;
   }
 
-  if (process.env.IS_LOCAL === 'true') {
+  if (isLocal()) {
     /**
      * We are returning static user id for local development
      * so we are able to use API in local context without authorizer

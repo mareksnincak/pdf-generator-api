@@ -6,6 +6,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
@@ -22,11 +23,7 @@ async function createPresignedUrl({
   fileSizeBytes: number;
   userId: string;
 }) {
-  const bucket = process.env.S3_BUCKET;
-  if (!bucket) {
-    throw new Error('getUrlForTemplateUpload.createPresignedUrl.missingBucket');
-  }
-
+  const bucket = getEnvVariableOrFail('S3_BUCKET');
   const uploadId = randomUUID();
   const url = await getPresignedUploadUrl({
     bucket,

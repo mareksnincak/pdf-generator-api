@@ -1,6 +1,6 @@
 import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
 
-import { AuthorizationScope } from '../../infra/cdk/enums/authorization.enum';
+import { customOAuthScopes } from '../../infra/cdk/enums/authorization.enum';
 import * as packageJson from '../../package.json';
 import { createTemplateRoute } from '../lambdas/create-template/open-api/open-api.route';
 import { deleteTemplateRoute } from '../lambdas/delete-template/open-api/open-api.route';
@@ -25,16 +25,17 @@ export function generateOpenApi({
   registry.registerPath(getUrlForTemplateUploadRoute);
   registry.registerPath(generateDocumentsRoute);
 
-  const oauth2Auth = registry.registerComponent('securitySchemes', 'oauth2Auth', {
+  const oAuth2AuthScopes: Record<string, string> = {};
+  for (const scope of Object.values(customOAuthScopes)) {
+    oAuth2AuthScopes[scope.pdfGeneratorName] = scope.description;
+  }
+
+  const oAuth2Auth = registry.registerComponent('securitySchemes', 'oauth2Auth', {
     type: 'oauth2',
     flows: {
       implicit: {
         authorizationUrl: authUrl,
-        scopes: {
-          [AuthorizationScope.pdfGeneratorReadTemplates]: 'Read templates.',
-          [AuthorizationScope.pdfGeneratorWriteTemplates]: 'Modify templates.',
-          [AuthorizationScope.pdfGeneratorGenerateDocuments]: 'Generate documents.',
-        },
+        scopes: oAuth2AuthScopes,
       },
     },
   });
@@ -51,11 +52,7 @@ export function generateOpenApi({
     servers: [{ url: apiUrl }],
     security: [
       {
-        [oauth2Auth.name]: [
-          AuthorizationScope.pdfGeneratorReadTemplates,
-          AuthorizationScope.pdfGeneratorWriteTemplates,
-          AuthorizationScope.pdfGeneratorGenerateDocuments,
-        ],
+        [oAuth2Auth.name]: Object.keys(oAuth2AuthScopes),
       },
     ],
   });

@@ -1,5 +1,7 @@
 import { DynamoDBClient, type DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 
+import { getEnvVariableOrFail } from '../../../helpers/env.helper';
+
 let client: DynamoDBClient;
 let tableName: string;
 
@@ -27,10 +29,6 @@ export function getTableName() {
     return tableName;
   }
 
-  if (!process.env.DYNAMODB_TABLE_NAME) {
-    throw new Error('commonDb.connectionHelper.getTableName.missingEnv');
-  }
-
-  tableName = process.env.DYNAMODB_TABLE_NAME;
+  tableName = getEnvVariableOrFail('DYNAMODB_TABLE_NAME');
   return tableName;
 }
