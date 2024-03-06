@@ -1,4 +1,4 @@
-export function getEnvVariableOrFail(name: string) {
+export function getEnvVariableOrFail(name: keyof NodeJS.ProcessEnv) {
   const value = process.env[name];
 
   if (!value) {
