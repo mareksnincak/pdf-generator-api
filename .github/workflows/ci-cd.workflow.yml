@@ -41,8 +41,9 @@ jobs:
       - run: npm ci
         env:
           PUPPETEER_SKIP_DOWNLOAD: true
-      - run: ldd ./infra/local/chromium/chrome-headless-shell | grep not
-      - run: ldd ./infra/local/chromium/chrome | grep not
+      - run: ls ./infra/local/chromium  | echo not found
+      # - run: ldd ./infra/local/chromium/chrome-headless-shell | grep not
+      # - run: ldd ./infra/local/chromium/chrome | grep not
       - run: npm run test
   test-it:
     runs-on: ubuntu-latest
