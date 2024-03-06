@@ -31,7 +31,8 @@
       "OPEN_API_SSM_PARAM_NAME": "sample-open-api-ssm-param-name"
     },
     "get-url-for-template-upload": {
-      "S3_BUCKET": "pdf-generator-api-test"
+      "S3_BUCKET": "pdf-generator-api-test",
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "set-default-user-password": {},
     "generate-document": {

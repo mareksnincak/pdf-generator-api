@@ -23,12 +23,15 @@ async function createPresignedUrl({
   fileSizeBytes: number;
   userId: string;
 }) {
+  const expiresInSeconds = Number(getEnvVariableOrFail('PRESIGNED_URL_EXPIRATION_SECONDS'));
   const bucket = getEnvVariableOrFail('S3_BUCKET');
   const uploadId = randomUUID();
+
   const url = await getPresignedUploadUrl({
     bucket,
     key: `${userId}/templates/uploads/${uploadId}`,
     fileSizeBytes,
+    expiresInSeconds,
   });
 
   return { url, uploadId };

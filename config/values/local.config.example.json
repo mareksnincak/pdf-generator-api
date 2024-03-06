@@ -26,7 +26,8 @@
     },
     "get-open-api": {},
     "get-url-for-template-upload": {
-      "S3_BUCKET": "pdf-generator-api-local"
+      "S3_BUCKET": "pdf-generator-api-local",
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "set-default-user-password": {},
     "generate-document": {
