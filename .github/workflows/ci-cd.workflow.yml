@@ -4,6 +4,8 @@ on:
   pull_request:
   push:
     branches: main
+env:
+  PUPPETEER_SKIP_DOWNLOAD: true
 jobs:
   audit:
     runs-on: ubuntu-latest

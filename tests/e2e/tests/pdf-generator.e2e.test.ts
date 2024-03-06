@@ -1,10 +1,13 @@
-import { randomUUID } from 'node:crypto';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 
 import request from 'supertest';
 
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { type GetTemplatesResponseDto } from '../../../src/lambdas/get-templates/dtos/response.dto';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
+import { documentMockName } from '../../common/constants/document.constant';
+import { isSamePdfFile } from '../../common/helpers/pdf.helper';
 import { getE2eSetup } from '../helpers/setup.helper';
 
 let baseUrl: string;
@@ -29,15 +32,17 @@ afterAll(async () => {
   }
 });
 
+const mocksPath = join(__dirname, '..', '..', 'common', 'mocks');
+
 describe('PDF Generator', () => {
   it('should create template', async () => {
-    const templateData = 'hello {{name}}';
+    const templateData = await readFile(join(mocksPath, 'document.mock.html'));
 
     // Get url for template upload
     const { body: getUrlForTemplateUploadResponse } = await request(baseUrl)
       .get('/templates/upload-url')
       .query({
-        fileSizeBytes: String(templateData.length),
+        fileSizeBytes: templateData.byteLength,
       })
       .auth(accessToken, { type: 'bearer' })
       .expect(200);
@@ -49,7 +54,7 @@ describe('PDF Generator', () => {
       getUrlForTemplateUploadResponse as GetUrlForTemplateUploadResponseDto;
 
     // Upload template data
-    await request(uploadUrl).put('').send(Buffer.from(templateData)).expect(200);
+    await request(uploadUrl).put('').send(templateData).expect(200);
 
     // Create template
     const { body: createTemplateResponse } = await request(baseUrl)
@@ -93,14 +98,13 @@ describe('PDF Generator', () => {
 
   it('should generate document', async () => {
     expect(templateId).toBeDefined();
-    const name = randomUUID();
 
     const { body: generateDocumentResponse } = await request(baseUrl)
       .post('/documents/generate')
       .send({
         templateId,
         data: {
-          name,
+          name: documentMockName,
         },
       })
       .auth(accessToken, { type: 'bearer' })
@@ -108,12 +112,13 @@ describe('PDF Generator', () => {
 
     expect(generateDocumentResponse).toHaveProperty('url', expect.any(String));
 
-    const { body: generatedData } = await request(generateDocumentResponse.url as string)
+    const { body: generatedDocument } = (await request(generateDocumentResponse.url as string)
       .get('')
       .responseType('blob')
-      .expect(200);
+      .expect(200)) as { body: Buffer };
 
-    expect((generatedData as Buffer).toString()).toEqual(`hello ${name}`);
+    const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
+    expect(await isSamePdfFile(generatedDocument, expectedDocument)).toEqual(true);
   });
 
   it('should delete template', async () => {

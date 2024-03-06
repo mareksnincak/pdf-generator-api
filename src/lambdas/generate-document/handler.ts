@@ -18,18 +18,17 @@ import { validateBody } from '../../helpers/validation.helper';
 
 import { generateDocumentRequestDto } from './dtos/request.dto';
 import { type GenerateDocumentResponseDto } from './dtos/response.dto';
+import { createPdfFromHtml } from './services/pdf.service';
 
 async function renderHtmlTemplate(template: TemplateEntity, data: Record<string, unknown>) {
+  logger.info('generateDocument.renderHtmlTemplate.start');
+
   const templateData = await template.getData();
   const compiledTemplate = compile(templateData.toString());
   const renderedTemplate = compiledTemplate(data);
 
+  logger.info('generateDocument.renderHtmlTemplate.success');
   return renderedTemplate;
-}
-
-async function transformPdfToHtml(html: string) {
-  // Will be implemented in next MR
-  return await Promise.resolve(Buffer.from(html));
 }
 
 async function scheduleObjectDeletion({
@@ -62,7 +61,7 @@ export async function getShareableUrl({
 }) {
   const expiresInSeconds = 60;
 
-  const key = `${keyPrefix}/${randomUUID()}`;
+  const key = `${keyPrefix}/${randomUUID()}.pdf`;
 
   const [url] = await Promise.all([
     getPresignedShareUrl({ bucket, key, expiresInSeconds }),
@@ -105,7 +104,7 @@ export async function generateDocument(
     const userId = getUserIdFromEventOrFail(event);
     const template = await getByIdOrFail({ id: templateId, userId });
     const renderedTemplate = await renderHtmlTemplate(template, data);
-    const pdf = await transformPdfToHtml(renderedTemplate);
+    const pdf = await createPdfFromHtml(renderedTemplate);
     const url = await getShareableUrl({
       bucket,
       keyPrefix: `${userId}/documents`,
