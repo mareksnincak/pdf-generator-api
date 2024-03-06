@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.130",
+    "@types/is-ci": "^3.0.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.10.4",
     "@types/pdf-parse": "^1.1.4",
