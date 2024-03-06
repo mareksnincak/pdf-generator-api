@@ -48,7 +48,7 @@ describe('createTemplate', () => {
     });
   });
 
-  it.each([' ', '.', '/', '\\', ':'])('should return 400 when id contains %s', async (id) => {
+  it.each([' ', '.', '/', '\\', ':'])('should return 400 when id contains "%s"', async (id) => {
     mockLogger();
     const requestBody = requestMockFactory.create({
       id,
