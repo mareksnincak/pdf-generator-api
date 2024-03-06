@@ -7,6 +7,8 @@
     "dtos",
     "linebreak",
     "metafile",
+    "numpages",
+    "numrender",
     "nvmrc",
     "openapi",
     "paren",

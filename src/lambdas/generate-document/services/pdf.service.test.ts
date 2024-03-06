@@ -1,3 +1,8 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+
+import { isSamePdfFile } from '../../../../tests/common/helpers/pdf.helper';
+
 import { createPdfFromHtml } from './pdf.service';
 
 afterEach(() => {
@@ -6,10 +11,12 @@ afterEach(() => {
 
 describe('createPdfFromHtml', () => {
   it('should create pdf document from html string', async () => {
-    const html = 'hello world';
+    const mocksPath = join(__dirname, '..', '..', '..', '..', 'tests', 'common', 'mocks');
+    const html = await readFile(join(mocksPath, 'document.mock.html'));
 
-    const result = await createPdfFromHtml(html);
+    const result = await createPdfFromHtml(html.toString('utf-8'));
 
-    expect(result).toEqual(expect.any(Buffer)); // TODO compare with mock
+    const pdf = await readFile(join(mocksPath, 'document.mock.pdf'));
+    expect(await isSamePdfFile(pdf, result)).toEqual(true);
   });
 });
