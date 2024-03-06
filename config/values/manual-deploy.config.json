@@ -8,9 +8,13 @@
     "get-templates": {},
     "delete-template": {},
     "get-open-api": {},
-    "get-url-for-template-upload": {},
+    "get-url-for-template-upload": {
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
+    },
     "set-default-user-password": {},
-    "generate-document": {},
+    "generate-document": {
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
+    },
     "delete-expired-s3-objects": {}
   }
 }
