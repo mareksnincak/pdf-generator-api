@@ -12,7 +12,7 @@
     "infra:up": "docker compose -f ./infra/local/docker-compose-app.yml up --wait -d && npm run init:db",
     "init:db": "npx ts-node ./scripts/init-db.ts",
     "postinstall": "npm run install-local-chromium",
-    "install-local-chromium": "npx is-ci | CHROMIUM_VERSION=122.0.6261.94 ./scripts/install-local-chromium.sh",
+    "install-local-chromium": "CHROMIUM_VERSION=122.0.6261.94 ./scripts/install-local-chromium.sh",
     "invoke": "npm run synth && sam local invoke -t ./infra/cdk/cdk.out/pdf-generator-api-local.template.json",
     "invoke:debug": "npm run invoke -- -d 9229",
     "it-infra:down": "docker compose -f ./infra/local/docker-compose-it.yml down --rmi \"local\" --volumes",
