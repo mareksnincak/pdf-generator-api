@@ -54,7 +54,7 @@ export async function decryptPaginationToken(params: { userId: string; paginatio
     }
 
     const decryptedData = await decrypt({ data: Buffer.from(paginationToken, 'base64url') });
-    const decodedData = decryptedData.toString('utf-8');
+    const decodedData = decryptedData.toString('utf8');
     const parsedData: PaginationTokenData = JSON.parse(decodedData);
 
     if (userId !== parsedData.userId) {
