@@ -48,6 +48,20 @@ describe('createTemplate', () => {
     });
   });
 
+  it.each([' ', '.', '/', '\\', ':'])('should return 400 when id contains %s', async (id) => {
+    mockLogger();
+    const requestBody = requestMockFactory.create({
+      id,
+    });
+
+    const event = eventMockFactory.create({
+      body: JSON.stringify(requestBody),
+    });
+
+    const result = await createTemplate(event, context);
+    expect(result.statusCode).toEqual(400);
+  });
+
   it('should return 404 when template data does not exist', async () => {
     mockLogger();
     jest.spyOn(s3Helper, 'moveObject').mockImplementation(() => {

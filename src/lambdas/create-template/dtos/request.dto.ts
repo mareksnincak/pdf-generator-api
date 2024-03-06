@@ -10,6 +10,7 @@ export const createTemplateRequestDto = z.object({
     .string()
     .min(1)
     .max(64)
+    .regex(/^[a-zA-Z0-9\-_]+$/)
     .optional()
     .openapi({ description: 'Template id.', example: 'templateId' }),
   name: z
