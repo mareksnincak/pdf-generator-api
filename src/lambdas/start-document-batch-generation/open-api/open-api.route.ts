@@ -3,7 +3,7 @@ import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
 import { ErrorMessage } from '../../../enums/error.enum';
 import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
 import { startDocumentBatchGenerationRequestDto } from '../dtos/request.dto';
-import { startDocumentGenerationBatchResponseDto } from '../dtos/response.dto';
+import { startDocumentBatchGenerationResponseDto } from '../dtos/response.dto';
 
 export const generateDocumentsRoute: RouteConfig = {
   method: 'post',
@@ -25,7 +25,7 @@ export const generateDocumentsRoute: RouteConfig = {
       description: 'Success. Batch was accepted for processing.',
       content: {
         'application/json': {
-          schema: startDocumentGenerationBatchResponseDto,
+          schema: startDocumentBatchGenerationResponseDto,
         },
       },
     },

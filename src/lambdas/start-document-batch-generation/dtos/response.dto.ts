@@ -3,12 +3,12 @@ import z from 'zod';
 
 extendZodWithOpenApi(z);
 
-export const startDocumentGenerationBatchResponseDto = z.object({
+export const startDocumentBatchGenerationResponseDto = z.object({
   id: z.string().uuid().openapi({
     description: 'Batch id.',
   }),
 });
 
-export type StartDocumentGenerationBatchResponseDto = z.infer<
-  typeof startDocumentGenerationBatchResponseDto
+export type StartDocumentBatchGenerationResponseDto = z.infer<
+  typeof startDocumentBatchGenerationResponseDto
 >;

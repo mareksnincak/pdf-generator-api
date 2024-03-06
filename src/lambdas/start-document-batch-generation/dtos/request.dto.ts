@@ -22,6 +22,8 @@ export const startDocumentBatchGenerationRequestDto = z
     return documentRefs.length === uniqueDocumentRefs.length;
   }, 'Document refs must be unique');
 
-export type StartDocumentBatchGenerationRequestDtoRequestDto = z.infer<
+export type StartDocumentBatchGenerationDocumentRequestDto = z.infer<typeof documentDto>;
+
+export type StartDocumentBatchGenerationRequestDto = z.infer<
   typeof startDocumentBatchGenerationRequestDto
 >;

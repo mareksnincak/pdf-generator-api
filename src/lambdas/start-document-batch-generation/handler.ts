@@ -14,14 +14,14 @@ import { startExecution } from '../../helpers/sfn.helper';
 import { validateBody } from '../../helpers/validation.helper';
 
 import {
-  type StartDocumentBatchGenerationRequestDtoRequestDto,
+  type StartDocumentBatchGenerationRequestDto,
   startDocumentBatchGenerationRequestDto,
 } from './dtos/request.dto';
-import { type StartDocumentGenerationBatchResponseDto } from './dtos/response.dto';
+import { type StartDocumentBatchGenerationResponseDto } from './dtos/response.dto';
 
 async function startStateMachineExecution(
   userId: string,
-  requestData: StartDocumentBatchGenerationRequestDtoRequestDto,
+  requestData: StartDocumentBatchGenerationRequestDto,
 ) {
   const id = randomUUID();
 
@@ -59,7 +59,7 @@ export async function startDocumentBatchGeneration(
 
     const id = await startStateMachineExecution(userId, validatedData);
 
-    const response: StartDocumentGenerationBatchResponseDto = {
+    const response: StartDocumentBatchGenerationResponseDto = {
       id,
     };
     logger.info(response, 'startDocumentBatchGeneration.response');
