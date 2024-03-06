@@ -24,7 +24,7 @@ async function getLaunchOptions() {
   const chromiumLocalExecutablePath = process.env.CHROMIUM_LOCAL_EXECUTABLE_PATH;
   if (chromiumLocalExecutablePath) {
     defaultLaunchOptions.executablePath = chromiumLocalExecutablePath;
-    defaultLaunchOptions.args = [...defaultArgs, '--no-sandbox', '--disable-setuid-sandbox'];
+    defaultLaunchOptions.args = ['--no-sandbox', '--disable-setuid-sandbox'];
   }
 
   launchOptions = defaultLaunchOptions;
