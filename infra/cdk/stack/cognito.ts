@@ -2,6 +2,7 @@ import { CustomResource, RemovalPolicy } from 'aws-cdk-lib';
 import {
   CfnUserPoolUser,
   OAuthScope,
+  type ResourceServerScope,
   UserPool,
   UserPoolClient,
   UserPoolDomain,
@@ -12,11 +13,7 @@ import { PhysicalResourceId, Provider } from 'aws-cdk-lib/custom-resources';
 import { type Construct } from 'constructs';
 
 import { type SetDefaultUserPasswordResourceCustomProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
-import {
-  AuthorizationScope,
-  PdfGeneratorCustomAuthorizationScope,
-  ResourceServerIdentifier,
-} from '../enums/authorization.enum';
+import { ResourceServerIdentifier, customOAuthScopes } from '../enums/authorization.enum';
 
 import { type createLambdas } from './lambdas';
 
@@ -107,24 +104,20 @@ export function createCognito({
     },
   });
 
+  const userPoolScopes: ResourceServerScope[] = Object.values(customOAuthScopes).map((scope) => ({
+    scopeName: scope.name,
+    scopeDescription: scope.description,
+  }));
+
   const userPoolResourceServer = new UserPoolResourceServer(scope, 'user-pool-resource-server', {
     userPool,
     identifier: ResourceServerIdentifier.pdfGenerator,
-    scopes: [
-      {
-        scopeName: PdfGeneratorCustomAuthorizationScope.readTemplates,
-        scopeDescription: 'Read templates',
-      },
-      {
-        scopeName: PdfGeneratorCustomAuthorizationScope.writeTemplates,
-        scopeDescription: 'Modify templates',
-      },
-      {
-        scopeName: PdfGeneratorCustomAuthorizationScope.generateDocuments,
-        scopeDescription: 'Generate documents',
-      },
-    ],
+    scopes: userPoolScopes,
   });
+
+  const userPoolClientScopes = Object.values(customOAuthScopes).map((scope) =>
+    OAuthScope.custom(scope.pdfGeneratorName),
+  );
 
   const userPoolClient = new UserPoolClient(scope, 'user-pool-client', {
     generateSecret: false,
@@ -136,12 +129,7 @@ export function createCognito({
     },
     preventUserExistenceErrors: true,
     oAuth: {
-      scopes: [
-        OAuthScope.COGNITO_ADMIN,
-        OAuthScope.custom(AuthorizationScope.pdfGeneratorReadTemplates),
-        OAuthScope.custom(AuthorizationScope.pdfGeneratorWriteTemplates),
-        OAuthScope.custom(AuthorizationScope.pdfGeneratorGenerateDocuments),
-      ],
+      scopes: [OAuthScope.COGNITO_ADMIN, ...userPoolClientScopes],
     },
   });
 

@@ -6,7 +6,7 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import { type Construct } from 'constructs';
 
-import { AuthorizationScope } from '../enums/authorization.enum';
+import { oAuthScopes } from '../enums/authorization.enum';
 
 import { type createCognito } from './cognito';
 import { type createLambdas } from './lambdas';
@@ -46,31 +46,43 @@ export function createApi({
     .addMethod('GET', new LambdaIntegration(lambdas.getUrlForTemplateUpload), {
       ...commonAuthorizationOptions,
       authorizationScopes: [
-        AuthorizationScope.admin,
-        AuthorizationScope.pdfGeneratorWriteTemplates,
+        oAuthScopes.admin.pdfGeneratorScope,
+        oAuthScopes.writeTemplates.pdfGeneratorName,
       ],
     });
 
   templatesResource.addMethod('POST', new LambdaIntegration(lambdas.createTemplate), {
     ...commonAuthorizationOptions,
-    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorWriteTemplates],
+    authorizationScopes: [
+      oAuthScopes.admin.pdfGeneratorScope,
+      oAuthScopes.writeTemplates.pdfGeneratorName,
+    ],
   });
 
   templatesResource.addMethod('GET', new LambdaIntegration(lambdas.getTemplates), {
     ...commonAuthorizationOptions,
-    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorReadTemplates],
+    authorizationScopes: [
+      oAuthScopes.admin.pdfGeneratorScope,
+      oAuthScopes.readTemplates.pdfGeneratorName,
+    ],
   });
 
   const templateByIdResource = templatesResource.addResource('{id}');
 
   templateByIdResource.addMethod('GET', new LambdaIntegration(lambdas.getTemplate), {
     ...commonAuthorizationOptions,
-    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorReadTemplates],
+    authorizationScopes: [
+      oAuthScopes.admin.pdfGeneratorScope,
+      oAuthScopes.readTemplates.pdfGeneratorName,
+    ],
   });
 
   templateByIdResource.addMethod('DELETE', new LambdaIntegration(lambdas.deleteTemplate), {
     ...commonAuthorizationOptions,
-    authorizationScopes: [AuthorizationScope.admin, AuthorizationScope.pdfGeneratorWriteTemplates],
+    authorizationScopes: [
+      oAuthScopes.admin.pdfGeneratorScope,
+      oAuthScopes.writeTemplates.pdfGeneratorName,
+    ],
   });
 
   // DOCUMENTS
@@ -81,8 +93,8 @@ export function createApi({
     .addMethod('POST', new LambdaIntegration(lambdas.generateDocument), {
       ...commonAuthorizationOptions,
       authorizationScopes: [
-        AuthorizationScope.admin,
-        AuthorizationScope.pdfGeneratorGenerateDocuments,
+        oAuthScopes.admin.pdfGeneratorScope,
+        oAuthScopes.generateDocuments.pdfGeneratorName,
       ],
     });
 
