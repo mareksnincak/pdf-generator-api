@@ -10,7 +10,7 @@ import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { startExecution } from '../../helpers/state-machine.helper';
+import { startExecution } from '../../helpers/sfn.helper';
 import { validateBody } from '../../helpers/validation.helper';
 
 import {
