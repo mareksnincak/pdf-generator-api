@@ -1,7 +1,8 @@
-mkdir -p ./infra/local/chromium /tmp/chromium
-
-local_chromium_path=$(readlink -f ./infra/local/chromium/)
+local_chromium_path=./infra/local/chromium/
 echo local chromium path: $local_chromium_path
+
+mkdir -p $local_chromium_path /tmp/chromium
+echo local direcory created: $local_chromium_path
 
 installation_output=$(npx @puppeteer/browsers install chrome-headless-shell@${CHROMIUM_VERSION} --path /tmp/chromium)
 echo installation output: $installation_output
