@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { getEnvVariableOrFail } from './env.helper';
+import { getEnvVariableOrFail, isLocal } from './env.helper';
 
 afterEach(() => {
   jest.resetAllMocks();
@@ -26,5 +26,31 @@ describe('getEnvVariableOrFail', () => {
       expect(error).toBeInstanceOf(Error);
       expect((error as Error).message).toEqual('envHelper.getEnvVariableOrFail.missing');
     }
+  });
+});
+
+describe('isLocal', () => {
+  it("should return true when IS_LOCAL === 'true'", () => {
+    process.env.IS_LOCAL = 'true';
+
+    const result = isLocal();
+
+    expect(result).toEqual(true);
+  });
+
+  it("should return false when IS_LOCAL === 'false'", () => {
+    process.env.IS_LOCAL = 'false';
+
+    const result = isLocal();
+
+    expect(result).toEqual(false);
+  });
+
+  it('should return false when IS_LOCAL is not set', () => {
+    delete process.env.IS_LOCAL;
+
+    const result = isLocal();
+
+    expect(result).toEqual(false);
   });
 });

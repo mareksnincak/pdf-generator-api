@@ -7,3 +7,7 @@ export function getEnvVariableOrFail(name: string) {
 
   return value;
 }
+
+export function isLocal() {
+  return process.env.IS_LOCAL === 'true';
+}
