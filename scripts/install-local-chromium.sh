@@ -2,7 +2,7 @@ local_chromium_path=./infra/local/chromium/
 echo local chromium path: $local_chromium_path
 
 mkdir -p $local_chromium_path /tmp/chromium
-echo local direcory created: $local_chromium_path
+echo local dir created: $local_chromium_path
 
 installation_output=$(npx @puppeteer/browsers install chrome-headless-shell@${CHROMIUM_VERSION} --path /tmp/chromium)
 echo installation output: $installation_output
@@ -15,5 +15,5 @@ echo installation dir path: $installation_dir_path
 
 # We are using copy so installer still finds original folder
 # and knows not to install the same version again
-cp -r $installation_dir_path/ $local_chromium_path  
+cp -r $installation_dir_path/* $local_chromium_path/
 echo success
