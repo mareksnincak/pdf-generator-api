@@ -56,9 +56,7 @@ describe('encryptPaginationToken', () => {
       expect(true).toEqual(false);
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
-      expect((error as Error).message).toEqual(
-        'commonDb.paginationHelper.encryptPaginationToken.missingKmsKeyId',
-      );
+      expect((error as Error).message).toEqual('envHelper.getEnvVariableOrFail.missing');
     }
   });
 });

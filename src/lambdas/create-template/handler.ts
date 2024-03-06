@@ -11,6 +11,7 @@ import { createOrReplace } from '../../db/template/template.repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
 import { NotFoundError } from '../../errors/not-found.error';
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
@@ -60,10 +61,7 @@ export async function createTemplateWithData({
   userId: string;
   requestData: CreateTemplateRequestDto;
 }) {
-  const bucket = process.env.S3_BUCKET;
-  if (!bucket) {
-    throw new Error('createTemplate.moveTemplateDataToPermanentLocation.missingS3Bucket');
-  }
+  const bucket = getEnvVariableOrFail('S3_BUCKET');
 
   const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId, bucket });
 

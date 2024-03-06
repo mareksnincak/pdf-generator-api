@@ -1,5 +1,6 @@
 import type { Context, SQSEvent } from 'aws-lambda';
 
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObjects } from '../../helpers/s3.helper';
 
@@ -8,11 +9,7 @@ export async function deleteExpiredS3Objects(event: SQSEvent, context: Context):
     setLoggerContext(event, context);
     logger.info('deleteExpiredS3Objects.starting');
 
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) {
-      throw new Error('deleteExpiredS3Objects.missingBucket');
-    }
-
+    const bucket = getEnvVariableOrFail('S3_BUCKET');
     const keysToDelete = event.Records.map((record) => record.body);
     await deleteObjects({
       bucket,

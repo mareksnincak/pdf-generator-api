@@ -26,11 +26,6 @@ export async function getTemplate(
 
     const { id } = validatedParams;
 
-    const bucket = process.env.S3_BUCKET;
-    if (!bucket) {
-      throw new Error('getTemplate.missingS3Bucket');
-    }
-
     const userId = getUserIdFromEventOrFail(event);
     const template = await getByIdOrFail({ id, userId });
 

@@ -1,5 +1,6 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleError } from '../../helpers/error.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getSsmParam } from '../../helpers/ssm.helper';
@@ -14,11 +15,7 @@ async function getOpenApiParams() {
     return;
   }
 
-  const ssmParamName = process.env.OPEN_API_SSM_PARAM_NAME;
-  if (!ssmParamName) {
-    throw new Error('getOpenApi.getOpenApiDocument.missingSsmParamName');
-  }
-
+  const ssmParamName = getEnvVariableOrFail('OPEN_API_SSM_PARAM_NAME');
   const value = await getSsmParam(ssmParamName);
 
   const openApiParams = JSON.parse(value) as OpenApiParamsSsmParam;
