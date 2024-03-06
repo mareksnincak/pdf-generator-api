@@ -4,8 +4,9 @@ import { type Key } from 'aws-cdk-lib/aws-kms';
 import { type Bucket } from 'aws-cdk-lib/aws-s3';
 
 import { type createCognito } from './cognito';
-import { type createLambdas } from './lambdas';
+import { type createStateMachineStartupLambdas, type createLambdas } from './lambdas';
 import { type createSqsQueues } from './sqs';
+import { type createStateMachines } from './state-machines';
 
 export function grantPermissions({
   region,
@@ -17,6 +18,8 @@ export function grantPermissions({
   cognito,
   kmsKey,
   sqsQueues,
+  stateMachines,
+  stateMachineStartupLambdas,
 }: {
   region: string;
   account: string;
@@ -27,6 +30,8 @@ export function grantPermissions({
   cognito: ReturnType<typeof createCognito>;
   kmsKey: Key;
   sqsQueues: ReturnType<typeof createSqsQueues>;
+  stateMachines: ReturnType<typeof createStateMachines>;
+  stateMachineStartupLambdas: ReturnType<typeof createStateMachineStartupLambdas>;
 }) {
   s3Bucket.grantPut(lambdas.getUrlForTemplateUpload);
   s3Bucket.grantReadWrite(lambdas.createTemplate);
@@ -56,4 +61,8 @@ export function grantPermissions({
   kmsKey.grantEncryptDecrypt(lambdas.getTemplates);
 
   sqsQueues.deleteExpiredS3ObjectsQueue.grantSendMessages(lambdas.generateDocument);
+
+  stateMachines.batchDocumentGenerationStateMachine.grantStartExecution(
+    stateMachineStartupLambdas.startDocumentBatchGeneration,
+  );
 }

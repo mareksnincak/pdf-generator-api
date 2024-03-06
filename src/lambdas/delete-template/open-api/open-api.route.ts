@@ -17,6 +17,14 @@ export const deleteTemplateRoute: RouteConfig = {
     204: {
       description: 'Success.',
     },
+    400: {
+      description: ErrorMessage.validationError,
+      content: {
+        'application/json': {
+          schema: httpErrorDto,
+        },
+      },
+    },
     404: {
       description: ErrorMessage.templateNotFound,
       content: {

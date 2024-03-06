@@ -47,7 +47,7 @@ async function scheduleObjectDeletion({
   });
 }
 
-export async function getShareableUrl({
+async function getShareableUrl({
   bucket,
   keyPrefix,
   data,

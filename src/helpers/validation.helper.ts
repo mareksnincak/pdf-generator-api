@@ -1,10 +1,10 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { type ZodObject, type ZodRawShape } from 'zod';
+import { type ZodTypeAny, type z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
 import { BadRequestError } from '../errors/bad-request.error';
 
-export function validate<T extends ZodRawShape>(data: unknown, dto: ZodObject<T>) {
+export function validate<T extends ZodTypeAny>(data: unknown, dto: T): z.infer<T> {
   const parsedData = dto.safeParse(data ?? {});
 
   if (!parsedData.success) {
@@ -15,24 +15,24 @@ export function validate<T extends ZodRawShape>(data: unknown, dto: ZodObject<T>
   return parsedData.data;
 }
 
-export function validateQueryParams<T extends ZodRawShape>(
+export function validateQueryParams<T extends ZodTypeAny>(
   event: Pick<APIGatewayProxyEvent, 'queryStringParameters'>,
-  dto: ZodObject<T>,
-) {
+  dto: T,
+): z.infer<T> {
   return validate(event.queryStringParameters, dto);
 }
 
-export function validatePathParams<T extends ZodRawShape>(
+export function validatePathParams<T extends ZodTypeAny>(
   event: Pick<APIGatewayProxyEvent, 'pathParameters'>,
-  dto: ZodObject<T>,
-) {
+  dto: T,
+): z.infer<T> {
   return validate(event.pathParameters, dto);
 }
 
-export function validateBody<T extends ZodRawShape>(
+export function validateBody<T extends ZodTypeAny>(
   event: Pick<APIGatewayProxyEvent, 'body'>,
-  dto: ZodObject<T>,
-) {
+  dto: T,
+): z.infer<T> {
   try {
     const data = JSON.parse(event.body ?? '');
     return validate(data, dto);

@@ -5,7 +5,13 @@ import { Lambda } from '../../infra/cdk/enums/lambda.enum';
 import { type EnvironmentName } from '../enums/config.enum';
 import { type EnvVars } from '../types/env.type';
 
+let envVars: EnvVars | undefined;
+
 export function getEnvVars(environmentName: EnvironmentName): EnvVars {
+  if (envVars) {
+    return envVars;
+  }
+
   const configPath = join(__dirname, '..', 'values', `${environmentName}.config.json`);
   const configFile = readFileSync(configPath);
   const config = JSON.parse(configFile.toString()) as {
@@ -13,9 +19,9 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
     lambda: Record<Lambda, Record<string, string>>;
   };
 
-  const envVars = new Map<Lambda | 'global', Record<string, string>>();
+  const envVarsMap = new Map<Lambda | 'global', Record<string, string>>();
 
-  envVars.set('global', config.global);
+  envVarsMap.set('global', config.global);
 
   for (const lambdaName of Object.values(Lambda)) {
     const lambdaConfig = config.lambda[lambdaName];
@@ -28,9 +34,10 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
       ...lambdaConfig,
     };
 
-    envVars.set(lambdaName as Lambda, fullConfig);
+    envVarsMap.set(lambdaName as Lambda, fullConfig);
   }
 
+  envVars = envVarsMap;
   return envVars;
 }
 

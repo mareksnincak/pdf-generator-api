@@ -23,6 +23,14 @@ export const getTemplateRoute: RouteConfig = {
         },
       },
     },
+    400: {
+      description: ErrorMessage.validationError,
+      content: {
+        'application/json': {
+          schema: httpErrorDto,
+        },
+      },
+    },
     404: {
       description: ErrorMessage.templateNotFound,
       content: {

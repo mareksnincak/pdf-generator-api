@@ -8,16 +8,17 @@ import { createApi } from './api';
 import { createCognito } from './cognito';
 import { createDynamoDbTable } from './dynamo';
 import { createKmsKey } from './kms';
-import { createLambdas } from './lambdas';
+import { createLambdas, createStateMachineStartupLambdas } from './lambdas';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
 import { createSqsEventSources, createSqsQueues } from './sqs';
 import { createStringParameters } from './ssm-parameters';
+import { createStateMachines } from './state-machines';
 
 export class CdkStack extends Stack {
   constructor({
-    scope,
+    scope: stackScope,
     id,
     props,
     cdkEnvVars,
@@ -27,7 +28,7 @@ export class CdkStack extends Stack {
     props?: StackProps;
     cdkEnvVars: CdkEnvVarsDto;
   }) {
-    super(scope, id, props);
+    super(stackScope, id, props);
 
     const retainStatefulResources = cdkEnvVars.RETAIN_STATEFUL_RESOURCES;
     const removalPolicy = retainStatefulResources
@@ -58,11 +59,20 @@ export class CdkStack extends Stack {
       sqsQueues,
     });
 
+    const stateMachines = createStateMachines({ scope: this });
+    const stateMachineStartupLambdas = createStateMachineStartupLambdas({
+      scope: this,
+      cdkEnvVars,
+      stateMachines,
+      retainStatefulResources,
+    });
+
     const cognito = createCognito({ scope: this, stackId: id, lambdas, removalPolicy });
 
     const api = createApi({
       scope: this,
       lambdas,
+      stateMachineStartupLambdas,
       cognito,
     });
 
@@ -81,6 +91,8 @@ export class CdkStack extends Stack {
       cognito,
       kmsKey,
       sqsQueues,
+      stateMachines,
+      stateMachineStartupLambdas,
     });
 
     createStringParameters({

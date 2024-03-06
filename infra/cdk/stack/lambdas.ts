@@ -17,6 +17,7 @@ import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { Lambda } from '../enums/lambda.enum';
 
 import { type createSqsQueues } from './sqs';
+import { type createStateMachines } from './state-machines';
 
 function getLambdaEntryPath(lambda: Lambda) {
   return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, 'handler.ts');
@@ -214,5 +215,45 @@ export function createLambdas({
     setDefaultUserPassword,
     generateDocument,
     deleteExpiredS3Objects,
+  };
+}
+
+/**
+ * As state machines use lambdas they need to be created before
+ * creating step function. Lambdas that start state machine need
+ * state machine ARN therefore we create them separately later.
+ */
+export function createStateMachineStartupLambdas({
+  scope,
+  cdkEnvVars,
+  stateMachines,
+  retainStatefulResources,
+}: {
+  scope: Construct;
+  cdkEnvVars: CdkEnvVarsDto;
+  retainStatefulResources: boolean;
+  stateMachines: ReturnType<typeof createStateMachines>;
+}) {
+  const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
+
+  const startDocumentBatchGeneration = new NodejsFunction(
+    scope,
+    Lambda.startDocumentBatchGeneration,
+    {
+      ...getCommonNodeJsFunctionProps({
+        lambda: Lambda.startDocumentBatchGeneration,
+        cdkEnvVars,
+        retainStatefulResources,
+      }),
+      handler: 'startDocumentBatchGeneration',
+      environment: {
+        STATE_MACHINE_ARN: stateMachines.batchDocumentGenerationStateMachine.stateMachineArn,
+        ...envVars.get(Lambda.startDocumentBatchGeneration),
+      },
+    },
+  );
+
+  return {
+    startDocumentBatchGeneration,
   };
 }

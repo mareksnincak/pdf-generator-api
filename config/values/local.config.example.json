@@ -37,6 +37,7 @@
       "DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL": "https://sqs.example.com/sample-delete-expired-s3-objects-queue",
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
+    "start-document-batch-generation": {},
     "delete-expired-s3-objects": {
       "S3_BUCKET": "pdf-generator-api-local"
     }
