@@ -22,7 +22,7 @@ import {
 import { TemplateEntity } from './template.entity';
 import { type Template } from './template.type';
 
-export async function createOrReplace(template: SetOptional<Template, 'id'>) {
+export async function createOrFail(template: SetOptional<Template, 'id'>) {
   try {
     logger.info('templateRepository.createOrReplace');
 

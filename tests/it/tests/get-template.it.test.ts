@@ -7,7 +7,7 @@ import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import { createOrReplace } from '../../../src/db/template/template.repository';
+import { createOrFail } from '../../../src/db/template/template.repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { getTemplate } from '../../../src/lambdas/get-template/handler';
@@ -61,7 +61,7 @@ describe('getTemplate', () => {
       userId,
     });
 
-    await createOrReplace(templateEntity);
+    await createOrFail(templateEntity);
 
     const result = await getTemplate(event, context);
 

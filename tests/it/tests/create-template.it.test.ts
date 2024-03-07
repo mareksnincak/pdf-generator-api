@@ -143,7 +143,7 @@ describe('createTemplate', () => {
       userId,
     });
 
-    await templateRepository.createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const result = await createTemplate(event, context);
 
@@ -181,7 +181,7 @@ describe('createTemplate', () => {
       userId: 'other-user-id',
     });
 
-    await templateRepository.createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const result = await createTemplate(event, context);
 

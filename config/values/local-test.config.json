@@ -50,6 +50,9 @@
       "S3_BUCKET": "pdf-generator-api-test"
     },
     "start-document-batch-generation": {
+      "DYNAMODB_ENDPOINT": "http://localhost:7999",
+      "DYNAMODB_REGION": "local",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
       "STATE_MACHINE_ARN": "sample-state-machine-arn"
     },
     "get-document-batch-result": {

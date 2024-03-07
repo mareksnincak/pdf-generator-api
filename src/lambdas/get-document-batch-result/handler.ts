@@ -4,12 +4,14 @@ import type {
   Context,
 } from 'aws-lambda';
 
+import * as documentBatchRepository from '../../db/document-batch/document-batch.repository';
 import { handleApiError } from '../../helpers/error.helper';
+import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { validatePathParams } from '../../helpers/validation.helper';
 
 import { getDocumentBatchResultRequestDto } from './dtos/request.dto';
-import { DocumentBatchStatus, type GetDocumentBatchResultResponseDto } from './dtos/response.dto';
+import { type GetDocumentBatchResultResponseDto } from './dtos/response.dto';
 
 export async function getDocumentBatchResult(
   event: APIGatewayProxyWithCognitoAuthorizerEvent,
@@ -22,14 +24,12 @@ export async function getDocumentBatchResult(
     const validatedData = validatePathParams(event, getDocumentBatchResultRequestDto);
     logger.info(validatedData, 'getDocumentBatchResult.validatedData');
 
-    // const { id } = validatedData;
-    // const userId = getUserIdFromEventOrFail(event);
+    const { id } = validatedData;
+    const userId = getUserIdFromEventOrFail(event);
 
-    const response: GetDocumentBatchResultResponseDto = {
-      status: DocumentBatchStatus.completed,
-      errors: [],
-      generatedDocuments: [],
-    };
+    const documentBatch = await documentBatchRepository.getByIdOrFail({ id, userId });
+
+    const response: GetDocumentBatchResultResponseDto = documentBatch.toPublicJson();
     logger.info(response, 'getDocumentBatchResult.response');
     return {
       body: JSON.stringify(response),

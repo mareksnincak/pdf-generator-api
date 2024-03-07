@@ -6,7 +6,7 @@ import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import { createOrReplace, getById } from '../../../src/db/template/template.repository';
+import { createOrFail, getById } from '../../../src/db/template/template.repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { deleteTemplate } from '../../../src/lambdas/delete-template/handler';
@@ -50,7 +50,7 @@ describe('deleteTemplate', () => {
       userId,
     });
 
-    await createOrReplace(templateEntity);
+    await createOrFail(templateEntity);
 
     const result = await deleteTemplate(event, context);
 

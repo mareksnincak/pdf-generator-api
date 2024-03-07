@@ -1,11 +1,11 @@
-import { randomUUID } from 'node:crypto';
-
 import type {
   APIGatewayProxyResult,
   APIGatewayProxyWithCognitoAuthorizerEvent,
   Context,
 } from 'aws-lambda';
 
+import { DocumentBatchStatus } from '../../db/document-batch/document-batch.enum';
+import * as documentBatchRepository from '../../db/document-batch/document-batch.repository';
 import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
@@ -19,29 +19,29 @@ import {
 } from './dtos/request.dto';
 import { type StartDocumentBatchGenerationResponseDto } from './dtos/response.dto';
 
-async function startStateMachineExecution(
-  userId: string,
-  requestData: StartDocumentBatchGenerationRequestDto,
-) {
-  const id = randomUUID();
-
+async function startStateMachineExecution({
+  name,
+  userId,
+  requestData,
+}: {
+  name: string;
+  userId: string;
+  requestData: StartDocumentBatchGenerationRequestDto;
+}) {
   if (isLocal()) {
     logger.info('startDocumentBatchGeneration.startStateMachineExecution.skippingLocal');
-    return id;
+    return;
   }
 
   const stateMachineArn = getEnvVariableOrFail('STATE_MACHINE_ARN');
-
   await startExecution({
     stateMachineArn,
-    name: id,
+    name,
     input: {
       userId,
       requestData,
     },
   });
-
-  return id;
 }
 
 export async function startDocumentBatchGeneration(
@@ -57,7 +57,12 @@ export async function startDocumentBatchGeneration(
 
     const userId = getUserIdFromEventOrFail(event);
 
-    const id = await startStateMachineExecution(userId, validatedData);
+    const { id } = await documentBatchRepository.create({
+      userId,
+      status: DocumentBatchStatus.inProgress,
+    });
+
+    await startStateMachineExecution({ name: id, userId, requestData: validatedData });
 
     const response: StartDocumentBatchGenerationResponseDto = {
       id,

@@ -11,7 +11,7 @@ import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import { createOrReplace } from '../../../src/db/template/template.repository';
+import { createOrFail } from '../../../src/db/template/template.repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { generateDocumentFromApiEvent } from '../../../src/lambdas/generate-document/api-handler';
@@ -93,7 +93,7 @@ describe('generateDocument', () => {
       .spyOn(requestPresigner, 'getSignedUrl')
       .mockResolvedValue(mockedUrl);
 
-    await createOrReplace(templateEntity);
+    await createOrFail(templateEntity);
 
     const uploadId = randomUUID();
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(uploadId);

@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { Context } from 'aws-lambda';
 
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { getErrorResponse } from '../../helpers/error.helper';
+import { handleError } from '../../helpers/error.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { putObject } from '../../helpers/s3.helper';
 import { validate } from '../../helpers/validation.helper';
@@ -53,11 +53,11 @@ export async function generateDocumentFromSfnEvent(
     return output;
   } catch (error) {
     logger.error(error, 'generateDocumentFromSfnEvent.error');
-    const { message } = getErrorResponse({ error, logPrefix: 'generateDocumentFromSfnEvent' });
+    const { response } = handleError({ error, logPrefix: 'generateDocumentFromSfnEvent' });
 
     const output: GenerateDocumentFromSfnErrorEventOutputDto = {
       ref: documentRef,
-      message,
+      message: response.message,
     };
     logger.info(output, 'generateDocumentFromSfnEvent.errorOutput');
     return output;

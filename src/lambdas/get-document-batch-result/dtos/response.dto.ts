@@ -9,6 +9,9 @@ export enum DocumentBatchStatus {
 }
 
 export const getDocumentBatchResultResponseDto = z.object({
+  id: z.string().uuid().openapi({
+    description: 'Batch id.',
+  }),
   status: z.nativeEnum(DocumentBatchStatus).openapi({
     description: 'Status.',
   }),
