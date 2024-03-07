@@ -54,6 +54,6 @@ export function setEnvVarsFromConfig(environmentName: EnvironmentName, lambda?: 
   }
 
   for (const [name, value] of Object.entries(values)) {
-    process.env[name] = String(value);
+    process.env[name as keyof NodeJS.ProcessEnv] = String(value);
   }
 }
