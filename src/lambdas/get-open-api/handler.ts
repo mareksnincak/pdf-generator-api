@@ -1,7 +1,7 @@
 import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
 
 import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
-import { handleError } from '../../helpers/error.helper';
+import { handleApiError } from '../../helpers/error.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getSsmParam } from '../../helpers/ssm.helper';
 import { generateOpenApi } from '../../open-api/generate-open-api.schema';
@@ -47,6 +47,6 @@ export async function getOpenApi(
       statusCode: 200,
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'getOpenApi' });
+    return handleApiError({ error, logPrefix: 'getOpenApi' });
   }
 }

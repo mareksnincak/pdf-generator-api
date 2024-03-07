@@ -5,7 +5,7 @@ import type {
 } from 'aws-lambda';
 
 import { getByIdOrFail } from '../../db/template/template.repository';
-import { handleError } from '../../helpers/error.helper';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { validatePathParams } from '../../helpers/validation.helper';
@@ -36,6 +36,6 @@ export async function getTemplate(
       body: JSON.stringify(response),
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'getTemplate' });
+    return handleApiError({ error, logPrefix: 'getTemplate' });
   }
 }

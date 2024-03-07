@@ -7,7 +7,7 @@ import type {
 } from 'aws-lambda';
 
 import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
-import { handleError } from '../../helpers/error.helper';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { startExecution } from '../../helpers/sfn.helper';
@@ -68,6 +68,6 @@ export async function startDocumentBatchGeneration(
       statusCode: 202,
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'createTemplate' });
+    return handleApiError({ error, logPrefix: 'createTemplate' });
   }
 }

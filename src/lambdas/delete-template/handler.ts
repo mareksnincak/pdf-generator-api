@@ -6,7 +6,7 @@ import type {
 
 import { deleteByIdOrFail } from '../../db/template/template.repository';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleError } from '../../helpers/error.helper';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObject } from '../../helpers/s3.helper';
@@ -38,6 +38,6 @@ export async function deleteTemplate(
       body: '',
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'deleteTemplate' });
+    return handleApiError({ error, logPrefix: 'deleteTemplate' });
   }
 }

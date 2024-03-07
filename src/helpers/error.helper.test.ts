@@ -1,15 +1,42 @@
 import { BadRequestError } from '../errors/bad-request.error';
 import { ConflictError } from '../errors/conflict.error';
+import { HttpError } from '../errors/http.error';
 import { NotFoundError } from '../errors/not-found.error';
 
-import { handleError } from './error.helper';
+import { handleApiError, getErrorResponse } from './error.helper';
 import { mockLogger } from './test.helper';
 
 afterEach(() => {
   jest.resetAllMocks();
 });
 
-describe('handleError', () => {
+describe('getErrorResponse', () => {
+  it('should return message from HttpError', () => {
+    mockLogger();
+    const error = new HttpError(400, {
+      message: 'Custom error message',
+    });
+
+    const result = getErrorResponse({ error, logPrefix: 'test' });
+
+    expect(result).toEqual({
+      message: 'Custom error message',
+    });
+  });
+
+  it('should return default message on unknown error', () => {
+    mockLogger();
+    const error = new Error('Custom error message');
+
+    const result = getErrorResponse({ error, logPrefix: 'test' });
+
+    expect(result).toEqual({
+      message: 'Internal server error',
+    });
+  });
+});
+
+describe('handleApiError', () => {
   it.each([
     [400, BadRequestError],
     [404, NotFoundError],
@@ -20,7 +47,7 @@ describe('handleError', () => {
       message: 'Custom error message',
     });
 
-    const result = handleError({ error, logPrefix: 'test' });
+    const result = handleApiError({ error, logPrefix: 'test' });
 
     expect(result).toEqual({
       body: '{"message":"Custom error message"}',
@@ -32,7 +59,7 @@ describe('handleError', () => {
     mockLogger();
     const error = new Error('Custom error message');
 
-    const result = handleError({ error, logPrefix: 'test' });
+    const result = handleApiError({ error, logPrefix: 'test' });
 
     expect(result).toEqual({
       body: '{"message":"Internal server error"}',

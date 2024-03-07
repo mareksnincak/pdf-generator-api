@@ -7,7 +7,7 @@ import type {
 } from 'aws-lambda';
 
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleError } from '../../helpers/error.helper';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getPresignedUploadUrl } from '../../helpers/s3.helper';
@@ -63,6 +63,6 @@ export async function getUrlForTemplateUpload(
       statusCode: 200,
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'getUrlForTemplateUpload' });
+    return handleApiError({ error, logPrefix: 'getUrlForTemplateUpload' });
   }
 }

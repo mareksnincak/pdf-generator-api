@@ -29,6 +29,7 @@ export function createStateMachines({
     lambdaFunction: lambdas.generateDocumentFromSfnEvent,
     payload: TaskInput.fromObject({
       userId: JsonPath.stringAt('$.userId'),
+      ref: JsonPath.stringAt('$.document.ref'),
       templateId: JsonPath.stringAt('$.document.templateId'),
       data: JsonPath.stringAt('$.document.data'),
     }),
