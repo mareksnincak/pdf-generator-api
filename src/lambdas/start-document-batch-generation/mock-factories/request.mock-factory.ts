@@ -4,7 +4,7 @@ import { randomUUID } from 'node:crypto';
 
 import { type PartialDeep } from 'type-fest';
 
-import { GenerateDocumentMockFactory } from '../../generate-document-api-gw/mock-factories/request.mock-factory';
+import { GenerateDocumentMockFactory } from '../../generate-document/mock-factories/request.mock-factory';
 import {
   type StartDocumentBatchGenerationDocumentRequestDto,
   type StartDocumentBatchGenerationRequestDto,

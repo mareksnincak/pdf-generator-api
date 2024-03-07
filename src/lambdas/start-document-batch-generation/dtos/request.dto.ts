@@ -1,7 +1,7 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-import { generateDocumentRequestDto } from '../../generate-document-api-gw/dtos/request.dto';
+import { generateDocumentRequestDto } from '../../generate-document/dtos/request.dto';
 
 extendZodWithOpenApi(z);
 

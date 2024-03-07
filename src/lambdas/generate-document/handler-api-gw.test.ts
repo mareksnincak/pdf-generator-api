@@ -13,7 +13,7 @@ import { mockLogger } from '../../helpers/test.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 
-import { generateDocument } from './handler';
+import { generateDocument } from './handler-api-gw';
 import { GenerateDocumentMockFactory } from './mock-factories/request.mock-factory';
 import * as pdfService from './services/pdf.service';
 

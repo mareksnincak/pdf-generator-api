@@ -4,7 +4,7 @@ import { customOAuthScopes } from '../../infra/cdk/enums/authorization.enum';
 import * as packageJson from '../../package.json';
 import { createTemplateRoute } from '../lambdas/create-template/open-api/open-api.route';
 import { deleteTemplateRoute } from '../lambdas/delete-template/open-api/open-api.route';
-import { generateDocumentRoute } from '../lambdas/generate-document-api-gw/open-api/open-api.route';
+import { generateDocumentRoute } from '../lambdas/generate-document/open-api/open-api.route';
 import { getTemplateRoute } from '../lambdas/get-template/open-api/open-api.route';
 import { getTemplatesRoute } from '../lambdas/get-templates/open-api/open-api.route';
 import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/open-api.route';

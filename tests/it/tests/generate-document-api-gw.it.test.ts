@@ -14,8 +14,8 @@ import { TemplateEntityMockFactory } from '../../../src/db/template/template.moc
 import { createOrReplace } from '../../../src/db/template/template.repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
-import { generateDocument } from '../../../src/lambdas/generate-document-api-gw/handler';
-import { GenerateDocumentMockFactory } from '../../../src/lambdas/generate-document-api-gw/mock-factories/request.mock-factory';
+import { generateDocument } from '../../../src/lambdas/generate-document/handler-api-gw';
+import { GenerateDocumentMockFactory } from '../../../src/lambdas/generate-document/mock-factories/request.mock-factory';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
 import { documentMockName } from '../../common/constants/document.constant';

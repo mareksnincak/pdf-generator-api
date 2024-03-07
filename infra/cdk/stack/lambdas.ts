@@ -19,8 +19,8 @@ import { Lambda } from '../enums/lambda.enum';
 import { type createSqsQueues } from './sqs';
 import { type createStateMachines } from './state-machines';
 
-function getLambdaEntryPath(lambda: Lambda) {
-  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, 'handler.ts');
+function getLambdaEntryPath(lambda: Lambda, handlerFilename = 'handler.ts') {
+  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, handlerFilename);
 }
 
 function getCommonNodeJsFunctionProps({
@@ -30,6 +30,7 @@ function getCommonNodeJsFunctionProps({
   architecture = Architecture.ARM_64,
   memorySize,
   bundlingOptions,
+  handlerFilename,
 }: {
   lambda: Lambda;
   cdkEnvVars: CdkEnvVarsDto;
@@ -37,11 +38,12 @@ function getCommonNodeJsFunctionProps({
   architecture?: Architecture;
   memorySize?: number;
   bundlingOptions?: BundlingOptions;
+  handlerFilename?: string;
 }) {
   return {
     runtime: Runtime.NODEJS_20_X,
     architecture,
-    entry: getLambdaEntryPath(lambda),
+    entry: getLambdaEntryPath(lambda, handlerFilename),
     bundling: {
       /**
        * We are using static hash to be able to use local watch.
@@ -182,6 +184,7 @@ export function createLambdas({
       bundlingOptions: {
         nodeModules: ['@sparticuz/chromium'],
       },
+      handlerFilename: 'handler-api-gw.ts',
     }),
     handler: 'generateDocument',
     environment: {
