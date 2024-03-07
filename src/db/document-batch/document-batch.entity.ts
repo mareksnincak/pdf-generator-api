@@ -4,6 +4,8 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
+import { getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
 import { type PrimaryKey } from '../common/types/entity.type';
 
@@ -78,25 +80,28 @@ export class DocumentBatchEntity extends BaseEntity {
     return marshall(this.getPrimaryKey({ id, userId }));
   }
 
-  public toPublicJson() {
+  public async toPublicJson() {
+    const bucket = getEnvVariableOrFail('S3_BUCKET');
+
+    const generatedDocuments = await Promise.all(
+      this.generatedDocuments.map(async ({ ref, s3Key }) => {
+        const url = await getPresignedShareUrl({
+          bucket,
+          key: s3Key,
+        });
+
+        return {
+          ref,
+          url,
+        };
+      }),
+    );
+
     return {
       id: this.id,
       status: this.status,
       errors: this.errors,
-      generatedDocuments: this.generatedDocuments,
+      generatedDocuments,
     };
   }
-
-  // public async toPublicJsonWithDataUrl() {
-  //   const bucket = getEnvVariableOrFail('S3_BUCKET');
-  //   const dataUrl = await getPresignedShareUrl({
-  //     bucket,
-  //     key: this.s3Key,
-  //   });
-
-  //   return {
-  //     ...this.toPublicJson(),
-  //     dataUrl,
-  //   };
-  // }
 }

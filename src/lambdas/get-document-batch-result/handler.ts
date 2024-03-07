@@ -29,7 +29,7 @@ export async function getDocumentBatchResult(
 
     const documentBatch = await documentBatchRepository.getByIdOrFail({ id, userId });
 
-    const response: GetDocumentBatchResultResponseDto = documentBatch.toPublicJson();
+    const response: GetDocumentBatchResultResponseDto = await documentBatch.toPublicJson();
     logger.info(response, 'getDocumentBatchResult.response');
     return {
       body: JSON.stringify(response),

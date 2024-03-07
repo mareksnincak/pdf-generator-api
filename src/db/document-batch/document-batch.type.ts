@@ -4,7 +4,7 @@ import { type DocumentBatchStatus } from './document-batch.enum';
 
 export type DocumentBatchError = { ref: string; message: string };
 
-export type DocumentBatchGeneratedDocument = { ref: string; url: string };
+export type DocumentBatchGeneratedDocument = { ref: string; s3Key: string };
 
 export type DocumentBatch = {
   id: string;

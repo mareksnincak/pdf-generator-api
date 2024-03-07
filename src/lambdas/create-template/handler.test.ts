@@ -31,7 +31,7 @@ afterEach(() => {
 describe('createTemplate', () => {
   it('should create template', async () => {
     jest.spyOn(s3Helper, 'moveObject').mockImplementation();
-    jest.spyOn(templateRepository, 'createOrReplace').mockResolvedValue(templateEntity);
+    jest.spyOn(templateRepository, 'createOrFail').mockResolvedValue(templateEntity);
 
     const requestBody = requestMockFactory.create();
     const event = eventMockFactory.create({
@@ -85,7 +85,7 @@ describe('createTemplate', () => {
     mockLogger();
     jest.spyOn(s3Helper, 'moveObject').mockImplementation();
     const deleteObjectSpy = jest.spyOn(s3Helper, 'deleteObject').mockImplementation();
-    jest.spyOn(templateRepository, 'createOrReplace').mockRejectedValue(
+    jest.spyOn(templateRepository, 'createOrFail').mockRejectedValue(
       new ConflictError({
         message: ErrorMessage.templateAlreadyExists,
       }),
