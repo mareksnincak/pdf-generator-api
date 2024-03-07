@@ -279,11 +279,13 @@ export function createStateMachineStartupLambdas({
   cdkEnvVars,
   stateMachines,
   retainStatefulResources,
+  dynamoDbTable,
 }: {
   scope: Construct;
   cdkEnvVars: CdkEnvVarsDto;
   retainStatefulResources: boolean;
   stateMachines: ReturnType<typeof createStateMachines>;
+  dynamoDbTable: Table;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
 
@@ -298,7 +300,8 @@ export function createStateMachineStartupLambdas({
       }),
       handler: 'startDocumentBatchGeneration',
       environment: {
-        STATE_MACHINE_ARN: stateMachines.batchDocumentGenerationStateMachine.stateMachineArn,
+        DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+        STATE_MACHINE_ARN: stateMachines.documentBatchGeneration.stateMachineArn,
         ...envVars.get(Lambda.startDocumentBatchGeneration),
       },
     },

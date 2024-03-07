@@ -4,6 +4,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
+import { type PrimaryKey } from '../../db/common/types/entity.type';
 import { DocumentBatchStatus } from '../../db/document-batch/document-batch.enum';
 import * as documentBatchRepository from '../../db/document-batch/document-batch.repository';
 import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
@@ -23,10 +24,12 @@ async function startStateMachineExecution({
   name,
   userId,
   requestData,
+  primaryKey,
 }: {
   name: string;
   userId: string;
   requestData: StartDocumentBatchGenerationRequestDto;
+  primaryKey: PrimaryKey;
 }) {
   if (isLocal()) {
     logger.info('startDocumentBatchGeneration.startStateMachineExecution.skippingLocal');
@@ -39,6 +42,7 @@ async function startStateMachineExecution({
     name,
     input: {
       userId,
+      primaryKey,
       requestData,
     },
   });
@@ -57,12 +61,17 @@ export async function startDocumentBatchGeneration(
 
     const userId = getUserIdFromEventOrFail(event);
 
-    const { id } = await documentBatchRepository.create({
+    const { id, primaryKey } = await documentBatchRepository.create({
       userId,
       status: DocumentBatchStatus.inProgress,
     });
 
-    await startStateMachineExecution({ name: id, userId, requestData: validatedData });
+    await startStateMachineExecution({
+      name: id,
+      userId,
+      requestData: validatedData,
+      primaryKey,
+    });
 
     const response: StartDocumentBatchGenerationResponseDto = {
       id,

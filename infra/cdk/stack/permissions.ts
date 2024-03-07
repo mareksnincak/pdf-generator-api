@@ -58,6 +58,8 @@ export function grantPermissions({
   dynamoDbTable.grantReadData(lambdas.generateDocumentFromApiEvent);
   dynamoDbTable.grantReadData(lambdas.generateDocumentFromSfnEvent);
   dynamoDbTable.grantReadData(lambdas.getDocumentBatchResult);
+  dynamoDbTable.grantWriteData(stateMachineStartupLambdas.startDocumentBatchGeneration);
+  dynamoDbTable.grantWriteData(stateMachines.documentBatchGeneration);
 
   cognito.defaultUsersCredentialsSecret.grantRead(lambdas.setDefaultUserPassword);
   cognito.userPool.grant(lambdas.setDefaultUserPassword, 'cognito-idp:AdminSetUserPassword');
@@ -66,7 +68,7 @@ export function grantPermissions({
 
   sqsQueues.deleteExpiredS3ObjectsQueue.grantSendMessages(lambdas.generateDocumentFromApiEvent);
 
-  stateMachines.batchDocumentGenerationStateMachine.grantStartExecution(
+  stateMachines.documentBatchGeneration.grantStartExecution(
     stateMachineStartupLambdas.startDocumentBatchGeneration,
   );
 }
