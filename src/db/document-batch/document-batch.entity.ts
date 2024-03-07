@@ -46,6 +46,12 @@ export class DocumentBatchEntity extends BaseEntity {
 
   public generatedDocuments: DocumentBatchGeneratedDocument[];
 
+  public static updatableFields: Set<string> = new Set<keyof DocumentBatch>([
+    'status',
+    'errors',
+    'generatedDocuments',
+  ]);
+
   async toDynamoItem(): Promise<Record<string, AttributeValue>> {
     const item: StoredDocumentBatch = {
       ...this.primaryKey,

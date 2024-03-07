@@ -76,6 +76,10 @@ export async function updateById(
   const expressionAttributeValues: Record<string, unknown> = {};
 
   Object.entries(updatedData).forEach(([key, value], index) => {
+    if (!DocumentBatchEntity.updatableFields.has(key)) {
+      return;
+    }
+
     updateExpressionItems.push(`#field${index} = :value${index}`);
     expressionAttributeNames[`#field${index}`] = key;
     expressionAttributeValues[`:value${index}`] = value;
