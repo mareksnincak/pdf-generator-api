@@ -4,7 +4,9 @@
   },
   "lambda": {
     "create-template": {},
-    "get-template": {},
+    "get-template": {
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "360"
+    },
     "get-templates": {},
     "delete-template": {},
     "get-open-api": {},
@@ -17,7 +19,9 @@
     },
     "generate-document-from-sfn-event": {},
     "start-document-batch-generation": {},
-    "get-document-batch-result": {},
+    "get-document-batch-result": {
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "360"
+    },
     "delete-expired-s3-objects": {}
   }
 }

@@ -82,12 +82,14 @@ export class DocumentBatchEntity extends BaseEntity {
 
   public async toPublicJson() {
     const bucket = getEnvVariableOrFail('S3_BUCKET');
+    const urlExpirationSeconds = Number(getEnvVariableOrFail('PRESIGNED_URL_EXPIRATION_SECONDS'));
 
     const generatedDocuments = await Promise.all(
       this.generatedDocuments.map(async ({ ref, s3Key }) => {
         const url = await getPresignedShareUrl({
           bucket,
           key: s3Key,
+          expiresInSeconds: urlExpirationSeconds,
         });
 
         return {

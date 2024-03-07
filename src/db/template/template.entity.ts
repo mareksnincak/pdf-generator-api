@@ -92,9 +92,12 @@ export class TemplateEntity extends BaseEntity {
 
   public async toPublicJsonWithDataUrl() {
     const bucket = getEnvVariableOrFail('S3_BUCKET');
+    const urlExpirationSeconds = Number(getEnvVariableOrFail('PRESIGNED_URL_EXPIRATION_SECONDS'));
+
     const dataUrl = await getPresignedShareUrl({
       bucket,
       key: this.s3Key,
+      expiresInSeconds: urlExpirationSeconds,
     });
 
     return {
