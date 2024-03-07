@@ -68,6 +68,6 @@ export async function startDocumentBatchGeneration(
       statusCode: 202,
     };
   } catch (error) {
-    return handleApiError({ error, logPrefix: 'createTemplate' });
+    return handleApiError({ error, logPrefix: 'startDocumentBatchGeneration' });
   }
 }

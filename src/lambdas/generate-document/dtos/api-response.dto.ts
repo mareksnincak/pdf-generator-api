@@ -6,7 +6,7 @@ extendZodWithOpenApi(z);
 export const generateDocumentFromApiEventResponseDto = z.object({
   url: z.string().openapi({
     description: 'Url to generated document.',
-    example: 'https://upload.example.com/upload-here',
+    example: 'https://document.example.com/my-document',
   }),
 });
 

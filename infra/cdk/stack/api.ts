@@ -116,5 +116,19 @@ export function createApi({
       },
     );
 
+  const documentBatchByIdResource = documentBatchResource.addResource('{id}');
+
+  documentBatchByIdResource.addMethod(
+    'GET',
+    new LambdaIntegration(lambdas.getDocumentBatchResult),
+    {
+      ...commonAuthorizationOptions,
+      authorizationScopes: [
+        oAuthScopes.admin.pdfGeneratorScope,
+        oAuthScopes.generateDocuments.pdfGeneratorName,
+      ],
+    },
+  );
+
   return api;
 }

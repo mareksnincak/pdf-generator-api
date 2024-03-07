@@ -17,6 +17,7 @@
     },
     "generate-document-from-sfn-event": {},
     "start-document-batch-generation": {},
+    "get-document-batch-result": {},
     "delete-expired-s3-objects": {}
   }
 }

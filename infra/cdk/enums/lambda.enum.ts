@@ -9,5 +9,6 @@ export enum Lambda {
   generateDocumentFromApiEvent = 'generate-document-from-api-event',
   generateDocumentFromSfnEvent = 'generate-document-from-sfn-event',
   startDocumentBatchGeneration = 'start-document-batch-generation',
+  getDocumentBatchResult = 'get-document-batch-result',
   deleteExpiredS3Objects = 'delete-expired-s3-objects',
 }

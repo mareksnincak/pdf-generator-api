@@ -5,7 +5,7 @@ import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
 import { startDocumentBatchGenerationRequestDto } from '../dtos/request.dto';
 import { startDocumentBatchGenerationResponseDto } from '../dtos/response.dto';
 
-export const generateDocumentsRoute: RouteConfig = {
+export const startDocumentBatchGenerationRoute: RouteConfig = {
   method: 'post',
   path: '/documents/batch/generate',
   tags: ['documents'],
