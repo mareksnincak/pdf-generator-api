@@ -4,13 +4,13 @@ import { randomUUID } from 'node:crypto';
 
 import { type PartialDeep } from 'type-fest';
 
-import { GenerateDocumentMockFactory } from '../../generate-document/mock-factories/request.mock-factory';
+import { GenerateDocumentFromApiGwEventRequestMockFactory } from '../../generate-document/mock-factories/api-request.mock-factory';
 import {
   type StartDocumentBatchGenerationDocumentRequestDto,
   type StartDocumentBatchGenerationRequestDto,
 } from '../dtos/request.dto';
 
-export class StartDocumentBatchGenerationDocumentRequestMockFactory extends GenerateDocumentMockFactory {
+export class StartDocumentBatchGenerationDocumentRequestMockFactory extends GenerateDocumentFromApiGwEventRequestMockFactory {
   create(
     overrides: Partial<StartDocumentBatchGenerationDocumentRequestDto> = {},
   ): StartDocumentBatchGenerationDocumentRequestDto {

@@ -1,11 +1,11 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-import { generateDocumentRequestDto } from '../../generate-document/dtos/request.dto';
+import { generateDocumentFromApiEventRequestDto } from '../../generate-document/dtos/api-request.dto';
 
 extendZodWithOpenApi(z);
 
-const documentDto = generateDocumentRequestDto.extend({
+const documentDto = generateDocumentFromApiEventRequestDto.extend({
   ref: z.string().min(1).max(64).openapi({
     description: 'Unique document reference. Used to match document entry with generation result.',
   }),

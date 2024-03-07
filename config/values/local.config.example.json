@@ -30,7 +30,7 @@
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "set-default-user-password": {},
-    "generate-document-api-gw": {
+    "generate-document-from-api-event": {
       "DYNAMODB_ENDPOINT": "http://host.docker.internal:8000",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
       "S3_BUCKET": "pdf-generator-api-local",

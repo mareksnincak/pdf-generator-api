@@ -174,26 +174,30 @@ export function createLambdas({
     },
   });
 
-  const generateDocumentApiGw = new NodejsFunction(scope, Lambda.generateDocumentApiGw, {
-    ...getCommonNodeJsFunctionProps({
-      lambda: Lambda.generateDocumentApiGw,
-      cdkEnvVars,
-      retainStatefulResources,
-      architecture: Architecture.X86_64,
-      memorySize: 2048,
-      bundlingOptions: {
-        nodeModules: ['@sparticuz/chromium'],
+  const generateDocumentFromApiEvent = new NodejsFunction(
+    scope,
+    Lambda.generateDocumentFromApiEvent,
+    {
+      ...getCommonNodeJsFunctionProps({
+        lambda: Lambda.generateDocumentFromApiEvent,
+        cdkEnvVars,
+        retainStatefulResources,
+        architecture: Architecture.X86_64,
+        memorySize: 2048,
+        bundlingOptions: {
+          nodeModules: ['@sparticuz/chromium'],
+        },
+        handlerFilename: 'api-handler.ts',
+      }),
+      handler: 'generateDocumentFromApiEvent',
+      environment: {
+        DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+        S3_BUCKET: s3BucketName,
+        DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
+        ...envVars.get(Lambda.generateDocumentFromApiEvent),
       },
-      handlerFilename: 'handler-api-gw.ts',
-    }),
-    handler: 'generateDocument',
-    environment: {
-      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
-      S3_BUCKET: s3BucketName,
-      DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
-      ...envVars.get(Lambda.generateDocumentApiGw),
     },
-  });
+  );
 
   const deleteExpiredS3Objects = new NodejsFunction(scope, Lambda.deleteExpiredS3Objects, {
     ...getCommonNodeJsFunctionProps({
@@ -216,7 +220,7 @@ export function createLambdas({
     getTemplates,
     deleteTemplate,
     setDefaultUserPassword,
-    generateDocumentApiGw,
+    generateDocumentFromApiEvent,
     deleteExpiredS3Objects,
   };
 }

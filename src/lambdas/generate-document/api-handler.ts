@@ -5,10 +5,7 @@ import type {
   APIGatewayProxyWithCognitoAuthorizerEvent,
   Context,
 } from 'aws-lambda';
-import { compile } from 'handlebars';
 
-import { type TemplateEntity } from '../../db/template/template.entity';
-import { getByIdOrFail } from '../../db/template/template.repository';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
@@ -17,20 +14,9 @@ import { getPresignedShareUrl, putObject } from '../../helpers/s3.helper';
 import { sendSqsMessage } from '../../helpers/sqs.helper';
 import { validateBody } from '../../helpers/validation.helper';
 
-import { generateDocumentRequestDto } from './dtos/request.dto';
-import { type GenerateDocumentResponseDto } from './dtos/response.dto';
-import { createPdfFromHtml } from './services/pdf.service';
-
-async function renderHtmlTemplate(template: TemplateEntity, data: Record<string, unknown>) {
-  logger.info('generateDocument.renderHtmlTemplate.start');
-
-  const templateData = await template.getData();
-  const compiledTemplate = compile(templateData.toString());
-  const renderedTemplate = compiledTemplate(data);
-
-  logger.info('generateDocument.renderHtmlTemplate.success');
-  return renderedTemplate;
-}
+import { generateDocumentFromApiEventRequestDto } from './dtos/api-request.dto';
+import { type GenerateDocumentFromApiEventResponseDto } from './dtos/api-response.dto';
+import { generateDocument } from './services/document-generation.service';
 
 async function scheduleObjectDeletion({
   key,
@@ -80,39 +66,43 @@ async function getShareableUrl({
   return url;
 }
 
-export async function generateDocument(
+export async function generateDocumentFromApiEvent(
   event: APIGatewayProxyWithCognitoAuthorizerEvent,
   context: Context,
 ): Promise<APIGatewayProxyResult> {
   try {
     setLoggerContext(event, context);
-    logger.info('generateDocument.starting');
+    logger.info('generateDocumentFromApiEvent.starting');
 
-    const validatedData = validateBody(event, generateDocumentRequestDto);
-    logger.info(validatedData, 'generateDocument.validatedData');
+    const validatedData = validateBody(event, generateDocumentFromApiEventRequestDto);
+    logger.info(validatedData, 'generateDocumentFromApiEvent.validatedData');
 
     const { templateId, data } = validatedData;
 
-    const bucket = getEnvVariableOrFail('S3_BUCKET');
     const userId = getUserIdFromEventOrFail(event);
-    const template = await getByIdOrFail({ id: templateId, userId });
-    const renderedTemplate = await renderHtmlTemplate(template, data);
-    const pdf = await createPdfFromHtml(renderedTemplate);
+    const bucket = getEnvVariableOrFail('S3_BUCKET');
+
+    const pdf = await generateDocument({
+      userId,
+      templateId,
+      data,
+    });
+
     const url = await getShareableUrl({
       bucket,
       keyPrefix: `${userId}/documents`,
       data: pdf,
     });
 
-    const response: GenerateDocumentResponseDto = {
+    const response: GenerateDocumentFromApiEventResponseDto = {
       url,
     };
-    logger.info('generateDocument.success');
+    logger.info('generateDocumentFromApiEvent.success');
     return {
       body: JSON.stringify(response),
       statusCode: 200,
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'createTemplate' });
+    return handleError({ error, logPrefix: 'generateDocumentFromApiEvent' });
   }
 }

@@ -13,24 +13,24 @@ import { mockLogger } from '../../helpers/test.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 
-import { generateDocument } from './handler-api-gw';
-import { GenerateDocumentMockFactory } from './mock-factories/request.mock-factory';
+import { generateDocumentFromApiEvent } from './api-handler';
+import { GenerateDocumentFromApiGwEventRequestMockFactory } from './mock-factories/api-request.mock-factory';
 import * as pdfService from './services/pdf.service';
 
-const requestMockFactory = new GenerateDocumentMockFactory();
+const requestMockFactory = new GenerateDocumentFromApiGwEventRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const templateEntity = new TemplateEntityMockFactory().create();
 const context = new ContextMockFactory().create();
 
 beforeAll(() => {
-  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.generateDocumentApiGw);
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.generateDocumentFromApiEvent);
 });
 
 afterEach(() => {
   jest.resetAllMocks();
 });
 
-describe('generateDocument', () => {
+describe('generateDocumentFromApiEvent', () => {
   it('should generate document', async () => {
     const name = randomUUID();
     const body = requestMockFactory.create({
@@ -50,7 +50,7 @@ describe('generateDocument', () => {
     jest.spyOn(sqsHelper, 'sendSqsMessage').mockResolvedValue();
     jest.spyOn(pdfService, 'createPdfFromHtml').mockResolvedValue(Buffer.from(randomUUID()));
 
-    const result = await generateDocument(event, context);
+    const result = await generateDocumentFromApiEvent(event, context);
 
     expect(result.statusCode).toEqual(200);
     expect(JSON.parse(result.body)).toEqual({
@@ -70,7 +70,7 @@ describe('generateDocument', () => {
       body: JSON.stringify(body),
     });
 
-    const result = await generateDocument(event, context);
+    const result = await generateDocumentFromApiEvent(event, context);
 
     expect(result.statusCode).toEqual(404);
     expect(JSON.parse(result.body)).toEqual({
