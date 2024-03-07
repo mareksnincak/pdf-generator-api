@@ -16,8 +16,8 @@ import { getEnvVars } from '../../../config/helpers/config.helper';
 import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { Lambda } from '../enums/lambda.enum';
 
+import { type createStateMachines } from './sfn';
 import { type createSqsQueues } from './sqs';
-import { type createStateMachines } from './state-machines';
 
 function getLambdaEntryPath(lambdaDirName: Lambda | string, handlerFilename = 'handler.ts') {
   return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambdaDirName, handlerFilename);

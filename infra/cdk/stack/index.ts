@@ -12,9 +12,9 @@ import { createLambdas, createStateMachineStartupLambdas } from './lambdas';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
+import { createStateMachines } from './sfn';
 import { createSqsEventSources, createSqsQueues } from './sqs';
 import { createStringParameters } from './ssm-parameters';
-import { createStateMachines } from './state-machines';
 
 export class CdkStack extends Stack {
   constructor({
@@ -59,7 +59,7 @@ export class CdkStack extends Stack {
       sqsQueues,
     });
 
-    const stateMachines = createStateMachines({ scope: this });
+    const stateMachines = createStateMachines({ scope: this, lambdas });
     const stateMachineStartupLambdas = createStateMachineStartupLambdas({
       scope: this,
       cdkEnvVars,

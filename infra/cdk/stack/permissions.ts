@@ -5,8 +5,8 @@ import { type Bucket } from 'aws-cdk-lib/aws-s3';
 
 import { type createCognito } from './cognito';
 import { type createStateMachineStartupLambdas, type createLambdas } from './lambdas';
+import { type createStateMachines } from './sfn';
 import { type createSqsQueues } from './sqs';
-import { type createStateMachines } from './state-machines';
 
 export function grantPermissions({
   region,
