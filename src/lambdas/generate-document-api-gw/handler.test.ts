@@ -23,7 +23,7 @@ const templateEntity = new TemplateEntityMockFactory().create();
 const context = new ContextMockFactory().create();
 
 beforeAll(() => {
-  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.generateDocument);
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.generateDocumentApiGw);
 });
 
 afterEach(() => {

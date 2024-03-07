@@ -5,7 +5,7 @@ import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
 import { generateDocumentRequestDto } from '../dtos/request.dto';
 import { generateDocumentResponseDto } from '../dtos/response.dto';
 
-export const generateDocumentsRoute: RouteConfig = {
+export const generateDocumentRoute: RouteConfig = {
   method: 'post',
   path: '/documents/generate',
   tags: ['documents'],

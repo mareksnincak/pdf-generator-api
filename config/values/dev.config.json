@@ -12,7 +12,7 @@
       "PRESIGNED_URL_EXPIRATION_SECONDS": "360"
     },
     "set-default-user-password": {},
-    "generate-document": {
+    "generate-document-api-gw": {
       "PRESIGNED_URL_EXPIRATION_SECONDS": "360"
     },
     "start-document-batch-generation": {},

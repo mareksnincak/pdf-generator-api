@@ -35,7 +35,7 @@
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "set-default-user-password": {},
-    "generate-document": {
+    "generate-document-api-gw": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",

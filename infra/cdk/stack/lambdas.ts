@@ -172,9 +172,9 @@ export function createLambdas({
     },
   });
 
-  const generateDocument = new NodejsFunction(scope, Lambda.generateDocument, {
+  const generateDocument = new NodejsFunction(scope, Lambda.generateDocumentApiGw, {
     ...getCommonNodeJsFunctionProps({
-      lambda: Lambda.generateDocument,
+      lambda: Lambda.generateDocumentApiGw,
       cdkEnvVars,
       retainStatefulResources,
       architecture: Architecture.X86_64,
@@ -188,7 +188,7 @@ export function createLambdas({
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
-      ...envVars.get(Lambda.generateDocument),
+      ...envVars.get(Lambda.generateDocumentApiGw),
     },
   });
 
