@@ -19,8 +19,8 @@ import { Lambda } from '../enums/lambda.enum';
 import { type createSqsQueues } from './sqs';
 import { type createStateMachines } from './state-machines';
 
-function getLambdaEntryPath(lambda: Lambda, handlerFilename = 'handler.ts') {
-  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, handlerFilename);
+function getLambdaEntryPath(lambdaDirName: Lambda | string, handlerFilename = 'handler.ts') {
+  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambdaDirName, handlerFilename);
 }
 
 function getCommonNodeJsFunctionProps({
@@ -31,6 +31,7 @@ function getCommonNodeJsFunctionProps({
   memorySize,
   bundlingOptions,
   handlerFilename,
+  lambdaDirName,
 }: {
   lambda: Lambda;
   cdkEnvVars: CdkEnvVarsDto;
@@ -39,11 +40,12 @@ function getCommonNodeJsFunctionProps({
   memorySize?: number;
   bundlingOptions?: BundlingOptions;
   handlerFilename?: string;
+  lambdaDirName?: string;
 }) {
   return {
     runtime: Runtime.NODEJS_20_X,
     architecture,
-    entry: getLambdaEntryPath(lambda, handlerFilename),
+    entry: getLambdaEntryPath(lambdaDirName ?? lambda, handlerFilename),
     bundling: {
       /**
        * We are using static hash to be able to use local watch.
@@ -187,6 +189,7 @@ export function createLambdas({
         bundlingOptions: {
           nodeModules: ['@sparticuz/chromium'],
         },
+        lambdaDirName: 'generate-document',
         handlerFilename: 'api-handler.ts',
       }),
       handler: 'generateDocumentFromApiEvent',
@@ -195,6 +198,31 @@ export function createLambdas({
         S3_BUCKET: s3BucketName,
         DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
         ...envVars.get(Lambda.generateDocumentFromApiEvent),
+      },
+    },
+  );
+
+  const generateDocumentFromSfnEvent = new NodejsFunction(
+    scope,
+    Lambda.generateDocumentFromSfnEvent,
+    {
+      ...getCommonNodeJsFunctionProps({
+        lambda: Lambda.generateDocumentFromSfnEvent,
+        cdkEnvVars,
+        retainStatefulResources,
+        architecture: Architecture.X86_64,
+        memorySize: 2048,
+        bundlingOptions: {
+          nodeModules: ['@sparticuz/chromium'],
+        },
+        lambdaDirName: 'generate-document',
+        handlerFilename: 'sfn-handler.ts',
+      }),
+      handler: 'generateDocumentFromSfnEvent',
+      environment: {
+        DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+        S3_BUCKET: s3BucketName,
+        ...envVars.get(Lambda.generateDocumentFromSfnEvent),
       },
     },
   );
@@ -221,6 +249,7 @@ export function createLambdas({
     deleteTemplate,
     setDefaultUserPassword,
     generateDocumentFromApiEvent,
+    generateDocumentFromSfnEvent,
     deleteExpiredS3Objects,
   };
 }

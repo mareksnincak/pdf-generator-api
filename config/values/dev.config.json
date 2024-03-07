@@ -15,6 +15,7 @@
     "generate-document-from-api-event": {
       "PRESIGNED_URL_EXPIRATION_SECONDS": "360"
     },
+    "generate-document-from-sfn-event": {},
     "start-document-batch-generation": {},
     "delete-expired-s3-objects": {}
   }
