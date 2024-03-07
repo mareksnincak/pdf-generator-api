@@ -174,7 +174,7 @@ export function createLambdas({
     },
   });
 
-  const generateDocument = new NodejsFunction(scope, Lambda.generateDocumentApiGw, {
+  const generateDocumentApiGw = new NodejsFunction(scope, Lambda.generateDocumentApiGw, {
     ...getCommonNodeJsFunctionProps({
       lambda: Lambda.generateDocumentApiGw,
       cdkEnvVars,
@@ -216,7 +216,7 @@ export function createLambdas({
     getTemplates,
     deleteTemplate,
     setDefaultUserPassword,
-    generateDocument,
+    generateDocumentApiGw,
     deleteExpiredS3Objects,
   };
 }

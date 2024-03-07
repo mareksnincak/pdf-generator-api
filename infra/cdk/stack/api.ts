@@ -92,7 +92,7 @@ export function createApi({
 
   documentResource
     .addResource('generate')
-    .addMethod('POST', new LambdaIntegration(lambdas.generateDocument), {
+    .addMethod('POST', new LambdaIntegration(lambdas.generateDocumentApiGw), {
       ...commonAuthorizationOptions,
       authorizationScopes: [
         oAuthScopes.admin.pdfGeneratorScope,
