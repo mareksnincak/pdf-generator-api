@@ -1,4 +1,5 @@
-import { GetItemCommand, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { GetItemCommand, PutItemCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { marshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
 import { ErrorMessage } from '../../enums/error.enum';
@@ -60,4 +61,38 @@ export async function getByIdOrFail(params: { id: string; userId: string }) {
 
   logger.info(documentBatchEntity.primaryKey, 'documentBatchRepository.getByIdOrFail.success');
   return documentBatchEntity;
+}
+
+export async function updateById(
+  identifiers: { id: string; userId: string },
+  updatedData: Partial<Omit<DocumentBatch, 'id' | 'userId'>>,
+) {
+  logger.info({ identifiers, updatedData }, 'documentBatchRepository.updateById');
+
+  const { id, userId } = identifiers;
+
+  const updateExpressionItems: string[] = [];
+  const expressionAttributeNames: Record<string, string> = {};
+  const expressionAttributeValues: Record<string, unknown> = {};
+
+  Object.entries(updatedData).forEach(([key, value], index) => {
+    updateExpressionItems.push(`#field${index} = :value${index}`);
+    expressionAttributeNames[`#field${index}`] = key;
+    expressionAttributeValues[`:value${index}`] = value;
+  });
+
+  const updateExpression = `SET ${updateExpressionItems.join(', ')}`;
+
+  const command = new UpdateItemCommand({
+    TableName: getTableName(),
+    Key: DocumentBatchEntity.getDynamoPrimaryKey({ id, userId }),
+    ConditionExpression: 'attribute_exists(PK)',
+    UpdateExpression: updateExpression,
+    ExpressionAttributeNames: expressionAttributeNames,
+    ExpressionAttributeValues: marshall(expressionAttributeValues),
+  });
+
+  await getDynamoDbClient().send(command);
+
+  logger.info('documentBatchRepository.updateById.success');
 }

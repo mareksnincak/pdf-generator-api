@@ -241,6 +241,19 @@ export function createLambdas({
     },
   });
 
+  const storeDocumentBatchResult = new NodejsFunction(scope, Lambda.storeDocumentBatchResult, {
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.storeDocumentBatchResult,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
+    handler: 'storeDocumentBatchResult',
+    environment: {
+      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+      ...envVars.get(Lambda.storeDocumentBatchResult),
+    },
+  });
+
   const deleteExpiredS3Objects = new NodejsFunction(scope, Lambda.deleteExpiredS3Objects, {
     ...getCommonNodeJsFunctionProps({
       lambda: Lambda.deleteExpiredS3Objects,
@@ -265,6 +278,7 @@ export function createLambdas({
     generateDocumentFromApiEvent,
     generateDocumentFromSfnEvent,
     getDocumentBatchResult,
+    storeDocumentBatchResult,
     deleteExpiredS3Objects,
   };
 }

@@ -6,14 +6,8 @@ import {
   StateMachine,
   TaskInput,
 } from 'aws-cdk-lib/aws-stepfunctions';
-import {
-  LambdaInvoke,
-  DynamoUpdateItem,
-  DynamoAttributeValue,
-} from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import { LambdaInvoke } from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { type Construct } from 'constructs';
-
-import { DocumentBatchStatus } from '../../../src/db/document-batch/document-batch.enum';
 
 import { type createLambdas } from './lambdas';
 
@@ -44,26 +38,37 @@ function createDocumentBatchGenerationStateMachine({
       data: JsonPath.stringAt('$.document.data'),
     }),
     resultSelector: {
-      payload: JsonPath.objectAt('$.Payload'),
+      status: JsonPath.stringAt('$.Payload.status'),
+      ref: JsonPath.stringAt('$.Payload.ref'),
+      message: JsonPath.stringAt('$.Payload.message'),
     },
   });
 
   generateDocumentsTask.itemProcessor(generateDocumentTask);
 
-  const storeResultTask = new DynamoUpdateItem(scope, 'Store result', {
-    table: dynamoDbTable,
-    key: {
-      PK: DynamoAttributeValue.fromString(JsonPath.stringAt('$.primaryKey.PK')),
-      SK: DynamoAttributeValue.fromString(JsonPath.stringAt('$.primaryKey.SK')),
-    },
-    updateExpression: 'SET #status = :status',
-    expressionAttributeNames: {
-      '#status': 'status',
-    },
-    expressionAttributeValues: {
-      ':status': DynamoAttributeValue.fromString(DocumentBatchStatus.completed),
-    },
+  const storeResultTask = new LambdaInvoke(scope, 'Store result', {
+    lambdaFunction: lambdas.storeDocumentBatchResult,
+    payload: TaskInput.fromObject({
+      id: JsonPath.stringAt('$$.executionName'),
+      userId: JsonPath.stringAt('$.userId'),
+      results: JsonPath.stringAt('$.generateDocumentsResult'),
+    }),
   });
+
+  // const setFailureStatusTask = new DynamoUpdateItem(scope, 'Set failure status', {
+  //   table: dynamoDbTable,
+  //   key: {
+  //     PK: DynamoAttributeValue.fromString(JsonPath.stringAt('$.primaryKey.PK')),
+  //     SK: DynamoAttributeValue.fromString(JsonPath.stringAt('$.primaryKey.SK')),
+  //   },
+  //   updateExpression: 'SET #status = :status',
+  //   expressionAttributeNames: {
+  //     '#status': 'status',
+  //   },
+  //   expressionAttributeValues: {
+  //     ':status': DynamoAttributeValue.fromString(DocumentBatchStatus.failure),
+  //   },
+  // });
 
   const definition = generateDocumentsTask.next(storeResultTask);
 

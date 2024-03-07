@@ -17,6 +17,7 @@ import {
   type GenerateDocumentFromSfnErrorEventOutputDto,
   type GenerateDocumentFromSfnSuccessEventOutputDto,
 } from './dtos/sfn-output.dto';
+import { DocumentGenerationStatus } from './enums/status.enum';
 import { generateDocument } from './services/document-generation.service';
 
 export async function generateDocumentFromSfnEvent(
@@ -46,19 +47,21 @@ export async function generateDocumentFromSfnEvent(
     });
 
     const output: GenerateDocumentFromSfnSuccessEventOutputDto = {
+      status: DocumentGenerationStatus.success,
       ref,
       s3Key,
     };
     logger.info(output, 'generateDocumentFromSfnEvent.successOutput');
     return output;
   } catch (error) {
-    logger.error(error, 'generateDocumentFromSfnEvent.error');
     const { response } = handleError({ error, logPrefix: 'generateDocumentFromSfnEvent' });
 
     const output: GenerateDocumentFromSfnErrorEventOutputDto = {
+      status: DocumentGenerationStatus.failure,
       ref: documentRef,
       message: response.message,
     };
+
     logger.info(output, 'generateDocumentFromSfnEvent.errorOutput');
     return output;
   }

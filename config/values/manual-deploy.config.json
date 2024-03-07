@@ -22,6 +22,7 @@
     "get-document-batch-result": {
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
+    "store-document-batch-result": {},
     "delete-expired-s3-objects": {}
   }
 }

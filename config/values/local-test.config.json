@@ -63,6 +63,11 @@
       "S3_BUCKET": "pdf-generator-api-test",
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
+    "store-document-batch-result": {
+      "DYNAMODB_ENDPOINT": "http://localhost:7999",
+      "DYNAMODB_REGION": "local",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator"
+    },
     "delete-expired-s3-objects": {
       "S3_BUCKET": "pdf-generator-api-test"
     }
