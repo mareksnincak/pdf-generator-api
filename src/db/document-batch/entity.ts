@@ -10,13 +10,13 @@ import { getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
 import { type PrimaryKey } from '../common/types/entity.type';
 
-import { type DocumentBatchStatus } from './document-batch.enum';
+import { type DocumentBatchStatus } from './enum';
 import {
   type DocumentBatchError,
   type DocumentBatch,
   type StoredDocumentBatch,
   type DocumentBatchGeneratedDocument,
-} from './document-batch.type';
+} from './type';
 
 export class DocumentBatchEntity extends BaseEntity {
   constructor({

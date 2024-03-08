@@ -4,7 +4,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { getMany } from '../../db/template/template.repository';
+import { getMany } from '../../db/template/repository';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';

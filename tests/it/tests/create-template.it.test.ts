@@ -6,8 +6,8 @@ import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aw
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import * as templateRepository from '../../../src/db/template/template.repository';
+import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
+import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';

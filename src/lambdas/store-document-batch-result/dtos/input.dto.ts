@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { DocumentBatchStatus } from '../../../db/document-batch/document-batch.enum';
+import { DocumentBatchStatus } from '../../../db/document-batch/enum';
 import { generateDocumentFromSfnEventOutputDto } from '../../generate-document/dtos/sfn-output.dto';
 
 export const storeDocumentBatchResultInputDto = z.object({

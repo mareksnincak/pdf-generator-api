@@ -1,7 +1,7 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import z from 'zod';
 
-import { DocumentBatchStatus } from '../../../db/document-batch/document-batch.enum';
+import { DocumentBatchStatus } from '../../../db/document-batch/enum';
 
 extendZodWithOpenApi(z);
 

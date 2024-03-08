@@ -7,7 +7,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { createOrFail } from '../../db/template/template.repository';
+import { createOrFail } from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
 import { NotFoundError } from '../../errors/not-found.error';

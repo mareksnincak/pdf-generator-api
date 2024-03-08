@@ -3,7 +3,8 @@ import { randomUUID } from 'node:crypto';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { mockAwsCredentials } from '../../../tests/it/helpers/credential.helper';
+import { DocumentBatchEntityMockFactory } from '../../db/document-batch/mock-factory';
+import * as documentBatchRepository from '../../db/document-batch/repository';
 import * as sfnHelper from '../../helpers/sfn.helper';
 import { mockLogger } from '../../helpers/test.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
@@ -15,6 +16,7 @@ import { StartDocumentBatchGenerationRequestMockFactory } from './mock-factories
 const requestMockFactory = new StartDocumentBatchGenerationRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const context = new ContextMockFactory().create();
+const documentBatchEntity = new DocumentBatchEntityMockFactory().create();
 
 beforeEach(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.startDocumentBatchGeneration);
@@ -33,13 +35,15 @@ describe('startDocumentBatchGeneration', () => {
 
     const startExecutionSpy = jest.spyOn(sfnHelper, 'startExecution').mockImplementation();
 
+    jest.spyOn(documentBatchRepository, 'create').mockResolvedValue(documentBatchEntity);
+
     const result = await startDocumentBatchGeneration(event, context);
 
     expect(result.statusCode).toEqual(202);
 
     const responseData = JSON.parse(result.body);
     expect(responseData).toEqual({
-      id: expect.any(String),
+      id: documentBatchEntity.id,
     });
 
     const batchId = responseData.id;
@@ -64,12 +68,14 @@ describe('startDocumentBatchGeneration', () => {
 
     const startExecutionSpy = jest.spyOn(sfnHelper, 'startExecution');
 
+    jest.spyOn(documentBatchRepository, 'create').mockResolvedValue(documentBatchEntity);
+
     const result = await startDocumentBatchGeneration(event, context);
 
     expect(result.statusCode).toEqual(202);
 
     expect(JSON.parse(result.body)).toEqual({
-      id: expect.any(String),
+      id: documentBatchEntity.id,
     });
 
     expect(startExecutionSpy).not.toHaveBeenCalled();

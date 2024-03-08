@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 
-import { TemplateType } from '../db/template/template.enum';
+import { TemplateType } from '../db/template/enum';
 import { type TemplateResponseDto } from '../dtos/template-response.dto';
 
 export class TemplateResponseMockFactory {

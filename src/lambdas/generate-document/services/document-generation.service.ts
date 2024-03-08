@@ -1,7 +1,7 @@
 import { compile } from 'handlebars';
 
-import { type TemplateEntity } from '../../../db/template/template.entity';
-import { getByIdOrFail } from '../../../db/template/template.repository';
+import { type TemplateEntity } from '../../../db/template/entity';
+import { getByIdOrFail } from '../../../db/template/repository';
 import { logger } from '../../../helpers/logger.helper';
 
 import { createPdfFromHtml } from './pdf.service';

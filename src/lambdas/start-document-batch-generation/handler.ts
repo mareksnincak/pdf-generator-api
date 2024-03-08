@@ -4,8 +4,8 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { DocumentBatchStatus } from '../../db/document-batch/document-batch.enum';
-import * as documentBatchRepository from '../../db/document-batch/document-batch.repository';
+import * as documentBatchRepository from '../../db/document-batch/repository';
+import { DocumentBatchStatus } from '../../db/document-batch/enum';
 import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';

@@ -11,7 +11,7 @@ import {
 import { LambdaInvoke } from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { type Construct } from 'constructs';
 
-import { DocumentBatchStatus } from '../../../src/db/document-batch/document-batch.enum';
+import { DocumentBatchStatus } from '../../../src/db/document-batch/enum';
 
 import { type createLambdas } from './lambdas';
 

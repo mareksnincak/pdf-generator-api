@@ -1,6 +1,6 @@
 import { type PrimaryKey } from '../common/types/entity.type';
 
-import { type TemplateType } from './template.enum';
+import { type TemplateType } from './enum';
 
 export type Template = {
   id: string;

@@ -1,10 +1,10 @@
 import type { Context } from 'aws-lambda';
 
-import * as documentBatchRepository from '../../db/document-batch/document-batch.repository';
+import * as documentBatchRepository from '../../db/document-batch/repository';
 import {
   type DocumentBatchError,
   type DocumentBatchGeneratedDocument,
-} from '../../db/document-batch/document-batch.type';
+} from '../../db/document-batch/type';
 import { handleError } from '../../helpers/error.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { validate } from '../../helpers/validation.helper';

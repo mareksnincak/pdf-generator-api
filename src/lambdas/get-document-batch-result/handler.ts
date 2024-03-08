@@ -4,7 +4,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import * as documentBatchRepository from '../../db/document-batch/document-batch.repository';
+import * as documentBatchRepository from '../../db/document-batch/repository';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';

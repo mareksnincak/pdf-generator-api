@@ -4,7 +4,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { deleteByIdOrFail } from '../../db/template/template.repository';
+import { deleteByIdOrFail } from '../../db/template/repository';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';

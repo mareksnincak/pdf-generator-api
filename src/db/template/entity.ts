@@ -10,8 +10,8 @@ import { getObject, getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
 import { type Gsi1Key, type PrimaryKey } from '../common/types/entity.type';
 
-import { type TemplateType } from './template.enum';
-import { type Template, type StoredTemplate } from './template.type';
+import { type TemplateType } from './enum';
+import { type Template, type StoredTemplate } from './type';
 
 export class TemplateEntity extends BaseEntity {
   constructor({

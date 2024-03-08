@@ -7,8 +7,8 @@ import { NotFoundError } from '../../errors/not-found.error';
 import { logger } from '../../helpers/logger.helper';
 import { getDynamoDbClient, getTableName } from '../common/helpers/connection.helper';
 
-import { DocumentBatchEntity } from './document-batch.entity';
-import { type DocumentBatch } from './document-batch.type';
+import { DocumentBatchEntity } from './entity';
+import { type DocumentBatch } from './type';
 
 export async function create(
   documentBatch: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments' | 'createdAt'>,

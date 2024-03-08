@@ -1,6 +1,6 @@
 import { type PrimaryKey } from '../common/types/entity.type';
 
-import { type DocumentBatchStatus } from './document-batch.enum';
+import { type DocumentBatchStatus } from './enum';
 
 export type DocumentBatchError = { ref: string | null; message: string };
 

@@ -1,8 +1,8 @@
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { TemplateEntityMockFactory } from '../../db/template/template.mock-factory';
-import * as templateRepository from '../../db/template/template.repository';
+import { TemplateEntityMockFactory } from '../../db/template/mock-factory';
+import * as templateRepository from '../../db/template/repository';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 import { TemplateResponseMockFactory } from '../../mock-factories/template-response.mock-factory';
