@@ -1,7 +1,7 @@
 import { compile } from 'handlebars';
 
 import { type TemplateEntity } from '../../../db/template/entity';
-import { getByIdOrFail } from '../../../db/template/repository';
+import * as templateRepository from '../../../db/template/repository';
 import { logger } from '../../../helpers/logger.helper';
 
 import { createPdfFromHtml } from './pdf.service';
@@ -26,7 +26,7 @@ export async function generateDocument({
   templateId: string;
   data: Record<string, unknown>;
 }) {
-  const template = await getByIdOrFail({ id: templateId, userId });
+  const template = await templateRepository.getByIdOrFail({ id: templateId, userId });
 
   const renderedTemplate = await renderHtmlTemplate(template, data);
 

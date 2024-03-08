@@ -4,7 +4,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { getByIdOrFail } from '../../db/template/repository';
+import * as templateRepository from '../../db/template/repository';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
@@ -27,7 +27,7 @@ export async function getTemplate(
     const { id } = validatedParams;
 
     const userId = getUserIdFromEventOrFail(event);
-    const template = await getByIdOrFail({ id, userId });
+    const template = await templateRepository.getByIdOrFail({ id, userId });
 
     const response: GetTemplateResponseDto = await template.toPublicJsonWithDataUrl();
     logger.info('getTemplate.success');

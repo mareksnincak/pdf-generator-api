@@ -7,7 +7,7 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { createOrFail } from '../../db/template/repository';
+import * as templateRepository from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
 import { NotFoundError } from '../../errors/not-found.error';
@@ -66,7 +66,7 @@ export async function createTemplateWithData({
   const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId, bucket });
 
   try {
-    const template = await createOrFail({ id, name, type, s3Key, userId });
+    const template = await templateRepository.createOrFail({ id, name, type, s3Key, userId });
     return template;
   } catch (error) {
     await deleteObject({ bucket, key: s3Key });
