@@ -1,7 +1,9 @@
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import {
   DefinitionBody,
+  Fail,
   JsonPath,
+  Parallel,
   Map as SfnMap,
   StateMachine,
   TaskInput,
@@ -46,7 +48,7 @@ function createDocumentBatchGenerationStateMachine({
 
   generateDocumentsTask.itemProcessor(generateDocumentTask);
 
-  const storeResultTask = new LambdaInvoke(scope, 'Store result', {
+  const storeSuccessResultTask = new LambdaInvoke(scope, 'Store success result', {
     lambdaFunction: lambdas.storeDocumentBatchResult,
     payload: TaskInput.fromObject({
       id: JsonPath.stringAt('$$.Execution.Name'),
@@ -56,22 +58,23 @@ function createDocumentBatchGenerationStateMachine({
     }),
   });
 
-  // const setFailureStatusTask = new DynamoUpdateItem(scope, 'Set failure status', {
-  //   table: dynamoDbTable,
-  //   key: {
-  //     PK: DynamoAttributeValue.fromString(JsonPath.stringAt('$.primaryKey.PK')),
-  //     SK: DynamoAttributeValue.fromString(JsonPath.stringAt('$.primaryKey.SK')),
-  //   },
-  //   updateExpression: 'SET #status = :status',
-  //   expressionAttributeNames: {
-  //     '#status': 'status',
-  //   },
-  //   expressionAttributeValues: {
-  //     ':status': DynamoAttributeValue.fromString(DocumentBatchStatus.failure),
-  //   },
-  // });
+  const storeFailureResultTask = new LambdaInvoke(scope, 'Store failure result', {
+    lambdaFunction: lambdas.storeDocumentBatchResult,
+    payload: TaskInput.fromObject({
+      id: JsonPath.stringAt('$$.Execution.Name'),
+      userId: JsonPath.stringAt('$.userId'),
+      status: DocumentBatchStatus.failure,
+    }),
+  });
 
-  const definition = generateDocumentsTask.next(storeResultTask);
+  const successFlowDefinition = generateDocumentsTask.next(storeSuccessResultTask);
+  const failureFlowDefinition = storeFailureResultTask.next(new Fail(scope, 'Fail'));
+
+  const definition = new Parallel(scope, 'Generate document batch flow')
+    .branch(successFlowDefinition)
+    .addCatch(failureFlowDefinition, {
+      resultPath: JsonPath.stringAt('$.error'),
+    });
 
   return new StateMachine(scope, 'generate-document-batch-state-machine', {
     definitionBody: DefinitionBody.fromChainable(definition),

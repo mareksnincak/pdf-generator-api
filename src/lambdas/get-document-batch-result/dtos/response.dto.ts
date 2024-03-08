@@ -1,12 +1,9 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import z from 'zod';
 
-extendZodWithOpenApi(z);
+import { DocumentBatchStatus } from '../../../db/document-batch/document-batch.enum';
 
-export enum DocumentBatchStatus {
-  inProgress = 'inProgress',
-  completed = 'completed',
-}
+extendZodWithOpenApi(z);
 
 export const getDocumentBatchResultResponseDto = z.object({
   id: z.string().uuid().openapi({

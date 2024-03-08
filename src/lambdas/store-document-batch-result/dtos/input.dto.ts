@@ -7,7 +7,7 @@ export const storeDocumentBatchResultInputDto = z.object({
   id: z.string(),
   userId: z.string(),
   status: z.nativeEnum(DocumentBatchStatus),
-  results: z.array(generateDocumentFromSfnEventOutputDto),
+  results: z.array(generateDocumentFromSfnEventOutputDto).default([]),
 });
 
 export type StoreDocumentBatchResultInputDto = z.infer<typeof storeDocumentBatchResultInputDto>;
