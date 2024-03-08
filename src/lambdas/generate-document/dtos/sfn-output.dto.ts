@@ -2,27 +2,27 @@ import { z } from 'zod';
 
 import { DocumentGenerationStatus } from '../enums/status.enum';
 
-export const generateDocumentFromSfnSuccessEventOutputDto = z.object({
+export const generateDocumentFromSfnEventSuccessOutputDto = z.object({
   status: z.literal(DocumentGenerationStatus.success),
   ref: z.string().min(1),
   s3Key: z.string().min(1),
 });
 
-export const generateDocumentFromSfnFailureEventOutputDto = z.object({
-  status: z.literal(DocumentGenerationStatus.failure),
+export const generateDocumentFromSfnEventErrorOutputDto = z.object({
+  status: z.literal(DocumentGenerationStatus.error),
   ref: z.string().min(1).nullable(),
   message: z.string().min(1),
 });
 
 export const generateDocumentFromSfnEventOutputDto =
-  generateDocumentFromSfnSuccessEventOutputDto.or(generateDocumentFromSfnFailureEventOutputDto);
+  generateDocumentFromSfnEventSuccessOutputDto.or(generateDocumentFromSfnEventErrorOutputDto);
 
-export type GenerateDocumentFromSfnSuccessEventOutputDto = z.infer<
-  typeof generateDocumentFromSfnSuccessEventOutputDto
+export type GenerateDocumentFromSfnEventSuccessOutputDto = z.infer<
+  typeof generateDocumentFromSfnEventSuccessOutputDto
 >;
 
-export type GenerateDocumentFromSfnErrorEventOutputDto = z.infer<
-  typeof generateDocumentFromSfnFailureEventOutputDto
+export type GenerateDocumentFromSfnEventErrorOutputDto = z.infer<
+  typeof generateDocumentFromSfnEventErrorOutputDto
 >;
 
 export type GenerateDocumentFromSfnEventOutputDto = z.infer<

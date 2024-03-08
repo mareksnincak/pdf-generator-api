@@ -68,7 +68,7 @@ describe('generateDocumentFromSfnEvent', () => {
     expect(result).toEqual({
       ref: input.ref,
       message: ErrorMessage.templateNotFound,
-      status: DocumentGenerationStatus.failure,
+      status: DocumentGenerationStatus.error,
     });
   });
 
@@ -86,7 +86,7 @@ describe('generateDocumentFromSfnEvent', () => {
     expect(result).toEqual({
       ref: input.ref,
       message: ErrorMessage.internalServerError,
-      status: DocumentGenerationStatus.failure,
+      status: DocumentGenerationStatus.error,
     });
   });
 });
