@@ -26,10 +26,11 @@ export class DocumentBatchEntity extends BaseEntity {
     errors = [],
     generatedDocuments = [],
     createdAt = new Date(),
+    expiresAt,
   }: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments' | 'createdAt'>) {
     const primaryKey = DocumentBatchEntity.getPrimaryKey({ id, userId });
 
-    super({ primaryKey, createdAt });
+    super({ primaryKey, createdAt, expiresAt });
 
     this.id = id;
     this.userId = userId;
@@ -48,6 +49,8 @@ export class DocumentBatchEntity extends BaseEntity {
 
   public generatedDocuments: DocumentBatchGeneratedDocument[];
 
+  public declare expiresAt: Date;
+
   public static updatableFields: Set<string> = new Set<keyof DocumentBatch>([
     'status',
     'errors',
@@ -63,6 +66,7 @@ export class DocumentBatchEntity extends BaseEntity {
       errors: this.errors,
       generatedDocuments: this.generatedDocuments,
       createdAt: toUnixTimestamp(this.createdAt),
+      expiresAt: toUnixTimestamp(this.expiresAt),
     };
 
     const result = marshall(item, {
@@ -78,6 +82,7 @@ export class DocumentBatchEntity extends BaseEntity {
     return new DocumentBatchEntity({
       ...rawItem,
       createdAt: fromUnixTimestamp(rawItem.createdAt),
+      expiresAt: fromUnixTimestamp(rawItem.expiresAt),
     });
   }
 

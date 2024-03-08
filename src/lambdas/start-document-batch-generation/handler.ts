@@ -4,8 +4,9 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import * as documentBatchRepository from '../../db/document-batch/repository';
 import { DocumentBatchStatus } from '../../db/document-batch/enum';
+import * as documentBatchRepository from '../../db/document-batch/repository';
+import { addHoursToDate } from '../../helpers/date.helper';
 import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
@@ -60,6 +61,7 @@ export async function startDocumentBatchGeneration(
     const { id } = await documentBatchRepository.create({
       userId,
       status: DocumentBatchStatus.inProgress,
+      expiresAt: addHoursToDate(new Date(), 1),
     });
 
     await startStateMachineExecution({

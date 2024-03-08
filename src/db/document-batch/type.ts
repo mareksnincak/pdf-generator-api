@@ -13,9 +13,11 @@ export type DocumentBatch = {
   errors: DocumentBatchError[];
   generatedDocuments: DocumentBatchGeneratedDocument[];
   createdAt: Date;
+  expiresAt: Date;
 };
 
 export type StoredDocumentBatch = PrimaryKey &
-  Omit<DocumentBatch, 'createdAt'> & {
+  Omit<DocumentBatch, 'createdAt' | 'expiresAt'> & {
     createdAt: number;
+    expiresAt: number;
   };
