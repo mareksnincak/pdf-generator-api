@@ -1,7 +1,7 @@
 import { addHoursToDate, fromUnixTimestamp, toUnixTimestamp } from './date.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('toUnixTimestamp', () => {

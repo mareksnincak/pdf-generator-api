@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { getEnvVariableOrFail, isLocal } from './env.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('getEnvVariableOrFail', () => {

@@ -3,7 +3,7 @@ import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import { sendSqsMessage } from './sqs.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('sendSqsMessage', () => {

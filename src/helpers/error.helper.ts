@@ -1,5 +1,6 @@
 import { type APIGatewayProxyResult } from 'aws-lambda';
 
+import { ErrorMessage } from '../enums/error.enum';
 import { HttpError, type HttpErrorResponse } from '../errors/http.error';
 
 import { logger } from './logger.helper';
@@ -16,7 +17,7 @@ export function handleError({ error, logPrefix }: { error: unknown; logPrefix: s
   }
 
   logger.error(error, `${logPrefix}.unknownError`);
-  return { statusCode: 500, response: { message: 'Internal server error' } };
+  return { statusCode: 500, response: { message: ErrorMessage.internalServerError } };
 }
 
 export function handleApiError({

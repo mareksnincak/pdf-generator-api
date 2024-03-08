@@ -9,7 +9,7 @@ import * as pdfService from './pdf.service';
 const templateEntity = new TemplateEntityMockFactory().create();
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('generateDocument', () => {

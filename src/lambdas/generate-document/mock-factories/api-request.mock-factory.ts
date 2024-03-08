@@ -2,7 +2,7 @@ import { randomBytes, randomUUID } from 'node:crypto';
 
 import { type GenerateDocumentFromApiEventRequestDto } from '../dtos/api-request.dto';
 
-export class GenerateDocumentFromApiGwEventRequestMockFactory {
+export class GenerateDocumentFromApiEventRequestMockFactory {
   create(
     overrides: Partial<GenerateDocumentFromApiEventRequestDto> = {},
   ): GenerateDocumentFromApiEventRequestDto {

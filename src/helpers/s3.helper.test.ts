@@ -30,7 +30,7 @@ jest.mock('@aws-sdk/s3-request-presigner', () => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('getObject', () => {

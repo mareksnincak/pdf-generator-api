@@ -8,7 +8,7 @@ import { mockLogger } from '../../../helpers/test.helper';
 import { decryptPaginationToken, encryptPaginationToken } from './pagination.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('encryptPaginationToken', () => {

@@ -5,7 +5,7 @@ import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn';
 import { startExecution } from './sfn.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('startExecution', () => {

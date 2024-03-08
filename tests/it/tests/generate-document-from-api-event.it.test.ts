@@ -15,7 +15,7 @@ import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { generateDocumentFromApiEvent } from '../../../src/lambdas/generate-document/api-handler';
-import { GenerateDocumentFromApiGwEventRequestMockFactory } from '../../../src/lambdas/generate-document/mock-factories/api-request.mock-factory';
+import { GenerateDocumentFromApiEventRequestMockFactory } from '../../../src/lambdas/generate-document/mock-factories/api-request.mock-factory';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
 import { documentMockName } from '../../common/constants/document.constant';
@@ -37,7 +37,7 @@ jest.mock('node:crypto', () => {
   };
 });
 
-const requestMockFactory = new GenerateDocumentFromApiGwEventRequestMockFactory();
+const requestMockFactory = new GenerateDocumentFromApiEventRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const templateEntityMockFactory = new TemplateEntityMockFactory();
 const context = new ContextMockFactory().create();

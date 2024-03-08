@@ -31,7 +31,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('deleteTemplate', () => {

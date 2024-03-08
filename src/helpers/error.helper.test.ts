@@ -1,3 +1,4 @@
+import { ErrorMessage } from '../enums/error.enum';
 import { BadRequestError } from '../errors/bad-request.error';
 import { ConflictError } from '../errors/conflict.error';
 import { NotFoundError } from '../errors/not-found.error';
@@ -6,7 +7,7 @@ import { handleApiError, handleError } from './error.helper';
 import { mockLogger } from './test.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('handleError', () => {
@@ -35,7 +36,7 @@ describe('handleError', () => {
     const result = handleError({ error, logPrefix: 'test' });
 
     expect(result).toEqual({
-      response: { message: 'Internal server error' },
+      response: { message: ErrorMessage.internalServerError },
       statusCode: 500,
     });
   });
@@ -67,7 +68,7 @@ describe('handleApiError', () => {
     const result = handleApiError({ error, logPrefix: 'test' });
 
     expect(result).toEqual({
-      body: '{"message":"Internal server error"}',
+      body: '{"message":"Internal server error."}',
       statusCode: 500,
     });
   });

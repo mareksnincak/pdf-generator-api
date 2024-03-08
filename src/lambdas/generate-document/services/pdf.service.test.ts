@@ -7,7 +7,7 @@ import { isSamePdfFile } from '../../../../tests/common/helpers/pdf.helper';
 import { createPdfFromHtml } from './pdf.service';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('createPdfFromHtml', () => {

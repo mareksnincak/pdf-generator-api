@@ -12,10 +12,10 @@ import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 
 import { generateDocumentFromApiEvent } from './api-handler';
-import { GenerateDocumentFromApiGwEventRequestMockFactory } from './mock-factories/api-request.mock-factory';
+import { GenerateDocumentFromApiEventRequestMockFactory } from './mock-factories/api-request.mock-factory';
 import * as documentGenerationService from './services/document-generation.service';
 
-const requestMockFactory = new GenerateDocumentFromApiGwEventRequestMockFactory();
+const requestMockFactory = new GenerateDocumentFromApiEventRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const context = new ContextMockFactory().create();
 
@@ -24,7 +24,7 @@ beforeAll(() => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('generateDocumentFromApiEvent', () => {

@@ -15,7 +15,7 @@ beforeAll(async () => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('deleteExpiredS3Objects', () => {

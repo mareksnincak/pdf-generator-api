@@ -4,7 +4,7 @@ import { getSsmParam } from './ssm.helper';
 import { mockLogger } from './test.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('getSsmParam', () => {
