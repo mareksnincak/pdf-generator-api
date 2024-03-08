@@ -11,7 +11,7 @@ import { DocumentBatchEntity } from './document-batch.entity';
 import { type DocumentBatch } from './document-batch.type';
 
 export async function create(
-  documentBatch: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments'>,
+  documentBatch: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments' | 'createdAt'>,
 ) {
   logger.info('documentBatchRepository.create');
 

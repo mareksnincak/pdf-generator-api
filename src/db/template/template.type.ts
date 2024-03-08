@@ -8,6 +8,10 @@ export type Template = {
   type: TemplateType;
   s3Key: string;
   userId: string;
+  createdAt: Date;
 };
 
-export type StoredTemplate = Template & PrimaryKey;
+export type StoredTemplate = PrimaryKey &
+  Omit<Template, 'createdAt'> & {
+    createdAt: number;
+  };

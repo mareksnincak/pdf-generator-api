@@ -11,6 +11,7 @@ export class TemplateEntityMockFactory {
       type: TemplateType.htmlHandlebars,
       s3Key: randomBytes(8).toString('hex'),
       userId: randomUUID(),
+      createdAt: new Date(),
       ...overrides,
     });
   }

@@ -4,6 +4,7 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
+import { fromUnixTimestamp, toUnixTimestamp } from '../../helpers/date.helper';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { getObject, getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
@@ -13,11 +14,18 @@ import { type TemplateType } from './template.enum';
 import { type Template, type StoredTemplate } from './template.type';
 
 export class TemplateEntity extends BaseEntity {
-  constructor({ id = randomUUID(), name, type, s3Key, userId }: SetOptional<Template, 'id'>) {
+  constructor({
+    id = randomUUID(),
+    name,
+    type,
+    s3Key,
+    userId,
+    createdAt = new Date(),
+  }: SetOptional<Template, 'id' | 'createdAt'>) {
     const primaryKey = TemplateEntity.getPrimaryKey({ id, userId });
     const gsi1Key = TemplateEntity.getGsi1Key({ userId, name });
 
-    super({ primaryKey, gsi1Key });
+    super({ primaryKey, gsi1Key, createdAt });
 
     this.id = id;
     this.name = name;
@@ -45,6 +53,7 @@ export class TemplateEntity extends BaseEntity {
       type: this.type,
       s3Key: this.s3Key,
       userId: this.userId,
+      createdAt: toUnixTimestamp(this.createdAt),
     };
 
     const result = marshall(item, {
@@ -55,9 +64,12 @@ export class TemplateEntity extends BaseEntity {
   }
 
   static fromDynamoItem(item: Record<string, AttributeValue>): TemplateEntity {
-    const rawTemplate = unmarshall(item) as StoredTemplate;
+    const rawItem = unmarshall(item) as StoredTemplate;
 
-    return new TemplateEntity(rawTemplate);
+    return new TemplateEntity({
+      ...rawItem,
+      createdAt: fromUnixTimestamp(rawItem.createdAt),
+    });
   }
 
   public static getPrimaryKey({ id, userId }: { id: string; userId: string }): PrimaryKey {

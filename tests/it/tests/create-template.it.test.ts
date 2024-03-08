@@ -36,6 +36,7 @@ beforeAll(() => {
 });
 
 beforeEach(async () => {
+  jest.useRealTimers();
   await refreshDynamoDb();
 });
 
@@ -45,6 +46,9 @@ afterEach(() => {
 
 describe('createTemplate', () => {
   it('should create template', async () => {
+    const mockedDate = new Date();
+    jest.useFakeTimers().setSystemTime(mockedDate);
+
     const dataId = randomUUID();
     const id = randomUUID();
 
@@ -93,6 +97,7 @@ describe('createTemplate', () => {
       SK: '#',
       GSI1PK: `TEMPLATE#USER#${userId}`,
       GSI1SK: `NAME#${requestBody.name}`,
+      createdAt: new Date(mockedDate.setMilliseconds(0)),
       id,
       name: requestBody.name,
       s3Key: `${userId}/templates/data/${requestBody.uploadId}`,

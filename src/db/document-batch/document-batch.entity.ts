@@ -4,6 +4,7 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
+import { fromUnixTimestamp, toUnixTimestamp } from '../../helpers/date.helper';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
@@ -24,10 +25,11 @@ export class DocumentBatchEntity extends BaseEntity {
     status,
     errors = [],
     generatedDocuments = [],
-  }: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments'>) {
+    createdAt = new Date(),
+  }: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments' | 'createdAt'>) {
     const primaryKey = DocumentBatchEntity.getPrimaryKey({ id, userId });
 
-    super({ primaryKey });
+    super({ primaryKey, createdAt });
 
     this.id = id;
     this.userId = userId;
@@ -60,6 +62,7 @@ export class DocumentBatchEntity extends BaseEntity {
       status: this.status,
       errors: this.errors,
       generatedDocuments: this.generatedDocuments,
+      createdAt: toUnixTimestamp(this.createdAt),
     };
 
     const result = marshall(item, {
@@ -70,9 +73,12 @@ export class DocumentBatchEntity extends BaseEntity {
   }
 
   static fromDynamoItem(item: Record<string, AttributeValue>): DocumentBatchEntity {
-    const rawTemplate = unmarshall(item) as StoredDocumentBatch;
+    const rawItem = unmarshall(item) as StoredDocumentBatch;
 
-    return new DocumentBatchEntity(rawTemplate);
+    return new DocumentBatchEntity({
+      ...rawItem,
+      createdAt: fromUnixTimestamp(rawItem.createdAt),
+    });
   }
 
   public static getPrimaryKey({ id, userId }: { id: string; userId: string }): PrimaryKey {

@@ -12,6 +12,10 @@ export type DocumentBatch = {
   status: DocumentBatchStatus;
   errors: DocumentBatchError[];
   generatedDocuments: DocumentBatchGeneratedDocument[];
+  createdAt: Date;
 };
 
-export type StoredDocumentBatch = DocumentBatch & PrimaryKey;
+export type StoredDocumentBatch = PrimaryKey &
+  Omit<DocumentBatch, 'createdAt'> & {
+    createdAt: number;
+  };

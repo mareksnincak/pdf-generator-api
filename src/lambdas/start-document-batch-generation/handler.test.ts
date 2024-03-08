@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { mockAwsCredentials } from '../../../tests/it/helpers/credential.helper';
 import * as sfnHelper from '../../helpers/sfn.helper';
 import { mockLogger } from '../../helpers/test.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';

@@ -11,17 +11,22 @@ export abstract class BaseEntity {
 
   private readonly GSI1SK?: string;
 
+  public readonly createdAt: Date;
+
   constructor({
     primaryKey: { PK, SK },
     gsi1Key: { GSI1PK, GSI1SK } = {},
+    createdAt,
   }: {
     primaryKey: PrimaryKey;
     gsi1Key?: Gsi1Key;
+    createdAt: Date;
   }) {
     this.PK = PK;
     this.SK = SK;
     this.GSI1PK = GSI1PK;
     this.GSI1SK = GSI1SK;
+    this.createdAt = createdAt;
   }
 
   public get primaryKey(): PrimaryKey {
