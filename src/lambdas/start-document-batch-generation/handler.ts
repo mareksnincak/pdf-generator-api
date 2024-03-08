@@ -57,11 +57,12 @@ export async function startDocumentBatchGeneration(
     logger.info(validatedData, 'startDocumentBatchGeneration.validatedData');
 
     const userId = getUserIdFromEventOrFail(event);
+    const documentBatchTtlHours = Number(getEnvVariableOrFail('DOCUMENT_BATCH_TTL_HOURS'));
 
     const { id } = await documentBatchRepository.create({
       userId,
       status: DocumentBatchStatus.inProgress,
-      expiresAt: addHoursToDate(new Date(), 1),
+      expiresAt: addHoursToDate(new Date(), documentBatchTtlHours),
     });
 
     await startStateMachineExecution({

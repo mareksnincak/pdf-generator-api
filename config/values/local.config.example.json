@@ -45,7 +45,8 @@
     },
     "start-document-batch-generation": {
       "DYNAMODB_ENDPOINT": "http://host.docker.internal:8000",
-      "DYNAMODB_TABLE_NAME": "PdfGenerator"
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
+      "DOCUMENT_BATCH_TTL_HOURS": "1"
     },
     "get-document-batch-result": {
       "DYNAMODB_ENDPOINT": "http://host.docker.internal:8000",

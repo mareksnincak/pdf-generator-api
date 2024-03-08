@@ -18,7 +18,9 @@
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "generate-document-from-sfn-event": {},
-    "start-document-batch-generation": {},
+    "start-document-batch-generation": {
+      "DOCUMENT_BATCH_TTL_HOURS": "1"
+    },
     "get-document-batch-result": {
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },

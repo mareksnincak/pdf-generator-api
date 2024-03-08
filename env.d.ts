@@ -15,6 +15,7 @@ declare global {
       AWS_SECRET_ACCESS_KEY?: string;
       CHROMIUM_LOCAL_EXECUTABLE_PATH?: string;
       DYNAMODB_REGION?: string;
+      DOCUMENT_BATCH_TTL_HOURS?: string;
     };
   }
 }

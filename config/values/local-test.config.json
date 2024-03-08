@@ -54,7 +54,8 @@
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
-      "STATE_MACHINE_ARN": "sample-state-machine-arn"
+      "STATE_MACHINE_ARN": "sample-state-machine-arn",
+      "DOCUMENT_BATCH_TTL_HOURS": "1"
     },
     "get-document-batch-result": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
