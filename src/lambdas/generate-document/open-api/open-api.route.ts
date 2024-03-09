@@ -2,10 +2,10 @@ import { type RouteConfig } from '@asteasolutions/zod-to-openapi';
 
 import { ErrorMessage } from '../../../enums/error.enum';
 import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
-import { generateDocumentRequestDto } from '../dtos/request.dto';
-import { generateDocumentResponseDto } from '../dtos/response.dto';
+import { generateDocumentFromApiEventRequestDto } from '../dtos/api-request.dto';
+import { generateDocumentFromApiEventResponseDto } from '../dtos/api-response.dto';
 
-export const generateDocumentsRoute: RouteConfig = {
+export const generateDocumentRoute: RouteConfig = {
   method: 'post',
   path: '/documents/generate',
   tags: ['documents'],
@@ -15,7 +15,7 @@ export const generateDocumentsRoute: RouteConfig = {
     body: {
       content: {
         'application/json': {
-          schema: generateDocumentRequestDto,
+          schema: generateDocumentFromApiEventRequestDto,
         },
       },
     },
@@ -25,7 +25,15 @@ export const generateDocumentsRoute: RouteConfig = {
       description: 'Success.',
       content: {
         'application/json': {
-          schema: generateDocumentResponseDto,
+          schema: generateDocumentFromApiEventResponseDto,
+        },
+      },
+    },
+    400: {
+      description: ErrorMessage.validationError,
+      content: {
+        'application/json': {
+          schema: httpErrorDto,
         },
       },
     },

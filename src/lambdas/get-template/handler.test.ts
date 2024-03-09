@@ -1,8 +1,8 @@
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { TemplateEntityMockFactory } from '../../db/template/template.mock-factory';
-import * as templateRepository from '../../db/template/template.repository';
+import { TemplateEntityMockFactory } from '../../db/template/mock-factory';
+import * as templateRepository from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { NotFoundError } from '../../errors/not-found.error';
 import { mockLogger } from '../../helpers/test.helper';
@@ -24,7 +24,7 @@ beforeAll(() => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('getTemplate', () => {

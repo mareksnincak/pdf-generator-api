@@ -4,8 +4,8 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { getMany } from '../../db/template/template.repository';
-import { handleError } from '../../helpers/error.helper';
+import * as templateRepository from '../../db/template/repository';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { validateQueryParams } from '../../helpers/validation.helper';
@@ -26,7 +26,11 @@ export async function getTemplates(
 
     const userId = getUserIdFromEventOrFail(event);
     const { limit, paginationToken } = validatedQueryParams;
-    const { templates, nextPaginationToken } = await getMany({ userId, limit, paginationToken });
+    const { templates, nextPaginationToken } = await templateRepository.getMany({
+      userId,
+      limit,
+      paginationToken,
+    });
 
     const response: GetTemplatesResponseDto = {
       nextPaginationToken: nextPaginationToken ?? null,
@@ -38,6 +42,6 @@ export async function getTemplates(
       body: JSON.stringify(response),
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'getTemplates' });
+    return handleApiError({ error, logPrefix: 'getTemplates' });
   }
 }

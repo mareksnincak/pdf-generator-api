@@ -6,8 +6,8 @@ import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aw
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import * as templateRepository from '../../../src/db/template/template.repository';
+import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
+import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { type CreateTemplateResponseDto } from '../../../src/lambdas/create-template/dtos/response.dto';
@@ -36,6 +36,7 @@ beforeAll(() => {
 });
 
 beforeEach(async () => {
+  jest.useRealTimers();
   await refreshDynamoDb();
 });
 
@@ -45,6 +46,9 @@ afterEach(() => {
 
 describe('createTemplate', () => {
   it('should create template', async () => {
+    const mockedDate = new Date();
+    jest.useFakeTimers().setSystemTime(mockedDate);
+
     const dataId = randomUUID();
     const id = randomUUID();
 
@@ -93,6 +97,7 @@ describe('createTemplate', () => {
       SK: '#',
       GSI1PK: `TEMPLATE#USER#${userId}`,
       GSI1SK: `NAME#${requestBody.name}`,
+      createdAt: new Date(mockedDate.setMilliseconds(0)),
       id,
       name: requestBody.name,
       s3Key: `${userId}/templates/data/${requestBody.uploadId}`,
@@ -143,7 +148,7 @@ describe('createTemplate', () => {
       userId,
     });
 
-    await templateRepository.createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const result = await createTemplate(event, context);
 
@@ -181,7 +186,7 @@ describe('createTemplate', () => {
       userId: 'other-user-id',
     });
 
-    await templateRepository.createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const result = await createTemplate(event, context);
 

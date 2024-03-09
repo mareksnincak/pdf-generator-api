@@ -10,15 +10,15 @@ import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import { createOrReplace } from '../../../src/db/template/template.repository';
+import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
+import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
-import { generateDocument } from '../../../src/lambdas/generate-document/handler';
-import { GenerateDocumentMockFactory } from '../../../src/lambdas/generate-document/mock-factories/request.mock-factory';
+import { generateDocumentFromApiEvent } from '../../../src/lambdas/generate-document/api-handler';
+import { GenerateDocumentFromApiEventRequestMockFactory } from '../../../src/lambdas/generate-document/mock-factories/api-request.mock-factory';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
-import { documentMockName } from '../../common/constants/document.constant';
+import { documentMockData } from '../../common/constants/document.constant';
 import { isSamePdfFile } from '../../common/helpers/pdf.helper';
 import { mockAwsCredentials } from '../helpers/credential.helper';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
@@ -37,13 +37,13 @@ jest.mock('node:crypto', () => {
   };
 });
 
-const requestMockFactory = new GenerateDocumentMockFactory();
+const requestMockFactory = new GenerateDocumentFromApiEventRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const templateEntityMockFactory = new TemplateEntityMockFactory();
 const context = new ContextMockFactory().create();
 
 beforeAll(() => {
-  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.generateDocument);
+  setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.generateDocumentFromApiEvent);
   mockAwsCredentials();
 });
 
@@ -73,9 +73,7 @@ describe('generateDocument', () => {
     const templateId = randomUUID();
     const body = requestMockFactory.create({
       templateId,
-      data: {
-        name: documentMockName,
-      },
+      data: documentMockData,
     });
 
     const event = eventMockFactory.create({
@@ -93,12 +91,12 @@ describe('generateDocument', () => {
       .spyOn(requestPresigner, 'getSignedUrl')
       .mockResolvedValue(mockedUrl);
 
-    await createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
-    const uploadId = randomUUID();
-    jest.spyOn(crypto, 'randomUUID').mockReturnValue(uploadId);
+    const documentId = randomUUID();
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue(documentId);
 
-    const result = await generateDocument(event, context);
+    const result = await generateDocumentFromApiEvent(event, context);
 
     expect(result.statusCode).toEqual(200);
     expect(JSON.parse(result.body)).toEqual({
@@ -106,7 +104,7 @@ describe('generateDocument', () => {
     });
 
     const expectedUploadBucket = 'pdf-generator-api-test';
-    const expectedUploadS3Key = `${userId}/documents/${uploadId}.pdf`;
+    const expectedUploadS3Key = `${userId}/documents/${documentId}.pdf`;
     const s3PutObjectArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3PutObjectArgs).toBeInstanceOf(PutObjectCommand);
     expect(s3PutObjectArgs.input).toEqual({
@@ -150,7 +148,7 @@ describe('generateDocument', () => {
       body: JSON.stringify(body),
     });
 
-    const result = await generateDocument(event, context);
+    const result = await generateDocumentFromApiEvent(event, context);
 
     expect(result.statusCode).toEqual(404);
     expect(JSON.parse(result.body)).toEqual({

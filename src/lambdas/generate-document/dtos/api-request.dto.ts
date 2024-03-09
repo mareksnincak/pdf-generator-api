@@ -3,7 +3,7 @@ import { z } from 'zod';
 
 extendZodWithOpenApi(z);
 
-export const generateDocumentRequestDto = z.object({
+export const generateDocumentFromApiEventRequestDto = z.object({
   templateId: z
     .string()
     .min(1)
@@ -17,4 +17,6 @@ export const generateDocumentRequestDto = z.object({
   }),
 });
 
-export type GenerateDocumentRequestDto = z.infer<typeof generateDocumentRequestDto>;
+export type GenerateDocumentFromApiEventRequestDto = z.infer<
+  typeof generateDocumentFromApiEventRequestDto
+>;

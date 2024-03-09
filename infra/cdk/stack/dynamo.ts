@@ -24,6 +24,7 @@ export function createDynamoDbTable({
       type: AttributeType.STRING,
     },
     removalPolicy,
+    timeToLiveAttribute: 'expiresAt',
   });
 
   table.addGlobalSecondaryIndex({

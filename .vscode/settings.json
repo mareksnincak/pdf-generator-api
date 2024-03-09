@@ -18,6 +18,7 @@
     "signin",
     "singleline",
     "sparticuz",
+    "stepfunctions",
     "unmarshall"
   ],
   "jestrunner.configPath": ".jest/jest.common.config.ts",

@@ -7,12 +7,12 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { createOrReplace } from '../../db/template/template.repository';
+import * as templateRepository from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
 import { NotFoundError } from '../../errors/not-found.error';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleError } from '../../helpers/error.helper';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObject, moveObject } from '../../helpers/s3.helper';
@@ -66,7 +66,7 @@ export async function createTemplateWithData({
   const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId, bucket });
 
   try {
-    const template = await createOrReplace({ id, name, type, s3Key, userId });
+    const template = await templateRepository.createOrFail({ id, name, type, s3Key, userId });
     return template;
   } catch (error) {
     await deleteObject({ bucket, key: s3Key });
@@ -96,6 +96,6 @@ export async function createTemplate(
       statusCode: 201,
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'createTemplate' });
+    return handleApiError({ error, logPrefix: 'createTemplate' });
   }
 }

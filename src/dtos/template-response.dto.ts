@@ -1,7 +1,7 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-import { TemplateType } from '../db/template/template.enum';
+import { TemplateType } from '../db/template/enum';
 
 extendZodWithOpenApi(z);
 

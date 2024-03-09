@@ -16,10 +16,11 @@ import { getEnvVars } from '../../../config/helpers/config.helper';
 import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { Lambda } from '../enums/lambda.enum';
 
+import { type createStateMachines } from './sfn';
 import { type createSqsQueues } from './sqs';
 
-function getLambdaEntryPath(lambda: Lambda) {
-  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambda, 'handler.ts');
+function getLambdaEntryPath(lambdaDirName: Lambda | string, handlerFilename = 'handler.ts') {
+  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambdaDirName, handlerFilename);
 }
 
 function getCommonNodeJsFunctionProps({
@@ -29,6 +30,8 @@ function getCommonNodeJsFunctionProps({
   architecture = Architecture.ARM_64,
   memorySize,
   bundlingOptions,
+  handlerFilename,
+  lambdaDirName,
 }: {
   lambda: Lambda;
   cdkEnvVars: CdkEnvVarsDto;
@@ -36,11 +39,13 @@ function getCommonNodeJsFunctionProps({
   architecture?: Architecture;
   memorySize?: number;
   bundlingOptions?: BundlingOptions;
+  handlerFilename?: string;
+  lambdaDirName?: string;
 }) {
   return {
     runtime: Runtime.NODEJS_20_X,
     architecture,
-    entry: getLambdaEntryPath(lambda),
+    entry: getLambdaEntryPath(lambdaDirName ?? lambda, handlerFilename),
     bundling: {
       /**
        * We are using static hash to be able to use local watch.
@@ -171,23 +176,81 @@ export function createLambdas({
     },
   });
 
-  const generateDocument = new NodejsFunction(scope, Lambda.generateDocument, {
+  const generateDocumentFromApiEvent = new NodejsFunction(
+    scope,
+    Lambda.generateDocumentFromApiEvent,
+    {
+      ...getCommonNodeJsFunctionProps({
+        lambda: Lambda.generateDocumentFromApiEvent,
+        cdkEnvVars,
+        retainStatefulResources,
+        architecture: Architecture.X86_64,
+        memorySize: 2048,
+        bundlingOptions: {
+          nodeModules: ['@sparticuz/chromium'],
+        },
+        lambdaDirName: 'generate-document',
+        handlerFilename: 'api-handler.ts',
+      }),
+      handler: 'generateDocumentFromApiEvent',
+      environment: {
+        DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+        S3_BUCKET: s3BucketName,
+        DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
+        ...envVars.get(Lambda.generateDocumentFromApiEvent),
+      },
+    },
+  );
+
+  const generateDocumentFromSfnEvent = new NodejsFunction(
+    scope,
+    Lambda.generateDocumentFromSfnEvent,
+    {
+      ...getCommonNodeJsFunctionProps({
+        lambda: Lambda.generateDocumentFromSfnEvent,
+        cdkEnvVars,
+        retainStatefulResources,
+        architecture: Architecture.X86_64,
+        memorySize: 2048,
+        bundlingOptions: {
+          nodeModules: ['@sparticuz/chromium'],
+        },
+        lambdaDirName: 'generate-document',
+        handlerFilename: 'sfn-handler.ts',
+      }),
+      handler: 'generateDocumentFromSfnEvent',
+      environment: {
+        DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+        S3_BUCKET: s3BucketName,
+        ...envVars.get(Lambda.generateDocumentFromSfnEvent),
+      },
+    },
+  );
+
+  const getDocumentBatchResult = new NodejsFunction(scope, Lambda.getDocumentBatchResult, {
     ...getCommonNodeJsFunctionProps({
-      lambda: Lambda.generateDocument,
+      lambda: Lambda.getDocumentBatchResult,
       cdkEnvVars,
       retainStatefulResources,
-      architecture: Architecture.X86_64,
-      memorySize: 2048,
-      bundlingOptions: {
-        nodeModules: ['@sparticuz/chromium'],
-      },
     }),
-    handler: 'generateDocument',
+    handler: 'getDocumentBatchResult',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
-      DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
-      ...envVars.get(Lambda.generateDocument),
+      ...envVars.get(Lambda.getDocumentBatchResult),
+    },
+  });
+
+  const storeDocumentBatchResult = new NodejsFunction(scope, Lambda.storeDocumentBatchResult, {
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.storeDocumentBatchResult,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
+    handler: 'storeDocumentBatchResult',
+    environment: {
+      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+      ...envVars.get(Lambda.storeDocumentBatchResult),
     },
   });
 
@@ -212,7 +275,53 @@ export function createLambdas({
     getTemplates,
     deleteTemplate,
     setDefaultUserPassword,
-    generateDocument,
+    generateDocumentFromApiEvent,
+    generateDocumentFromSfnEvent,
+    getDocumentBatchResult,
+    storeDocumentBatchResult,
     deleteExpiredS3Objects,
+  };
+}
+
+/**
+ * As state machines use lambdas they need to be created before
+ * creating step function. Lambdas that start state machine need
+ * state machine ARN therefore we create them separately later.
+ */
+export function createStateMachineStartupLambdas({
+  scope,
+  cdkEnvVars,
+  stateMachines,
+  retainStatefulResources,
+  dynamoDbTable,
+}: {
+  scope: Construct;
+  cdkEnvVars: CdkEnvVarsDto;
+  retainStatefulResources: boolean;
+  stateMachines: ReturnType<typeof createStateMachines>;
+  dynamoDbTable: Table;
+}) {
+  const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
+
+  const startDocumentBatchGeneration = new NodejsFunction(
+    scope,
+    Lambda.startDocumentBatchGeneration,
+    {
+      ...getCommonNodeJsFunctionProps({
+        lambda: Lambda.startDocumentBatchGeneration,
+        cdkEnvVars,
+        retainStatefulResources,
+      }),
+      handler: 'startDocumentBatchGeneration',
+      environment: {
+        DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+        STATE_MACHINE_ARN: stateMachines.documentBatchGeneration.stateMachineArn,
+        ...envVars.get(Lambda.startDocumentBatchGeneration),
+      },
+    },
+  );
+
+  return {
+    startDocumentBatchGeneration,
   };
 }

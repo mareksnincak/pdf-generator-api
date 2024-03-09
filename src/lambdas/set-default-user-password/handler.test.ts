@@ -18,7 +18,7 @@ beforeAll(() => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('setDefaultUserPassword', () => {

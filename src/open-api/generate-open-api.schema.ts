@@ -4,10 +4,12 @@ import { customOAuthScopes } from '../../infra/cdk/enums/authorization.enum';
 import * as packageJson from '../../package.json';
 import { createTemplateRoute } from '../lambdas/create-template/open-api/open-api.route';
 import { deleteTemplateRoute } from '../lambdas/delete-template/open-api/open-api.route';
-import { generateDocumentsRoute } from '../lambdas/generate-document/open-api/open-api.route';
+import { generateDocumentRoute } from '../lambdas/generate-document/open-api/open-api.route';
+import { getDocumentBatchResultRoute } from '../lambdas/get-document-batch-result/open-api/open-api.route';
 import { getTemplateRoute } from '../lambdas/get-template/open-api/open-api.route';
 import { getTemplatesRoute } from '../lambdas/get-templates/open-api/open-api.route';
 import { getUrlForTemplateUploadRoute } from '../lambdas/get-url-for-template-upload/open-api/open-api.route';
+import { startDocumentBatchGenerationRoute } from '../lambdas/start-document-batch-generation/open-api/open-api.route';
 
 export function generateOpenApi({
   apiUrl = '/',
@@ -23,7 +25,9 @@ export function generateOpenApi({
   registry.registerPath(getTemplatesRoute);
   registry.registerPath(deleteTemplateRoute);
   registry.registerPath(getUrlForTemplateUploadRoute);
-  registry.registerPath(generateDocumentsRoute);
+  registry.registerPath(generateDocumentRoute);
+  registry.registerPath(startDocumentBatchGenerationRoute);
+  registry.registerPath(getDocumentBatchResultRoute);
 
   const oAuth2AuthScopes: Record<string, string> = {};
   for (const scope of Object.values(customOAuthScopes)) {

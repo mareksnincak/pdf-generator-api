@@ -6,6 +6,10 @@ export enum Lambda {
   getTemplates = 'get-templates',
   deleteTemplate = 'delete-template',
   setDefaultUserPassword = 'set-default-user-password',
-  generateDocument = 'generate-document',
+  generateDocumentFromApiEvent = 'generate-document-from-api-event',
+  generateDocumentFromSfnEvent = 'generate-document-from-sfn-event',
+  startDocumentBatchGeneration = 'start-document-batch-generation',
+  getDocumentBatchResult = 'get-document-batch-result',
+  storeDocumentBatchResult = 'store-document-batch-result',
   deleteExpiredS3Objects = 'delete-expired-s3-objects',
 }

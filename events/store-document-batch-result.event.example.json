@@ -1,0 +1,12 @@
+{
+  "id": "f54bcdec-0ac9-456e-bb70-a27e8cb6824a",
+  "userId": "56bee3f1-946f-434f-adc1-742208a080f7",
+  "status": "completed",
+  "results": [
+    {
+      "status": "success",
+      "ref": "sampleRef",
+      "s3Key": "sampleS3Key"
+    }
+  ]
+}

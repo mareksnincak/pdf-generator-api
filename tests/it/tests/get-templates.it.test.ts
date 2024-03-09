@@ -5,8 +5,8 @@ import { DecryptCommand, EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import { createOrReplace } from '../../../src/db/template/template.repository';
+import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
+import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { type GetTemplatesResponseDto } from '../../../src/lambdas/get-templates/dtos/response.dto';
@@ -32,7 +32,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('getTemplates', () => {
@@ -48,7 +48,7 @@ describe('getTemplates', () => {
       name: 'a',
     });
 
-    await createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const result = await getTemplates(event, context);
 
@@ -82,7 +82,10 @@ describe('getTemplates', () => {
       name: 'b',
     });
 
-    await Promise.all([createOrReplace(templateEntityA), createOrReplace(templateEntityB)]);
+    await Promise.all([
+      templateRepository.createOrFail(templateEntityA),
+      templateRepository.createOrFail(templateEntityB),
+    ]);
 
     const result = await getTemplates(event, context);
 
@@ -107,7 +110,7 @@ describe('getTemplates', () => {
       userId,
     });
 
-    await createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const paginationToken = randomBytes(8).toString();
     const kmsClientSpy = jest.spyOn(KMSClient.prototype, 'send').mockImplementation(() => ({
@@ -163,9 +166,9 @@ describe('getTemplates', () => {
     });
 
     await Promise.all([
-      createOrReplace(templateEntityA),
-      createOrReplace(templateEntityB),
-      createOrReplace(templateEntityC),
+      templateRepository.createOrFail(templateEntityA),
+      templateRepository.createOrFail(templateEntityB),
+      templateRepository.createOrFail(templateEntityC),
     ]);
 
     const kmsClientSpy = jest.spyOn(KMSClient.prototype, 'send').mockImplementation(() => ({
@@ -208,7 +211,7 @@ describe('getTemplates', () => {
       userId: 'other-user-id',
     });
 
-    await createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const result = await getTemplates(event, context);
 

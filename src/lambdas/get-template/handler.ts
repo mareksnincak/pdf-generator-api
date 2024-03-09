@@ -4,8 +4,8 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { getByIdOrFail } from '../../db/template/template.repository';
-import { handleError } from '../../helpers/error.helper';
+import * as templateRepository from '../../db/template/repository';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { validatePathParams } from '../../helpers/validation.helper';
@@ -27,7 +27,7 @@ export async function getTemplate(
     const { id } = validatedParams;
 
     const userId = getUserIdFromEventOrFail(event);
-    const template = await getByIdOrFail({ id, userId });
+    const template = await templateRepository.getByIdOrFail({ id, userId });
 
     const response: GetTemplateResponseDto = await template.toPublicJsonWithDataUrl();
     logger.info('getTemplate.success');
@@ -36,6 +36,6 @@ export async function getTemplate(
       body: JSON.stringify(response),
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'getTemplate' });
+    return handleApiError({ error, logPrefix: 'getTemplate' });
   }
 }

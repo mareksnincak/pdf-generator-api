@@ -4,9 +4,9 @@ import type {
   Context,
 } from 'aws-lambda';
 
-import { deleteByIdOrFail } from '../../db/template/template.repository';
+import * as templateRepository from '../../db/template/repository';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleError } from '../../helpers/error.helper';
+import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObject } from '../../helpers/s3.helper';
@@ -29,7 +29,7 @@ export async function deleteTemplate(
 
     const bucket = getEnvVariableOrFail('S3_BUCKET');
     const userId = getUserIdFromEventOrFail(event);
-    const deletedTemplate = await deleteByIdOrFail({ id, userId });
+    const deletedTemplate = await templateRepository.deleteByIdOrFail({ id, userId });
     await deleteObject({ bucket, key: deletedTemplate.s3Key });
 
     logger.info('deleteTemplate.success');
@@ -38,6 +38,6 @@ export async function deleteTemplate(
       body: '',
     };
   } catch (error) {
-    return handleError({ error, logPrefix: 'deleteTemplate' });
+    return handleApiError({ error, logPrefix: 'deleteTemplate' });
   }
 }

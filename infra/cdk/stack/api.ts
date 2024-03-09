@@ -9,15 +9,17 @@ import { type Construct } from 'constructs';
 import { oAuthScopes } from '../enums/authorization.enum';
 
 import { type createCognito } from './cognito';
-import { type createLambdas } from './lambdas';
+import { type createStateMachineStartupLambdas, type createLambdas } from './lambdas';
 
 export function createApi({
   scope,
   lambdas,
+  stateMachineStartupLambdas,
   cognito,
 }: {
   scope: Construct;
   lambdas: ReturnType<typeof createLambdas>;
+  stateMachineStartupLambdas: ReturnType<typeof createStateMachineStartupLambdas>;
   cognito: ReturnType<typeof createCognito>;
 }) {
   const api = new RestApi(scope, 'api', {
@@ -90,13 +92,43 @@ export function createApi({
 
   documentResource
     .addResource('generate')
-    .addMethod('POST', new LambdaIntegration(lambdas.generateDocument), {
+    .addMethod('POST', new LambdaIntegration(lambdas.generateDocumentFromApiEvent), {
       ...commonAuthorizationOptions,
       authorizationScopes: [
         oAuthScopes.admin.pdfGeneratorScope,
         oAuthScopes.generateDocuments.pdfGeneratorName,
       ],
     });
+
+  const documentBatchResource = documentResource.addResource('batch');
+
+  documentBatchResource
+    .addResource('generate')
+    .addMethod(
+      'POST',
+      new LambdaIntegration(stateMachineStartupLambdas.startDocumentBatchGeneration),
+      {
+        ...commonAuthorizationOptions,
+        authorizationScopes: [
+          oAuthScopes.admin.pdfGeneratorScope,
+          oAuthScopes.generateDocuments.pdfGeneratorName,
+        ],
+      },
+    );
+
+  const documentBatchByIdResource = documentBatchResource.addResource('{id}');
+
+  documentBatchByIdResource.addMethod(
+    'GET',
+    new LambdaIntegration(lambdas.getDocumentBatchResult),
+    {
+      ...commonAuthorizationOptions,
+      authorizationScopes: [
+        oAuthScopes.admin.pdfGeneratorScope,
+        oAuthScopes.generateDocuments.pdfGeneratorName,
+      ],
+    },
+  );
 
   return api;
 }

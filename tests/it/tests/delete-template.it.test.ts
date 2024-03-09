@@ -5,8 +5,8 @@ import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
-import { TemplateEntityMockFactory } from '../../../src/db/template/template.mock-factory';
-import { createOrReplace, getById } from '../../../src/db/template/template.repository';
+import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
+import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
 import { mockLogger } from '../../../src/helpers/test.helper';
 import { deleteTemplate } from '../../../src/lambdas/delete-template/handler';
@@ -31,7 +31,7 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('deleteTemplate', () => {
@@ -50,14 +50,17 @@ describe('deleteTemplate', () => {
       userId,
     });
 
-    await createOrReplace(templateEntity);
+    await templateRepository.createOrFail(templateEntity);
 
     const result = await deleteTemplate(event, context);
 
     expect(result.statusCode).toEqual(204);
     expect(result.body).toEqual('');
 
-    const templateAfterDeletion = await getById({ id: templateEntity.id, userId });
+    const templateAfterDeletion = await templateRepository.getById({
+      id: templateEntity.id,
+      userId,
+    });
     expect(templateAfterDeletion).toEqual(null);
 
     const s3ClientArgs = s3ClientSpy.mock.calls[0][0];

@@ -4,7 +4,7 @@ import { getSecret } from './secret-manager.helper';
 import { mockLogger } from './test.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('getSecret', () => {

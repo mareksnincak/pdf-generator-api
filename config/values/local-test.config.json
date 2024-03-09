@@ -13,7 +13,8 @@
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
-      "S3_BUCKET": "pdf-generator-api-test"
+      "S3_BUCKET": "pdf-generator-api-test",
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "get-templates": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
@@ -35,13 +36,38 @@
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "set-default-user-password": {},
-    "generate-document": {
+    "generate-document-from-api-event": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
       "S3_BUCKET": "pdf-generator-api-test",
       "DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL": "https://sqs.example.com/sample-delete-expired-s3-objects-queue",
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
+    },
+    "generate-document-from-sfn-event": {
+      "DYNAMODB_ENDPOINT": "http://localhost:7999",
+      "DYNAMODB_REGION": "local",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
+      "S3_BUCKET": "pdf-generator-api-test"
+    },
+    "start-document-batch-generation": {
+      "DYNAMODB_ENDPOINT": "http://localhost:7999",
+      "DYNAMODB_REGION": "local",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
+      "STATE_MACHINE_ARN": "sample-state-machine-arn",
+      "DOCUMENT_BATCH_TTL_HOURS": "1"
+    },
+    "get-document-batch-result": {
+      "DYNAMODB_ENDPOINT": "http://localhost:7999",
+      "DYNAMODB_REGION": "local",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator",
+      "S3_BUCKET": "pdf-generator-api-test",
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
+    },
+    "store-document-batch-result": {
+      "DYNAMODB_ENDPOINT": "http://localhost:7999",
+      "DYNAMODB_REGION": "local",
+      "DYNAMODB_TABLE_NAME": "PdfGenerator"
     },
     "delete-expired-s3-objects": {
       "S3_BUCKET": "pdf-generator-api-test"

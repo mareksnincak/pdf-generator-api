@@ -3,7 +3,7 @@ import { DecryptCommand, EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
 import { decrypt, encrypt } from './kms.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('encrypt', () => {

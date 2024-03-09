@@ -19,10 +19,10 @@ import {
   encryptPaginationToken,
 } from '../common/helpers/pagination.helper';
 
-import { TemplateEntity } from './template.entity';
-import { type Template } from './template.type';
+import { TemplateEntity } from './entity';
+import { type Template } from './type';
 
-export async function createOrReplace(template: SetOptional<Template, 'id'>) {
+export async function createOrFail(template: SetOptional<Template, 'id' | 'createdAt'>) {
   try {
     logger.info('templateRepository.createOrReplace');
 

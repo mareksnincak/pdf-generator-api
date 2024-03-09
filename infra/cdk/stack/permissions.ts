@@ -4,7 +4,8 @@ import { type Key } from 'aws-cdk-lib/aws-kms';
 import { type Bucket } from 'aws-cdk-lib/aws-s3';
 
 import { type createCognito } from './cognito';
-import { type createLambdas } from './lambdas';
+import { type createStateMachineStartupLambdas, type createLambdas } from './lambdas';
+import { type createStateMachines } from './sfn';
 import { type createSqsQueues } from './sqs';
 
 export function grantPermissions({
@@ -17,6 +18,8 @@ export function grantPermissions({
   cognito,
   kmsKey,
   sqsQueues,
+  stateMachines,
+  stateMachineStartupLambdas,
 }: {
   region: string;
   account: string;
@@ -27,6 +30,8 @@ export function grantPermissions({
   cognito: ReturnType<typeof createCognito>;
   kmsKey: Key;
   sqsQueues: ReturnType<typeof createSqsQueues>;
+  stateMachines: ReturnType<typeof createStateMachines>;
+  stateMachineStartupLambdas: ReturnType<typeof createStateMachineStartupLambdas>;
 }) {
   s3Bucket.grantPut(lambdas.getUrlForTemplateUpload);
   s3Bucket.grantReadWrite(lambdas.createTemplate);
@@ -34,7 +39,9 @@ export function grantPermissions({
   s3Bucket.grantDelete(lambdas.deleteTemplate);
   s3Bucket.grantRead(lambdas.getTemplate);
   s3Bucket.grantDelete(lambdas.deleteExpiredS3Objects);
-  s3Bucket.grantReadWrite(lambdas.generateDocument);
+  s3Bucket.grantReadWrite(lambdas.generateDocumentFromApiEvent);
+  s3Bucket.grantReadWrite(lambdas.generateDocumentFromSfnEvent);
+  s3Bucket.grantReadWrite(lambdas.getDocumentBatchResult);
 
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(
@@ -48,12 +55,20 @@ export function grantPermissions({
   dynamoDbTable.grantWriteData(lambdas.deleteTemplate);
   dynamoDbTable.grantReadData(lambdas.getTemplate);
   dynamoDbTable.grantReadData(lambdas.getTemplates);
-  dynamoDbTable.grantReadData(lambdas.generateDocument);
+  dynamoDbTable.grantReadData(lambdas.generateDocumentFromApiEvent);
+  dynamoDbTable.grantReadData(lambdas.generateDocumentFromSfnEvent);
+  dynamoDbTable.grantReadData(lambdas.getDocumentBatchResult);
+  dynamoDbTable.grantWriteData(lambdas.storeDocumentBatchResult);
+  dynamoDbTable.grantWriteData(stateMachineStartupLambdas.startDocumentBatchGeneration);
 
   cognito.defaultUsersCredentialsSecret.grantRead(lambdas.setDefaultUserPassword);
   cognito.userPool.grant(lambdas.setDefaultUserPassword, 'cognito-idp:AdminSetUserPassword');
 
   kmsKey.grantEncryptDecrypt(lambdas.getTemplates);
 
-  sqsQueues.deleteExpiredS3ObjectsQueue.grantSendMessages(lambdas.generateDocument);
+  sqsQueues.deleteExpiredS3ObjectsQueue.grantSendMessages(lambdas.generateDocumentFromApiEvent);
+
+  stateMachines.documentBatchGeneration.grantStartExecution(
+    stateMachineStartupLambdas.startDocumentBatchGeneration,
+  );
 }

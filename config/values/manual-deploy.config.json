@@ -4,7 +4,9 @@
   },
   "lambda": {
     "create-template": {},
-    "get-template": {},
+    "get-template": {
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
+    },
     "get-templates": {},
     "delete-template": {},
     "get-open-api": {},
@@ -12,9 +14,17 @@
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
     "set-default-user-password": {},
-    "generate-document": {
+    "generate-document-from-api-event": {
       "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
     },
+    "generate-document-from-sfn-event": {},
+    "start-document-batch-generation": {
+      "DOCUMENT_BATCH_TTL_HOURS": "1"
+    },
+    "get-document-batch-result": {
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
+    },
+    "store-document-batch-result": {},
     "delete-expired-s3-objects": {}
   }
 }

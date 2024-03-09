@@ -3,24 +3,24 @@ import { randomUUID } from 'node:crypto';
 import { getEnvVariableOrFail, isLocal } from './env.helper';
 
 afterEach(() => {
-  jest.resetAllMocks();
+  jest.clearAllMocks();
 });
 
 describe('getEnvVariableOrFail', () => {
   it('should return env variable value when variable exists', () => {
     const value = randomUUID();
-    process.env.SOME_TESTING_ENV_VARIABLE = value;
+    process.env.S3_BUCKET = value;
 
-    const result = getEnvVariableOrFail('SOME_TESTING_ENV_VARIABLE');
+    const result = getEnvVariableOrFail('S3_BUCKET');
 
     expect(result).toEqual(value);
   });
 
   it("should throw error when variable doesn't exists", () => {
-    delete process.env.SOME_TESTING_ENV_VARIABLE;
+    delete process.env.S3_BUCKET;
 
     try {
-      getEnvVariableOrFail('SOME_TESTING_ENV_VARIABLE');
+      getEnvVariableOrFail('S3_BUCKET');
       expect(true).toEqual(false);
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
