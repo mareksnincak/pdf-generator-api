@@ -40,7 +40,6 @@ export async function generateDocumentFromSfnEvent(
 
     const documentId = randomUUID();
     const s3Key = `${userId}/documents/${documentId}.pdf`;
-    // TODO delete with dynamodb stream when item ttl expires
     await putObject({
       bucket,
       key: s3Key,

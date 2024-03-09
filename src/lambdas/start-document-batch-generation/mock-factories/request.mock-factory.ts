@@ -1,4 +1,3 @@
-// TODO handle eslint bug and remove rule disable from eslint
 import { randomUUID } from 'node:crypto';
 
 import { type PartialDeep } from 'type-fest';
