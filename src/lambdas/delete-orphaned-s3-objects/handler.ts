@@ -9,6 +9,7 @@ import { deleteObjects } from '../../helpers/s3.helper';
 
 function getKeysToDelete({ eventName, dynamodb }: DynamoDBRecord): string[] {
   logger.info({ eventName, keys: dynamodb?.Keys }, 'deleteOrphanedS3Objects.handleRecord');
+  logger.debug({ dynamodb }, 'deleteOrphanedS3Objects.dynamoDbValue');
 
   const PK = dynamodb?.Keys?.PK.S;
   const item = dynamodb?.OldImage as Record<string, AttributeValue>;
@@ -44,6 +45,7 @@ export async function deleteOrphanedS3Objects(
   try {
     setLoggerContext({}, context);
     logger.info('deleteOrphanedS3Objects.starting');
+    logger.debug(event, 'deleteOrphanedS3Objects.event');
 
     const bucket = getEnvVariableOrFail('S3_BUCKET');
 
