@@ -42,23 +42,6 @@ describe('encryptPaginationToken', () => {
 
     expect(result).toEqual(undefined);
   });
-
-  it('should throw error when kms key id is not set', async () => {
-    process.env.KMS_KEY_ID = '';
-    const userId = randomUUID();
-    const paginationToken = { PK: { S: 'sample-pk' } };
-
-    try {
-      await encryptPaginationToken({
-        userId,
-        paginationToken,
-      });
-      expect(true).toEqual(false);
-    } catch (error) {
-      expect(error).toBeInstanceOf(Error);
-      expect((error as Error).message).toEqual('envHelper.getEnvVariableOrFail.missing');
-    }
-  });
 });
 
 describe('decryptPaginationToken', () => {

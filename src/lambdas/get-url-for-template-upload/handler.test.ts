@@ -7,6 +7,7 @@ import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
+import * as scheduleDeletionHelper from '../delete-expired-s3-objects/helpers/schedule-deletion.helper';
 
 import { getUrlForTemplateUpload } from './handler';
 import { GetUrlForTemplateUploadRequestMockFactory } from './mock-factories/request.mock-factory';
@@ -44,6 +45,7 @@ describe('getUrlForTemplateUpload', () => {
 
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(uploadId);
     jest.spyOn(s3RequestPresigner, 'getSignedUrl').mockResolvedValue(presignedUrl);
+    jest.spyOn(scheduleDeletionHelper, 'scheduleObjectDeletion').mockResolvedValue();
 
     const queryStringParameters = requestMockFactory.create();
     const event = eventMockFactory.create({

@@ -11,7 +11,8 @@
     "delete-template": {},
     "get-open-api": {},
     "get-url-for-template-upload": {
-      "PRESIGNED_URL_EXPIRATION_SECONDS": "60"
+      "PRESIGNED_URL_EXPIRATION_SECONDS": "60",
+      "DELETE_UPLOADED_OBJECT_IN_SECONDS": "120"
     },
     "set-default-user-password": {},
     "generate-document-from-api-event": {

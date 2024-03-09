@@ -1,5 +1,6 @@
 import * as crypto from 'node:crypto';
 
+import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
 import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
 
 import { EnvironmentName } from '../../../config/enums/config.enum';
@@ -51,6 +52,8 @@ describe('getUrlForTemplateUpload', () => {
       queryStringParameters,
     });
 
+    const sqsClientSpy = jest.spyOn(SQSClient.prototype, 'send').mockImplementation();
+
     const result = await getUrlForTemplateUpload(event, context);
 
     expect(result.statusCode).toEqual(200);
@@ -60,11 +63,21 @@ describe('getUrlForTemplateUpload', () => {
     });
 
     const userId = event.requestContext.authorizer.claims.sub;
+    const expectedUploadS3Key = `${userId}/templates/uploads/${uploadId}`;
+
     const getSignedUrlArgs = getSignedUrlSpy.mock.lastCall;
     expect(getSignedUrlArgs?.[1].input).toEqual({
       Bucket: 'pdf-generator-api-test',
       ContentLength: 1024,
-      Key: `${userId}/templates/uploads/${uploadId}`,
+      Key: expectedUploadS3Key,
+    });
+
+    const sqsClientArgs = sqsClientSpy.mock.calls[0]?.[0];
+    expect(sqsClientArgs).toBeInstanceOf(SendMessageCommand);
+    expect(sqsClientArgs.input).toEqual({
+      MessageBody: expectedUploadS3Key,
+      QueueUrl: 'https://sqs.example.com/sample-delete-expired-s3-objects-queue',
+      DelaySeconds: 120,
     });
   });
 });

@@ -67,6 +67,7 @@ export function grantPermissions({
   kmsKey.grantEncryptDecrypt(lambdas.getTemplates);
 
   sqsQueues.deleteExpiredS3ObjectsQueue.grantSendMessages(lambdas.generateDocumentFromApiEvent);
+  sqsQueues.deleteExpiredS3ObjectsQueue.grantSendMessages(lambdas.getUrlForTemplateUpload);
 
   stateMachines.documentBatchGeneration.grantStartExecution(
     stateMachineStartupLambdas.startDocumentBatchGeneration,

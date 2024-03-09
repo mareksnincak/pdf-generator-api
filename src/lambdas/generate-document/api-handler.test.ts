@@ -6,10 +6,10 @@ import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
 import { ErrorMessage } from '../../enums/error.enum';
 import { NotFoundError } from '../../errors/not-found.error';
 import * as s3Helper from '../../helpers/s3.helper';
-import * as sqsHelper from '../../helpers/sqs.helper';
 import { mockLogger } from '../../helpers/test.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
+import * as scheduleDeletionHelper from '../delete-expired-s3-objects/helpers/schedule-deletion.helper';
 
 import { generateDocumentFromApiEvent } from './api-handler';
 import { GenerateDocumentFromApiEventRequestMockFactory } from './mock-factories/api-request.mock-factory';
@@ -46,7 +46,7 @@ describe('generateDocumentFromApiEvent', () => {
       .mockResolvedValue(Buffer.from(randomUUID()));
     jest.spyOn(s3Helper, 'getPresignedShareUrl').mockResolvedValue(mockedUrl);
     jest.spyOn(s3Helper, 'putObject').mockResolvedValue();
-    jest.spyOn(sqsHelper, 'sendSqsMessage').mockResolvedValue();
+    jest.spyOn(scheduleDeletionHelper, 'scheduleObjectDeletion').mockResolvedValue();
 
     const result = await generateDocumentFromApiEvent(event, context);
 

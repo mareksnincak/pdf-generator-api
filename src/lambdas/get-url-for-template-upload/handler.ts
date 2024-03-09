@@ -12,6 +12,7 @@ import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getPresignedUploadUrl } from '../../helpers/s3.helper';
 import { validateQueryParams } from '../../helpers/validation.helper';
+import { scheduleObjectDeletion } from '../delete-expired-s3-objects/helpers/schedule-deletion.helper';
 
 import { getUrlForTemplateUploadRequestDto } from './dtos/request.dto';
 import { type GetUrlForTemplateUploadResponseDto } from './dtos/response.dto';
@@ -24,15 +25,23 @@ async function createPresignedUrl({
   userId: string;
 }) {
   const expiresInSeconds = Number(getEnvVariableOrFail('PRESIGNED_URL_EXPIRATION_SECONDS'));
+  const deleteInSeconds = Number(getEnvVariableOrFail('DELETE_UPLOADED_OBJECT_IN_SECONDS'));
   const bucket = getEnvVariableOrFail('S3_BUCKET');
   const uploadId = randomUUID();
 
-  const url = await getPresignedUploadUrl({
-    bucket,
-    key: `${userId}/templates/uploads/${uploadId}`,
-    fileSizeBytes,
-    expiresInSeconds,
-  });
+  const key = `${userId}/templates/uploads/${uploadId}`;
+  const [url] = await Promise.all([
+    getPresignedUploadUrl({
+      bucket,
+      key,
+      fileSizeBytes,
+      expiresInSeconds,
+    }),
+    scheduleObjectDeletion({
+      key,
+      deleteInSeconds,
+    }),
+  ]);
 
   return { url, uploadId };
 }
