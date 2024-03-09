@@ -5,7 +5,7 @@ import { TemplateEntityMockFactory } from '../../db/template/mock-factory';
 import * as templateRepository from '../../db/template/repository';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
-import { TemplateResponseMockFactory } from '../../mock-factories/template-response.mock-factory';
+import { TemplateMockFactory } from '../../mock-factories/template.mock-factory';
 
 import { getTemplates } from './handler';
 import { GetTemplatesRequestMockFactory } from './mock-factories/request.mock-factory';
@@ -14,7 +14,7 @@ const requestMockFactory = new GetTemplatesRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const templateEntity = new TemplateEntityMockFactory().create();
 const context = new ContextMockFactory().create();
-const templateResponseMockFactory = new TemplateResponseMockFactory();
+const templateResponseMockFactory = new TemplateMockFactory();
 
 beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getTemplates);
