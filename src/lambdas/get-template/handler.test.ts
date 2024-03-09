@@ -8,7 +8,7 @@ import { NotFoundError } from '../../errors/not-found.error';
 import { mockLogger } from '../../helpers/test.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
-import { TemplateWithDataResponseMockFactory } from '../../mock-factories/template-with-data-response.mock-factory';
+import { GetTemplatesResponseMockFactory } from '../get-templates/mock-factories/response.mock-factory';
 
 import { getTemplate } from './handler';
 import { GetTemplateRequestMockFactory } from './mock-factories/request.mock-factory';
@@ -17,7 +17,7 @@ const requestMockFactory = new GetTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const templateEntity = new TemplateEntityMockFactory().create();
 const context = new ContextMockFactory().create();
-const responseMockFactory = new TemplateWithDataResponseMockFactory();
+const responseMockFactory = new GetTemplatesResponseMockFactory();
 
 beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getTemplate);

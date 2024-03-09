@@ -5,8 +5,13 @@ import { TemplateType } from '../db/template/enum';
 
 extendZodWithOpenApi(z);
 
-export const templateResponseDto = z.object({
-  id: z.string().min(1).max(64).openapi({ description: 'Template id.', example: 'templateId' }),
+export const templateDto = z.object({
+  id: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-zA-Z0-9\-_]+$/)
+    .openapi({ description: 'Template id.', example: 'templateId' }),
   name: z
     .string()
     .min(1)
@@ -15,4 +20,4 @@ export const templateResponseDto = z.object({
   type: z.nativeEnum(TemplateType).openapi({ description: 'Template type.' }),
 });
 
-export type TemplateResponseDto = z.infer<typeof templateResponseDto>;
+export type TemplateDto = z.infer<typeof templateDto>;

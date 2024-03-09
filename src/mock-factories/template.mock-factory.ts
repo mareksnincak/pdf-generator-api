@@ -1,10 +1,10 @@
 import { randomBytes, randomUUID } from 'node:crypto';
 
 import { TemplateType } from '../db/template/enum';
-import { type TemplateResponseDto } from '../dtos/template-response.dto';
+import { type TemplateDto } from '../dtos/template.dto';
 
-export class TemplateResponseMockFactory {
-  create(overrides: Partial<TemplateResponseDto> = {}): TemplateResponseDto {
+export class TemplateMockFactory {
+  create(overrides: Partial<TemplateDto> = {}): TemplateDto {
     return {
       id: randomUUID(),
       name: randomBytes(8).toString('hex'),

@@ -1,14 +1,12 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
+import { templateDto } from '../../../dtos/template.dto';
+
 extendZodWithOpenApi(z);
 
 export const generateDocumentFromApiEventRequestDto = z.object({
-  templateId: z
-    .string()
-    .min(1)
-    .max(64)
-    .openapi({ description: 'Template id.', example: 'templateId' }),
+  templateId: templateDto.shape.id,
   data: z.record(z.string(), z.unknown()).openapi({
     description: 'Data to insert to template.',
     example: {

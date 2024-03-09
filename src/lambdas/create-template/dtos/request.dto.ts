@@ -1,28 +1,18 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-import { TemplateType } from '../../../db/template/enum';
+import { templateDto } from '../../../dtos/template.dto';
 
 extendZodWithOpenApi(z);
 
 export const createTemplateRequestDto = z.object({
-  id: z
-    .string()
-    .min(1)
-    .max(64)
-    .regex(/^[a-zA-Z0-9\-_]+$/)
-    .optional()
-    .openapi({ description: 'Template id.', example: 'templateId' }),
-  name: z
-    .string()
-    .min(1)
-    .max(64)
-    .openapi({ description: 'Template name.', example: 'Template name' }),
+  id: templateDto.shape.id.optional(),
+  name: templateDto.shape.name,
   uploadId: z
     .string()
     .uuid()
     .openapi({ description: 'Upload id from GET /templates/upload-url api call.' }),
-  type: z.nativeEnum(TemplateType).openapi({ description: 'Template type.' }),
+  type: templateDto.shape.type,
 });
 
 export type CreateTemplateRequestDto = z.infer<typeof createTemplateRequestDto>;

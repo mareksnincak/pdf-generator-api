@@ -2,13 +2,12 @@ import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import z from 'zod';
 
 import { DocumentBatchStatus } from '../../../db/document-batch/enum';
+import { batchIdDto } from '../../../dtos/batch-id.dto';
 
 extendZodWithOpenApi(z);
 
 export const getDocumentBatchResultResponseDto = z.object({
-  id: z.string().uuid().openapi({
-    description: 'Batch id.',
-  }),
+  id: batchIdDto.shape.id,
   status: z.nativeEnum(DocumentBatchStatus).openapi({
     description: 'Status.',
   }),
