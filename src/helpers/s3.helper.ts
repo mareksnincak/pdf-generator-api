@@ -70,6 +70,12 @@ export async function deleteObject({ bucket, key }: { bucket: string; key: strin
 
 export async function deleteObjects({ bucket, keys }: { bucket: string; keys: string[] }) {
   logger.info({ bucket, keys }, 's3Helper.deleteObjects');
+
+  if (!keys.length) {
+    logger.info('s3Helper.deleteObjects.skipping');
+    return;
+  }
+
   const objectsToDelete: ObjectIdentifier[] = keys.map((key) => ({
     Key: key,
   }));
