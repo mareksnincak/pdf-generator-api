@@ -53,4 +53,43 @@ describe('Documents', () => {
     const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
     expect(await isSamePdfFile(generatedDocument, expectedDocument)).toEqual(true);
   });
+
+  it('should generate document batch', async () => {
+    expect(templateId).toBeDefined();
+
+    const successRef = 'successRef';
+    const errorRef = 'errorRef';
+
+    const { body: generateDocumentBatchResponse } = await request(baseUrl)
+      .post('/documents/batch/generate')
+      .send({
+        documents: [
+          {
+            ref: successRef,
+            templateId,
+            data: documentMockData,
+          },
+          {
+            ref: errorRef,
+            templateId: 'nonExistentTemplateId',
+            data: documentMockData,
+          },
+        ],
+      })
+      .auth(accessToken, { type: 'bearer' })
+      .expect(202);
+
+    expect(generateDocumentBatchResponse).toHaveProperty('id', expect.any(String));
+    // const batchId = generateDocumentBatchResponse.id as string;
+
+    // expect(generateDocumentResponse).toHaveProperty('url', expect.any(String));
+
+    // const { body: generatedDocument } = (await request(generateDocumentResponse.url as string)
+    //   .get('')
+    //   .responseType('blob')
+    //   .expect(200)) as { body: Buffer };
+
+    // const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
+    // expect(await isSamePdfFile(generatedDocument, expectedDocument)).toEqual(true);
+  });
 });
