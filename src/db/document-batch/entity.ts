@@ -39,6 +39,8 @@ export class DocumentBatchEntity extends BaseEntity {
     this.generatedDocuments = generatedDocuments;
   }
 
+  public static pkPrefix = 'DOCUMENT_BATCH#';
+
   public id: string;
 
   public userId: string;

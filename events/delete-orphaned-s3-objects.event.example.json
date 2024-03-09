@@ -1,3 +1,55 @@
 {
-  "Records": []
+  "Records": [
+    {
+      "eventID": "5f05973cc10b2df05dea095e482f7e64",
+      "eventName": "REMOVE",
+      "eventVersion": "1.1",
+      "eventSource": "aws:dynamodb",
+      "awsRegion": "eu-central-1",
+      "dynamodb": {
+        "ApproximateCreationDateTime": 1709988327,
+        "Keys": {
+          "SK": {
+            "S": "#"
+          },
+          "PK": {
+            "S": "TEMPLATE#USER#f2c1b3c6-65a2-4f0b-9e23-988e40df221c#ID#a18b61a3-8ae5-4f4a-95f3-f0e74972658b"
+          }
+        },
+        "OldImage": {
+          "s3Key": {
+            "S": "f2c1b3c6-65a2-4f0b-9e23-988e40df221c/templates/data/5ea3ef71-91a6-466b-b38c-5b58762b307b"
+          },
+          "GSI1PK": {
+            "S": "TEMPLATE#USER#f2c1b3c6-65a2-4f0b-9e23-988e40df221c"
+          },
+          "GSI1SK": {
+            "S": "NAME#mock document"
+          },
+          "SK": {
+            "S": "#"
+          },
+          "name": {
+            "S": "mock document"
+          },
+          "PK": {
+            "S": "TEMPLATE#USER#f2c1b3c6-65a2-4f0b-9e23-988e40df221c#ID#a18b61a3-8ae5-4f4a-95f3-f0e74972658b"
+          },
+          "id": {
+            "S": "a18b61a3-8ae5-4f4a-95f3-f0e74972658b"
+          },
+          "type": {
+            "S": "html/handlebars"
+          },
+          "userId": {
+            "S": "f2c1b3c6-65a2-4f0b-9e23-988e40df221c"
+          }
+        },
+        "SequenceNumber": "9202500000000020294214086",
+        "SizeBytes": 479,
+        "StreamViewType": "OLD_IMAGES"
+      },
+      "eventSourceARN": "arn:aws:dynamodb:eu-central-1:589075096383:table/pdf-generator-api-manual-deploy/stream/2024-03-09T12:39:45.735"
+    }
+  ]
 }

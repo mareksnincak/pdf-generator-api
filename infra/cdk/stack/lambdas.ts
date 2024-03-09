@@ -160,7 +160,6 @@ export function createLambdas({
     handler: 'deleteTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
-      S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.deleteTemplate),
     },
   });

@@ -29,7 +29,7 @@ export function createDynamoDbTable({
     },
     removalPolicy,
     timeToLiveAttribute: 'expiresAt',
-    stream: StreamViewType.NEW_AND_OLD_IMAGES,
+    stream: StreamViewType.OLD_IMAGE,
   });
 
   table.addGlobalSecondaryIndex({

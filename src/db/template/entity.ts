@@ -34,6 +34,8 @@ export class TemplateEntity extends BaseEntity {
     this.userId = userId;
   }
 
+  public static pkPrefix = 'TEMPLATE#';
+
   public id: string;
 
   public name: string;
