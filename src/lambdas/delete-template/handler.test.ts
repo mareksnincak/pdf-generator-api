@@ -5,7 +5,6 @@ import { TemplateEntityMockFactory } from '../../db/template/mock-factory';
 import * as templateRepository from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { NotFoundError } from '../../errors/not-found.error';
-import * as s3Helper from '../../helpers/s3.helper';
 import { mockLogger } from '../../helpers/test.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
@@ -28,7 +27,6 @@ afterEach(() => {
 
 describe('deleteTemplate', () => {
   it('should delete template', async () => {
-    jest.spyOn(s3Helper, 'deleteObject').mockImplementation();
     jest.spyOn(templateRepository, 'deleteByIdOrFail').mockResolvedValue(templateEntity);
 
     const pathParameters = requestMockFactory.create();

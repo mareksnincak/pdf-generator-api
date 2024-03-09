@@ -122,6 +122,17 @@ describe('deleteObjects', () => {
     });
   });
 
+  it("should skip delete if there aren't any keys", async () => {
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => ({}));
+
+    const bucket = 'sample-bucket';
+    const keys: string[] = [];
+
+    await deleteObjects({ bucket, keys });
+
+    expect(s3ClientSpy).not.toHaveBeenCalled();
+  });
+
   it('should throw error if there is some error in response', async () => {
     mockLogger();
     const bucket = 'sample-bucket';

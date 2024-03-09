@@ -1,8 +1,12 @@
 import { type RemovalPolicy } from 'aws-cdk-lib';
-import { AttributeType, ProjectionType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, ProjectionType, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { FilterCriteria, FilterRule, StartingPosition } from 'aws-cdk-lib/aws-lambda';
+import { DynamoEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
 import { type Construct } from 'constructs';
 
 import { DynamoIndex } from '../../../src/db/common/enums/dynamo.enum';
+
+import { type createLambdas } from './lambdas';
 
 export function createDynamoDbTable({
   scope,
@@ -25,6 +29,7 @@ export function createDynamoDbTable({
     },
     removalPolicy,
     timeToLiveAttribute: 'expiresAt',
+    stream: StreamViewType.OLD_IMAGE,
   });
 
   table.addGlobalSecondaryIndex({
@@ -41,4 +46,21 @@ export function createDynamoDbTable({
   });
 
   return table;
+}
+
+export function createDynamoDbEventSources({
+  dynamoDbTable,
+  lambdas,
+}: {
+  dynamoDbTable: Table;
+  lambdas: ReturnType<typeof createLambdas>;
+}) {
+  const itemRemovalEventSource = new DynamoEventSource(dynamoDbTable, {
+    startingPosition: StartingPosition.LATEST,
+    filters: [FilterCriteria.filter({ eventName: FilterRule.isEqual('REMOVE') })],
+    bisectBatchOnError: true,
+    retryAttempts: 10,
+  });
+
+  lambdas.deleteOrphanedS3Objects.addEventSource(itemRemovalEventSource);
 }

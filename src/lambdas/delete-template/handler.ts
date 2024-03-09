@@ -5,11 +5,9 @@ import type {
 } from 'aws-lambda';
 
 import * as templateRepository from '../../db/template/repository';
-import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
-import { deleteObject } from '../../helpers/s3.helper';
 import { validatePathParams } from '../../helpers/validation.helper';
 
 import { deleteTemplateRequestDto } from './dtos/request.dto';
@@ -27,10 +25,8 @@ export async function deleteTemplate(
 
     const { id } = validatedData;
 
-    const bucket = getEnvVariableOrFail('S3_BUCKET');
     const userId = getUserIdFromEventOrFail(event);
-    const deletedTemplate = await templateRepository.deleteByIdOrFail({ id, userId });
-    await deleteObject({ bucket, key: deletedTemplate.s3Key });
+    await templateRepository.deleteByIdOrFail({ id, userId });
 
     logger.info('deleteTemplate.success');
     return {

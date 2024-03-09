@@ -12,4 +12,5 @@ export enum Lambda {
   getDocumentBatchResult = 'get-document-batch-result',
   storeDocumentBatchResult = 'store-document-batch-result',
   deleteExpiredS3Objects = 'delete-expired-s3-objects',
+  deleteOrphanedS3Objects = 'delete-orphaned-s3-objects',
 }

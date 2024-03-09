@@ -39,6 +39,8 @@ export class DocumentBatchEntity extends BaseEntity {
     this.generatedDocuments = generatedDocuments;
   }
 
+  public static pkPrefix = 'DOCUMENT_BATCH#';
+
   public id: string;
 
   public userId: string;
@@ -57,7 +59,7 @@ export class DocumentBatchEntity extends BaseEntity {
     'generatedDocuments',
   ]);
 
-  async toDynamoItem(): Promise<Record<string, AttributeValue>> {
+  toDynamoItem(): Record<string, AttributeValue> {
     const item: StoredDocumentBatch = {
       ...this.primaryKey,
       id: this.id,

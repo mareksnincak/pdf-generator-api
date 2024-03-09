@@ -1,7 +1,5 @@
 import { randomUUID } from 'node:crypto';
 
-import { DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
-
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
@@ -36,8 +34,6 @@ afterEach(() => {
 
 describe('deleteTemplate', () => {
   it('should delete template', async () => {
-    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
-
     const id = randomUUID();
     const pathParameters = requestMockFactory.create({ id });
     const event = eventMockFactory.create({
@@ -62,13 +58,6 @@ describe('deleteTemplate', () => {
       userId,
     });
     expect(templateAfterDeletion).toEqual(null);
-
-    const s3ClientArgs = s3ClientSpy.mock.calls[0][0];
-    expect(s3ClientArgs).toBeInstanceOf(DeleteObjectCommand);
-    expect(s3ClientArgs.input).toEqual({
-      Bucket: 'pdf-generator-api-test',
-      Key: templateEntity.s3Key,
-    });
   });
 
   it('should return 404 when template does not exist', async () => {

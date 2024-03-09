@@ -27,7 +27,7 @@ export async function createOrFail(template: SetOptional<Template, 'id' | 'creat
     logger.info('templateRepository.createOrReplace');
 
     const templateEntity = new TemplateEntity(template);
-    const item = await templateEntity.toDynamoItem();
+    const item = templateEntity.toDynamoItem();
     const command = new PutItemCommand({
       TableName: getTableName(),
       Item: item,

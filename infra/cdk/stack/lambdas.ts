@@ -160,7 +160,6 @@ export function createLambdas({
     handler: 'deleteTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
-      S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.deleteTemplate),
     },
   });
@@ -268,6 +267,19 @@ export function createLambdas({
     },
   });
 
+  const deleteOrphanedS3Objects = new NodejsFunction(scope, Lambda.deleteOrphanedS3Objects, {
+    ...getCommonNodeJsFunctionProps({
+      lambda: Lambda.deleteOrphanedS3Objects,
+      cdkEnvVars,
+      retainStatefulResources,
+    }),
+    handler: 'deleteOrphanedS3Objects',
+    environment: {
+      S3_BUCKET: s3BucketName,
+      ...envVars.get(Lambda.deleteOrphanedS3Objects),
+    },
+  });
+
   return {
     getOpenApi,
     getUrlForTemplateUpload,
@@ -281,6 +293,7 @@ export function createLambdas({
     getDocumentBatchResult,
     storeDocumentBatchResult,
     deleteExpiredS3Objects,
+    deleteOrphanedS3Objects,
   };
 }
 

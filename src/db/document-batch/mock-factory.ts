@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
+import { type PartialDeep } from 'type-fest';
+
 import { addHoursToDate } from '../../helpers/date.helper';
 
 import { DocumentBatchEntity } from './entity';
@@ -27,12 +29,32 @@ export class DocumentBatchGeneratedDocumentMockFactory {
 }
 
 export class DocumentBatchEntityMockFactory {
-  create(overrides: Partial<DocumentBatchEntity> = {}): DocumentBatchEntity {
+  create(
+    overrides: PartialDeep<DocumentBatchEntity, { recurseIntoArrays: true }> = {},
+  ): DocumentBatchEntity {
+    const errorFactory = new DocumentBatchErrorMockFactory();
+    const generatedDocumentFactory = new DocumentBatchGeneratedDocumentMockFactory();
+
+    let errors: DocumentBatchError[] = [];
+    let generatedDocuments: DocumentBatchGeneratedDocument[] = [];
+
+    if (overrides.errors) {
+      errors = overrides.errors.map((override) => errorFactory.create(override));
+    }
+
+    if (overrides.generatedDocuments) {
+      generatedDocuments = overrides.generatedDocuments.map((override) =>
+        generatedDocumentFactory.create(override),
+      );
+    }
+
     return new DocumentBatchEntity({
       userId: randomUUID(),
       status: DocumentBatchStatus.inProgress,
       expiresAt: addHoursToDate(new Date(), 1),
       ...overrides,
+      errors,
+      generatedDocuments,
     });
   }
 }
