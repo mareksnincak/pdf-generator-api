@@ -6,7 +6,7 @@ import request from 'supertest';
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { type GetTemplatesResponseDto } from '../../../src/lambdas/get-templates/dtos/response.dto';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
-import { documentMockName } from '../../common/constants/document.constant';
+import { documentMockData } from '../../common/constants/document.constant';
 import { isSamePdfFile } from '../../common/helpers/pdf.helper';
 import { getE2eSetup } from '../helpers/setup.helper';
 
@@ -103,9 +103,7 @@ describe('PDF Generator', () => {
       .post('/documents/generate')
       .send({
         templateId,
-        data: {
-          name: documentMockName,
-        },
+        data: documentMockData,
       })
       .auth(accessToken, { type: 'bearer' })
       .expect(200);

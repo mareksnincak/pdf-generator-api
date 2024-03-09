@@ -49,7 +49,7 @@ describe('generateDocumentFromSfnEvent', () => {
 
     expect(result).toEqual({
       ref: input.ref,
-      s3Key: `${input.userId}/documents/${documentId}`,
+      s3Key: `${input.userId}/documents/${documentId}.pdf`,
       status: DocumentGenerationStatus.success,
     });
   });
