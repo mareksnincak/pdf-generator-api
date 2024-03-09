@@ -58,6 +58,8 @@ export function createDynamoDbEventSources({
   const itemRemovalEventSource = new DynamoEventSource(dynamoDbTable, {
     startingPosition: StartingPosition.LATEST,
     filters: [FilterCriteria.filter({ eventName: FilterRule.isEqual('REMOVE') })],
+    bisectBatchOnError: true,
+    retryAttempts: 10,
   });
 
   lambdas.deleteOrphanedS3Objects.addEventSource(itemRemovalEventSource);
