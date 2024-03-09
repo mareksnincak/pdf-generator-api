@@ -104,6 +104,7 @@ export function createLambdas({
     handler: 'getUrlForTemplateUpload',
     environment: {
       S3_BUCKET: s3BucketName,
+      DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
       ...envVars.get(Lambda.getUrlForTemplateUpload),
     },
   });

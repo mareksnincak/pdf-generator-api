@@ -11,27 +11,12 @@ import { handleApiError } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getPresignedShareUrl, putObject } from '../../helpers/s3.helper';
-import { sendSqsMessage } from '../../helpers/sqs.helper';
 import { validateBody } from '../../helpers/validation.helper';
+import { scheduleObjectDeletion } from '../delete-expired-s3-objects/helpers/schedule-deletion.helper';
 
 import { generateDocumentFromApiEventRequestDto } from './dtos/api-request.dto';
 import { type GenerateDocumentFromApiEventResponseDto } from './dtos/api-response.dto';
 import { generateDocument } from './services/document-generation.service';
-
-async function scheduleObjectDeletion({
-  key,
-  deleteInSeconds,
-}: {
-  key: string;
-  deleteInSeconds?: number;
-}) {
-  const queueUrl = getEnvVariableOrFail('DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL');
-  await sendSqsMessage({
-    queueUrl,
-    body: key,
-    delaySeconds: deleteInSeconds,
-  });
-}
 
 async function getShareableUrl({
   bucket,

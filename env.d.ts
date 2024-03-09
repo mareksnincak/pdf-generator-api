@@ -16,6 +16,7 @@ declare global {
       CHROMIUM_LOCAL_EXECUTABLE_PATH?: string;
       DYNAMODB_REGION?: string;
       DOCUMENT_BATCH_TTL_HOURS?: string;
+      DELETE_UPLOADED_OBJECT_IN_SECONDS?: string;
     };
   }
 }
