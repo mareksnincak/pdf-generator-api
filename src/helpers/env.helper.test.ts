@@ -24,7 +24,7 @@ describe('getEnvVariableOrFail', () => {
       expect(true).toEqual(false);
     } catch (error) {
       expect(error).toBeInstanceOf(Error);
-      expect((error as Error).message).toEqual('envHelper.getEnvVariableOrFail.missing');
+      expect((error as Error).message).toEqual('envHelper.getEnvVariableOrFail.missing.S3_BUCKET');
     }
   });
 });
