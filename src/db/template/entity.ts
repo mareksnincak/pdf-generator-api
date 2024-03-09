@@ -46,7 +46,7 @@ export class TemplateEntity extends BaseEntity {
 
   public userId: string;
 
-  async toDynamoItem(): Promise<Record<string, AttributeValue>> {
+  toDynamoItem(): Record<string, AttributeValue> {
     const item: StoredTemplate = {
       ...this.primaryKey,
       ...this.gsi1Key,

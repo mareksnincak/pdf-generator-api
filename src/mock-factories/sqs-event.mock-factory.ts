@@ -5,11 +5,11 @@ import { SqsRecordMockFactory } from './sqs-record.mock-factory';
 
 export class SqsEventMockFactory {
   create(overrides: PartialDeep<SQSEvent, { recurseIntoArrays: true }> = {}): SQSEvent {
-    let records: SQSRecord[] = [new SqsRecordMockFactory().create()];
+    const recordMockFactory = new SqsRecordMockFactory();
+
+    let records: SQSRecord[] = [recordMockFactory.create()];
     if (overrides.Records) {
-      records = overrides.Records.map((recordOverride) =>
-        new SqsRecordMockFactory().create(recordOverride),
-      );
+      records = overrides.Records.map((recordOverride) => recordMockFactory.create(recordOverride));
     }
 
     return {

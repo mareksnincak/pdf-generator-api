@@ -16,7 +16,7 @@ export async function create(
   logger.info('documentBatchRepository.create');
 
   const documentBatchEntity = new DocumentBatchEntity(documentBatch);
-  const item = await documentBatchEntity.toDynamoItem();
+  const item = documentBatchEntity.toDynamoItem();
   const command = new PutItemCommand({
     TableName: getTableName(),
     Item: item,
