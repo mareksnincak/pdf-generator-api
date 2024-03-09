@@ -27,7 +27,7 @@ afterEach(() => {
 });
 
 describe('startDocumentBatchGeneration', () => {
-  it('should start state machine execution', async () => {
+  it('should start document batch generation', async () => {
     const body = requestMockFactory.create();
     const event = eventMockFactory.create({
       body: JSON.stringify(body),
