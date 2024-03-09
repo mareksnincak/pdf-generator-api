@@ -28,27 +28,10 @@ export class DocumentBatchGeneratedDocumentMockFactory {
 
 export class DocumentBatchEntityMockFactory {
   create(overrides: Partial<DocumentBatchEntity> = {}): DocumentBatchEntity {
-    const errorMockFactory = new DocumentBatchErrorMockFactory();
-    const generatedDocumentMockFactory = new DocumentBatchGeneratedDocumentMockFactory();
-
-    let errors = [errorMockFactory.create()];
-    if (overrides.errors) {
-      errors = overrides.errors.map((override) => errorMockFactory.create(override));
-    }
-
-    let generatedDocuments = [generatedDocumentMockFactory.create()];
-    if (overrides.generatedDocuments) {
-      generatedDocuments = overrides.generatedDocuments.map((override) =>
-        generatedDocumentMockFactory.create(override),
-      );
-    }
-
     return new DocumentBatchEntity({
       userId: randomUUID(),
       status: DocumentBatchStatus.inProgress,
       expiresAt: addHoursToDate(new Date(), 1),
-      errors,
-      generatedDocuments,
       ...overrides,
     });
   }
