@@ -17,7 +17,7 @@
     "invoke:debug": "npm run invoke -- -d 9229",
     "it-infra:down": "docker compose -f ./infra/local/docker-compose-it.yml down --rmi \"local\" --volumes",
     "it-infra:up": "docker compose -f ./infra/local/docker-compose-it.yml up --wait -d --build --force-recreate",
-    "lint": "npx tsc --noEmit && npx sort-package-json --check && eslint --config ./.eslintrc.json .",
+    "lint": "npx tsc --noEmit && npx sort-package-json --check && prettier . --list-different && eslint --config ./.eslintrc.json .",
     "open-api:generate": "npx ts-node ./src/open-api/generate-open-api.script.ts",
     "sort-package-json": "npx sort-package-json",
     "start": "npm run synth && sam local start-api -t ./infra/cdk/cdk.out/pdf-generator-api-local.template.json",
@@ -80,7 +80,7 @@
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
     "type-fest": "^4.10.3",
-    "typescript": "^5.3.3",
+    "typescript": "~5.3.3",
     "wait-for-expect": "^3.0.2"
   }
 }
