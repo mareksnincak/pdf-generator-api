@@ -6,7 +6,7 @@ import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 
 import { createApi } from './api';
 import { createCognito } from './cognito';
-import { createDynamoDbTable } from './dynamo';
+import { createDynamoDbEventSources, createDynamoDbTable } from './dynamo';
 import { createKmsKey } from './kms';
 import { createLambdas, createStateMachineStartupLambdas } from './lambdas';
 import { createOutputs } from './outputs';
@@ -79,6 +79,11 @@ export class CdkStack extends Stack {
 
     createSqsEventSources({
       sqsQueues,
+      lambdas,
+    });
+
+    createDynamoDbEventSources({
+      dynamoDbTable,
       lambdas,
     });
 

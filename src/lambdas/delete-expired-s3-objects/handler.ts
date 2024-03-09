@@ -6,7 +6,7 @@ import { deleteObjects } from '../../helpers/s3.helper';
 
 export async function deleteExpiredS3Objects(event: SQSEvent, context: Context): Promise<void> {
   try {
-    setLoggerContext(event, context);
+    setLoggerContext({}, context);
     logger.info('deleteExpiredS3Objects.starting');
 
     const bucket = getEnvVariableOrFail('S3_BUCKET');

@@ -39,6 +39,7 @@ export function grantPermissions({
   s3Bucket.grantDelete(lambdas.deleteTemplate);
   s3Bucket.grantRead(lambdas.getTemplate);
   s3Bucket.grantDelete(lambdas.deleteExpiredS3Objects);
+  s3Bucket.grantDelete(lambdas.deleteOrphanedS3Objects);
   s3Bucket.grantReadWrite(lambdas.generateDocumentFromApiEvent);
   s3Bucket.grantReadWrite(lambdas.generateDocumentFromSfnEvent);
   s3Bucket.grantReadWrite(lambdas.getDocumentBatchResult);

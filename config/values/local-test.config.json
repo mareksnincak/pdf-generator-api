@@ -73,6 +73,9 @@
     },
     "delete-expired-s3-objects": {
       "S3_BUCKET": "pdf-generator-api-test"
+    },
+    "delete-orphaned-s3-objects": {
+      "S3_BUCKET": "pdf-generator-api-test"
     }
   }
 }
