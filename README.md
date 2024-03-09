@@ -2,12 +2,23 @@
 
 API for generating dynamic PDF documents.
 
+- [API documentation](#api-documentation)
 - [How to run](#how-to-run)
 - [How to test](#how-to-test)
   - [Unit tests](#unit-tests)
   - [Integration tests](#integration-tests)
   - [E2e tests](#e2e-tests)
   - [Running single test only](#running-single-test-only)
+
+## API documentation
+
+OpenAPI documentation is available on root (`/`) url.
+
+It is also possible to generate OpenAPI document manually:
+
+```bash
+npm run open-api:generate
+```
 
 ## How to run
 
