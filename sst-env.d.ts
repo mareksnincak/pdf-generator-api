@@ -14,6 +14,22 @@ declare module "sst" {
       "name": string
       "type": "sst.aws.Bucket"
     }
+    "CreateTemplate": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "DeleteExpiredS3Objects": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "DeleteOrphanedS3Objects": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "DeleteTemplate": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "DynamoDb": {
       "name": string
       "type": "sst.aws.Dynamo"
@@ -22,7 +38,39 @@ declare module "sst" {
       "type": "sst.aws.Queue"
       "url": string
     }
+    "GenerateDocumentFromApiEvent": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "GenerateDocumentFromSfnEvent": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "GetDocumentBatchResult": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
     "GetOpenApi": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "GetTemplate": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "GetTemplates": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "GetUrlForTemplateUpload": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "SetDefaultUserPassword": {
+      "name": string
+      "type": "sst.aws.Function"
+    }
+    "StoreDocumentBatchResult": {
       "name": string
       "type": "sst.aws.Function"
     }
