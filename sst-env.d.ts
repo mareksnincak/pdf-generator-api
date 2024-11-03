@@ -6,9 +6,5 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
-    "pdf-generator-api-local": {
-      "name": string
-      "type": "sst.aws.Dynamo"
-    }
   }
 }
