@@ -9,3 +9,6 @@ config/values/local.config.json
 events/*
 !events/*.example.json
 infra/cdk/cdk.output.json
+
+# sst
+.sst

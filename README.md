@@ -22,6 +22,13 @@ npm run open-api:generate
 
 ## How to run
 
+### Prerequisites
+
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) with [authentication setup](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html)
+- [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)
+
+### Steps to run
+
 1. install dependencies
    ```bash
    npm i
@@ -32,9 +39,14 @@ npm run open-api:generate
    cp config/values/local.config.example.json config/values/local.config.json
    # update values in config/values/local.config.json
    ```
+1. export aws profile name to AWS_PROFILE env variable:
+   ```bash
+   export AWS_PROFILE=<PROFILE_NAME>
+   # export AWS_PROFILE=dev
+   ```
 1. expose AWS credentials in CLI:
    ```bash
-   aws-vault exec dev
+   aws sso login --sso-session $AWS_PROFILE
    ```
 1. run infrastructure
    ```bash
