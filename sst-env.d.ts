@@ -6,6 +6,10 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
+    "Api": {
+      "type": "sst.aws.ApiGatewayV2"
+      "url": string
+    }
     "Bucket": {
       "name": string
       "type": "sst.aws.Bucket"
@@ -17,6 +21,10 @@ declare module "sst" {
     "ExpiredS3Objects": {
       "type": "sst.aws.Queue"
       "url": string
+    }
+    "GetOpenApi": {
+      "name": string
+      "type": "sst.aws.Function"
     }
   }
 }
