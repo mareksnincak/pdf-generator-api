@@ -10,9 +10,15 @@ export default $config({
   },
   async run() {
     const { dynamoDbTable } = await import('./infra/sst/dynamo');
+    const { s3Bucket } = await import('./infra/sst/s3');
+    const { kmsKey } = await import('./infra/sst/kms');
+    const { expiredS3ObjectsQueue } = await import('./infra/sst/sqs');
 
     return {
       tableName: dynamoDbTable.name,
+      s3BucketName: s3Bucket.name,
+      kmsKeyArn: kmsKey.arn,
+      expiredS3ObjectsQueueArn: expiredS3ObjectsQueue.arn,
     };
   },
 });

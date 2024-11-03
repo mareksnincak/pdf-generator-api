@@ -1,6 +1,6 @@
 import { DynamoIndex } from '../../src/db/common/enums/dynamo.enum';
 
-export const dynamoDbTable = new sst.aws.Dynamo('PDF generator', {
+export const dynamoDbTable = new sst.aws.Dynamo('DynamoDb', {
   fields: {
     PK: 'string',
     SK: 'string',

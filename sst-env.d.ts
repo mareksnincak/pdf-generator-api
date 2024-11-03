@@ -6,5 +6,17 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
+    "Bucket": {
+      "name": string
+      "type": "sst.aws.Bucket"
+    }
+    "DynamoDb": {
+      "name": string
+      "type": "sst.aws.Dynamo"
+    }
+    "ExpiredS3Objects": {
+      "type": "sst.aws.Queue"
+      "url": string
+    }
   }
 }
