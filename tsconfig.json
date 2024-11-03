@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "moduleResolution": "Bundler",
-    "module": "ESNext",
     "target": "ESNext",
     "strict": true,
     "noEmit": true,
