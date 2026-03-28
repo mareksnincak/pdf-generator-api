@@ -19,6 +19,7 @@
     "it-infra:up": "docker compose -f ./infra/local/docker-compose-it.yml up --wait -d --build --force-recreate",
     "lint": "npx tsc --noEmit && npx sort-package-json --check && prettier . --list-different && eslint --config ./.eslintrc.json .",
     "open-api:generate": "npx tsx ./src/open-api/generate-open-api.script.ts",
+    "prepare": "husky",
     "sort-package-json": "npx sort-package-json",
     "start": "npm run synth && sam local start-api -t ./infra/cdk/cdk.out/pdf-generator-api-local.template.json",
     "start:debug": "FORCE_STATIC_HASH=true concurrently --kill-others \"npm run synth:watch\" \"npm run start -- -d 9229\"",
@@ -28,8 +29,7 @@
     "synth:watch": "chokidar src/** package-lock.json config/values/local.config.json -c 'npm run synth'",
     "test": "jest --config ./.jest/jest.unit.config.ts",
     "test:e2e": "jest --config ./.jest/jest.e2e.config.ts",
-    "test:it": "npm run it-infra:up && jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down",
-    "prepare": "husky"
+    "test:it": "npm run it-infra:up && jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^6.4.0",

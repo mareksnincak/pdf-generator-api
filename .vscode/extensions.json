@@ -3,6 +3,7 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "streetsidesoftware.code-spell-checker",
-    "firsttris.vscode-jest-runner"
+    "firsttris.vscode-jest-runner",
+    "github.vscode-github-actions"
   ]
 }
