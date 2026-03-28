@@ -2,9 +2,12 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "cSpell.words": [
+    "aaronshaf",
     "asteasolutions",
     "Ciphertext",
     "dtos",
+    "dynamodblocal",
+    "healthcheck",
     "linebreak",
     "metafile",
     "numpages",
