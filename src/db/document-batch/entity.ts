@@ -51,7 +51,7 @@ export class DocumentBatchEntity extends BaseEntity {
 
   public generatedDocuments: DocumentBatchGeneratedDocument[];
 
-  public declare expiresAt: Date;
+  declare public expiresAt: Date;
 
   public static updatableFields: Set<string> = new Set<keyof DocumentBatch>([
     'status',
