@@ -1,6 +1,6 @@
 import { join } from 'node:path';
 
-import { Duration } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import { type Key } from 'aws-cdk-lib/aws-kms';
 import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
@@ -9,7 +9,7 @@ import {
   NodejsFunction,
   type NodejsFunctionProps,
 } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { type Construct } from 'constructs';
 
 import { getEnvVars } from '../../../config/helpers/config.helper';
@@ -24,6 +24,7 @@ function getLambdaEntryPath(lambdaDirName: Lambda | string, handlerFilename = 'h
 }
 
 function getCommonNodeJsFunctionProps({
+  scope,
   lambda,
   cdkEnvVars,
   retainStatefulResources,
@@ -33,6 +34,7 @@ function getCommonNodeJsFunctionProps({
   handlerFilename,
   lambdaDirName,
 }: {
+  scope: Construct;
   lambda: Lambda;
   cdkEnvVars: CdkEnvVarsDto;
   retainStatefulResources: boolean;
@@ -42,6 +44,11 @@ function getCommonNodeJsFunctionProps({
   handlerFilename?: string;
   lambdaDirName?: string;
 }) {
+  const logGroup = new LogGroup(scope, `${lambda}-log-group`, {
+    retention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
+    removalPolicy: RemovalPolicy.DESTROY, // This matches Lambda's default for auto-created log groups
+  });
+
   return {
     runtime: Runtime.NODEJS_24_X,
     architecture,
@@ -55,7 +62,7 @@ function getCommonNodeJsFunctionProps({
       assetHash: cdkEnvVars.FORCE_STATIC_HASH ? lambda : undefined,
       ...bundlingOptions,
     },
-    logRetention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
+    logGroup,
     timeout: Duration.seconds(30),
     memorySize,
   } satisfies NodejsFunctionProps;
@@ -84,6 +91,7 @@ export function createLambdas({
 
   const getOpenApi = new NodejsFunction(scope, Lambda.getOpenApi, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.getOpenApi,
       cdkEnvVars,
       retainStatefulResources,
@@ -97,6 +105,7 @@ export function createLambdas({
 
   const getUrlForTemplateUpload = new NodejsFunction(scope, Lambda.getUrlForTemplateUpload, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.getUrlForTemplateUpload,
       cdkEnvVars,
       retainStatefulResources,
@@ -111,6 +120,7 @@ export function createLambdas({
 
   const createTemplate = new NodejsFunction(scope, Lambda.createTemplate, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.createTemplate,
       cdkEnvVars,
       retainStatefulResources,
@@ -125,6 +135,7 @@ export function createLambdas({
 
   const getTemplate = new NodejsFunction(scope, Lambda.getTemplate, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.getTemplate,
       cdkEnvVars,
       retainStatefulResources,
@@ -139,6 +150,7 @@ export function createLambdas({
 
   const getTemplates = new NodejsFunction(scope, Lambda.getTemplates, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.getTemplates,
       cdkEnvVars,
       retainStatefulResources,
@@ -153,6 +165,7 @@ export function createLambdas({
 
   const deleteTemplate = new NodejsFunction(scope, Lambda.deleteTemplate, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.deleteTemplate,
       cdkEnvVars,
       retainStatefulResources,
@@ -166,6 +179,7 @@ export function createLambdas({
 
   const setDefaultUserPassword = new NodejsFunction(scope, Lambda.setDefaultUserPassword, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.setDefaultUserPassword,
       cdkEnvVars,
       retainStatefulResources,
@@ -181,6 +195,7 @@ export function createLambdas({
     Lambda.generateDocumentFromApiEvent,
     {
       ...getCommonNodeJsFunctionProps({
+        scope,
         lambda: Lambda.generateDocumentFromApiEvent,
         cdkEnvVars,
         retainStatefulResources,
@@ -207,6 +222,7 @@ export function createLambdas({
     Lambda.generateDocumentFromSfnEvent,
     {
       ...getCommonNodeJsFunctionProps({
+        scope,
         lambda: Lambda.generateDocumentFromSfnEvent,
         cdkEnvVars,
         retainStatefulResources,
@@ -229,6 +245,7 @@ export function createLambdas({
 
   const getDocumentBatchResult = new NodejsFunction(scope, Lambda.getDocumentBatchResult, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.getDocumentBatchResult,
       cdkEnvVars,
       retainStatefulResources,
@@ -243,6 +260,7 @@ export function createLambdas({
 
   const storeDocumentBatchResult = new NodejsFunction(scope, Lambda.storeDocumentBatchResult, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.storeDocumentBatchResult,
       cdkEnvVars,
       retainStatefulResources,
@@ -256,6 +274,7 @@ export function createLambdas({
 
   const deleteExpiredS3Objects = new NodejsFunction(scope, Lambda.deleteExpiredS3Objects, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.deleteExpiredS3Objects,
       cdkEnvVars,
       retainStatefulResources,
@@ -269,6 +288,7 @@ export function createLambdas({
 
   const deleteOrphanedS3Objects = new NodejsFunction(scope, Lambda.deleteOrphanedS3Objects, {
     ...getCommonNodeJsFunctionProps({
+      scope,
       lambda: Lambda.deleteOrphanedS3Objects,
       cdkEnvVars,
       retainStatefulResources,
@@ -322,6 +342,7 @@ export function createStateMachineStartupLambdas({
     Lambda.startDocumentBatchGeneration,
     {
       ...getCommonNodeJsFunctionProps({
+        scope,
         lambda: Lambda.startDocumentBatchGeneration,
         cdkEnvVars,
         retainStatefulResources,
