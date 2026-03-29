@@ -13,20 +13,20 @@ export function getSfnClient() {
 }
 
 export async function startExecution({
-  stateMachineArn,
-  name,
   input,
+  name,
+  stateMachineArn,
 }: {
-  stateMachineArn: string;
-  name: string;
   input: Record<string, unknown>;
+  name: string;
+  stateMachineArn: string;
 }) {
-  logger.info({ stateMachineArn, name }, 'stateMachineHelper.startExecution');
+  logger.info({ name, stateMachineArn }, 'stateMachineHelper.startExecution');
 
   const command = new StartExecutionCommand({
-    stateMachineArn,
-    name,
     input: JSON.stringify(input),
+    name,
+    stateMachineArn,
   });
 
   const result = await getSfnClient().send(command);

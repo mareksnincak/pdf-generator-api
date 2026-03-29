@@ -1,4 +1,4 @@
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 
 import { logger } from './logger.helper';
 
@@ -14,17 +14,17 @@ export function getSqsClient() {
 
 export async function sendSqsMessage(params: {
   body: string;
-  queueUrl: string;
   delaySeconds?: number;
+  queueUrl: string;
 }) {
   logger.info(params, 'sqsHelper.sendMessage');
-  const { body, queueUrl, delaySeconds } = params;
+  const { body, delaySeconds, queueUrl } = params;
 
   await getSqsClient().send(
     new SendMessageCommand({
+      DelaySeconds: delaySeconds,
       MessageBody: body,
       QueueUrl: queueUrl,
-      DelaySeconds: delaySeconds,
     }),
   );
 

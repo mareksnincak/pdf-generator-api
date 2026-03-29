@@ -12,25 +12,25 @@ import { type PrimaryKey } from '../common/types/entity.type';
 
 import { type DocumentBatchStatus } from './enum';
 import {
-  type DocumentBatchError,
   type DocumentBatch,
-  type StoredDocumentBatch,
+  type DocumentBatchError,
   type DocumentBatchGeneratedDocument,
+  type StoredDocumentBatch,
 } from './type';
 
 export class DocumentBatchEntity extends BaseEntity {
   constructor({
-    id = randomUUID(),
-    userId,
-    status,
-    errors = [],
-    generatedDocuments = [],
     createdAt = new Date(),
+    errors = [],
     expiresAt,
-  }: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments' | 'createdAt'>) {
+    generatedDocuments = [],
+    id = randomUUID(),
+    status,
+    userId,
+  }: SetOptional<DocumentBatch, 'createdAt' | 'errors' | 'generatedDocuments' | 'id'>) {
     const primaryKey = DocumentBatchEntity.getPrimaryKey({ id, userId });
 
-    super({ primaryKey, createdAt, expiresAt });
+    super({ createdAt, expiresAt, primaryKey });
 
     this.id = id;
     this.userId = userId;
@@ -54,21 +54,21 @@ export class DocumentBatchEntity extends BaseEntity {
   declare public expiresAt: Date;
 
   public static updatableFields: Set<string> = new Set<keyof DocumentBatch>([
-    'status',
     'errors',
     'generatedDocuments',
+    'status',
   ]);
 
   toDynamoItem(): Record<string, AttributeValue> {
     const item: StoredDocumentBatch = {
       ...this.primaryKey,
-      id: this.id,
-      userId: this.userId,
-      status: this.status,
-      errors: this.errors,
-      generatedDocuments: this.generatedDocuments,
       createdAt: toUnixTimestamp(this.createdAt),
+      errors: this.errors,
       expiresAt: toUnixTimestamp(this.expiresAt),
+      generatedDocuments: this.generatedDocuments,
+      id: this.id,
+      status: this.status,
+      userId: this.userId,
     };
 
     const result = marshall(item, {
@@ -107,8 +107,8 @@ export class DocumentBatchEntity extends BaseEntity {
       this.generatedDocuments.map(async ({ ref, s3Key }) => {
         const url = await getPresignedShareUrl({
           bucket,
-          key: s3Key,
           expiresInSeconds: urlExpirationSeconds,
+          key: s3Key,
         });
 
         return {
@@ -119,10 +119,10 @@ export class DocumentBatchEntity extends BaseEntity {
     );
 
     return {
-      id: this.id,
-      status: this.status,
       errors: this.errors,
       generatedDocuments,
+      id: this.id,
+      status: this.status,
     };
   }
 }

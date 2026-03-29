@@ -15,28 +15,28 @@ import { DocumentBatchStatus } from '../../../src/db/document-batch/enum';
 import { type createLambdas } from './lambdas';
 
 function createDocumentBatchGenerationStateMachine({
-  scope,
   lambdas,
+  scope,
 }: {
-  scope: Construct;
   lambdas: ReturnType<typeof createLambdas>;
+  scope: Construct;
 }) {
   const generateDocumentsTask = new SfnMap(scope, 'Generate documents', {
-    itemsPath: JsonPath.stringAt('$.requestData.documents'),
     itemSelector: {
-      userId: JsonPath.stringAt('$.userId'),
       document: JsonPath.stringAt('$$.Map.Item.Value'),
+      userId: JsonPath.stringAt('$.userId'),
     },
+    itemsPath: JsonPath.stringAt('$.requestData.documents'),
     resultPath: JsonPath.stringAt('$.generateDocumentsResult'),
   });
 
   const generateDocumentTask = new LambdaInvoke(scope, 'Generate document', {
     lambdaFunction: lambdas.generateDocumentFromSfnEvent,
     payload: TaskInput.fromObject({
-      userId: JsonPath.stringAt('$.userId'),
+      data: JsonPath.stringAt('$.document.data'),
       ref: JsonPath.stringAt('$.document.ref'),
       templateId: JsonPath.stringAt('$.document.templateId'),
-      data: JsonPath.stringAt('$.document.data'),
+      userId: JsonPath.stringAt('$.userId'),
     }),
     resultSelector: {
       payload: JsonPath.stringAt('$.Payload'),
@@ -49,9 +49,9 @@ function createDocumentBatchGenerationStateMachine({
     lambdaFunction: lambdas.storeDocumentBatchResult,
     payload: TaskInput.fromObject({
       id: JsonPath.stringAt('$$.Execution.Name'),
-      userId: JsonPath.stringAt('$.userId'),
-      status: DocumentBatchStatus.completed,
       results: JsonPath.stringAt('$.generateDocumentsResult[*].payload'),
+      status: DocumentBatchStatus.completed,
+      userId: JsonPath.stringAt('$.userId'),
     }),
   });
 
@@ -59,8 +59,8 @@ function createDocumentBatchGenerationStateMachine({
     lambdaFunction: lambdas.storeDocumentBatchResult,
     payload: TaskInput.fromObject({
       id: JsonPath.stringAt('$$.Execution.Name'),
-      userId: JsonPath.stringAt('$.userId'),
       status: DocumentBatchStatus.failure,
+      userId: JsonPath.stringAt('$.userId'),
     }),
   });
 
@@ -79,15 +79,15 @@ function createDocumentBatchGenerationStateMachine({
 }
 
 export function createStateMachines({
-  scope,
   lambdas,
+  scope,
 }: {
-  scope: Construct;
   lambdas: ReturnType<typeof createLambdas>;
+  scope: Construct;
 }) {
   const documentBatchGeneration = createDocumentBatchGenerationStateMachine({
-    scope,
     lambdas,
+    scope,
   });
 
   return { documentBatchGeneration };

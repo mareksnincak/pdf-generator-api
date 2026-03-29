@@ -66,10 +66,10 @@ describe('getDocumentBatchResult', () => {
     const error = errorMockFactory.create();
     const generatedDocument = generatedDocumentMockFactory.create();
     const documentBatchEntity = documentBatchEntityMockFactory.create({
-      id,
-      userId,
       errors: [error],
       generatedDocuments: [generatedDocument],
+      id,
+      userId,
     });
 
     await documentBatchRepository.create(documentBatchEntity);

@@ -6,30 +6,30 @@ import { getDocumentBatchResultRequestDto } from '../dtos/request.dto';
 import { getDocumentBatchResultResponseDto } from '../dtos/response.dto';
 
 export const getDocumentBatchResultRoute: RouteConfig = {
+  description: 'Get document batch result.',
   method: 'get',
   path: '/documents/batch/{id}',
-  tags: ['documents'],
-  summary: 'Get document batch result',
-  description: 'Get document batch result.',
   request: {
     params: getDocumentBatchResultRequestDto,
   },
   responses: {
     200: {
-      description: 'Success.',
       content: {
         'application/json': {
           schema: getDocumentBatchResultResponseDto,
         },
       },
+      description: 'Success.',
     },
     400: {
-      description: ErrorMessage.validationError,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.validationError,
     },
   },
+  summary: 'Get document batch result',
+  tags: ['documents'],
 };

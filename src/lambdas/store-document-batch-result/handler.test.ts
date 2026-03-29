@@ -74,8 +74,8 @@ describe('storeDocumentBatchResult', () => {
       {
         errors: [
           {
-            ref: errorResult.ref,
             message: errorResult.message,
+            ref: errorResult.ref,
           },
         ],
         generatedDocuments: [
@@ -95,8 +95,8 @@ describe('storeDocumentBatchResult', () => {
     const updateByIdSpy = jest.spyOn(documentBatchRepository, 'updateById').mockResolvedValue();
 
     const input = inputMockFactory.create({
-      status: DocumentBatchStatus.failure,
       results: undefined,
+      status: DocumentBatchStatus.failure,
     });
 
     await storeDocumentBatchResult(input, context);

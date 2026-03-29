@@ -17,19 +17,19 @@ import { createTemplateE2e, deleteTemplateE2e } from './shared.e2e';
 let baseUrl: string;
 let accessToken: string;
 
-let templateId: string | null = null;
+let templateId: null | string = null;
 
 beforeAll(async () => {
   const e2eSetup = await getE2eSetup();
   baseUrl = e2eSetup.baseUrl;
   accessToken = e2eSetup.accessToken;
 
-  templateId = await createTemplateE2e({ baseUrl, accessToken });
+  templateId = await createTemplateE2e({ accessToken, baseUrl });
 });
 
 afterAll(async () => {
   if (templateId) {
-    await deleteTemplateE2e({ baseUrl, accessToken, templateId });
+    await deleteTemplateE2e({ accessToken, baseUrl, templateId });
   }
 });
 
@@ -42,8 +42,8 @@ describe('Documents', () => {
     const { body: generateDocumentResponse } = await request(baseUrl)
       .post('/documents/generate')
       .send({
-        templateId,
         data: documentMockData,
+        templateId,
       })
       .auth(accessToken, { type: 'bearer' })
       .expect(200);
@@ -70,14 +70,14 @@ describe('Documents', () => {
       .send({
         documents: [
           {
+            data: documentMockData,
             ref: successRef,
             templateId,
-            data: documentMockData,
           },
           {
+            data: documentMockData,
             ref: errorRef,
             templateId: 'nonExistentTemplateId',
-            data: documentMockData,
           },
         ],
       })

@@ -7,15 +7,15 @@ import { type OpenApiParamsSsmParam } from '../../../src/lambdas/get-open-api/ty
 import { type createCognito } from './cognito';
 
 export function createStringParameters({
-  scope,
   api,
-  openApiParamsSsmParamName,
   cognito,
+  openApiParamsSsmParamName,
+  scope,
 }: {
-  scope: Construct;
   api: RestApi;
-  openApiParamsSsmParamName: string;
   cognito: ReturnType<typeof createCognito>;
+  openApiParamsSsmParamName: string;
+  scope: Construct;
 }) {
   const openApiParams: OpenApiParamsSsmParam = {
     apiUrl: api.url,

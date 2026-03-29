@@ -7,10 +7,10 @@ export class GenerateDocumentFromApiEventRequestMockFactory {
     overrides: Partial<GenerateDocumentFromApiEventRequestDto> = {},
   ): GenerateDocumentFromApiEventRequestDto {
     return {
-      templateId: randomUUID(),
       data: {
         name: randomBytes(8).toString('hex'),
       },
+      templateId: randomUUID(),
       ...overrides,
     };
   }

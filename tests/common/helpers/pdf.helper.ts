@@ -13,7 +13,7 @@ async function parsePdf(buffer: Uint8Array) {
 
   await parser.destroy();
 
-  return { text, numberOfPages: total };
+  return { numberOfPages: total, text };
 }
 
 export async function isSamePdfFile(file1: Uint8Array, file2: Uint8Array) {

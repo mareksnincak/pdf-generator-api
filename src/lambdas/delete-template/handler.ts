@@ -30,8 +30,8 @@ export async function deleteTemplate(
 
     logger.info('deleteTemplate.success');
     return {
-      statusCode: 204,
       body: '',
+      statusCode: 204,
     };
   } catch (error) {
     return handleApiError({ error, logPrefix: 'deleteTemplate' });

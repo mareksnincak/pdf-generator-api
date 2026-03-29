@@ -7,15 +7,11 @@ import { batchIdDto } from '../../../dtos/batch-id.dto';
 extendZodWithOpenApi(z);
 
 export const getDocumentBatchResultResponseDto = z.object({
-  id: batchIdDto.shape.id,
-  status: z.enum(DocumentBatchStatus).openapi({
-    description: 'Status.',
-  }),
   errors: z
     .array(
       z.object({
-        ref: z.string().nullable().openapi({ description: 'Document reference.' }),
         message: z.string().openapi({ description: 'Error message.' }),
+        ref: z.string().nullable().openapi({ description: 'Document reference.' }),
       }),
     )
     .openapi({
@@ -34,6 +30,10 @@ export const getDocumentBatchResultResponseDto = z.object({
     .openapi({
       description: 'Successfully generated documents.',
     }),
+  id: batchIdDto.shape.id,
+  status: z.enum(DocumentBatchStatus).openapi({
+    description: 'Status.',
+  }),
 });
 
 export type GetDocumentBatchResultResponseDto = z.infer<typeof getDocumentBatchResultResponseDto>;

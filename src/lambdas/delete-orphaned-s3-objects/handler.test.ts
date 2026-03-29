@@ -36,13 +36,13 @@ describe('deleteOrphanedS3Objects', () => {
     const event = eventMockFactory.create({
       Records: [
         {
-          eventName: 'REMOVE',
           dynamodb: {
             Keys: {
               PK: item.PK,
             },
             OldImage: item,
           },
+          eventName: 'REMOVE',
         },
       ],
     });
@@ -68,13 +68,13 @@ describe('deleteOrphanedS3Objects', () => {
     const event = eventMockFactory.create({
       Records: [
         {
-          eventName: 'REMOVE',
           dynamodb: {
             Keys: {
               PK: item.PK,
             },
             OldImage: item,
           },
+          eventName: 'REMOVE',
         },
       ],
     });

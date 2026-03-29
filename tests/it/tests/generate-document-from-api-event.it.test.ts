@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 
 import { EnvironmentName } from '../../../config/enums/config.enum';
@@ -72,8 +72,8 @@ describe('generateDocument', () => {
 
     const templateId = randomUUID();
     const body = requestMockFactory.create({
-      templateId,
       data: documentMockData,
+      templateId,
     });
 
     const event = eventMockFactory.create({
@@ -108,9 +108,9 @@ describe('generateDocument', () => {
     const s3PutObjectArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3PutObjectArgs).toBeInstanceOf(PutObjectCommand);
     expect(s3PutObjectArgs.input).toEqual({
+      Body: expect.any(Uint8Array),
       Bucket: expectedUploadBucket,
       Key: expectedUploadS3Key,
-      Body: expect.any(Uint8Array),
     });
 
     const generatedDocument = (s3PutObjectArgs as PutObjectCommand).input.Body as Buffer;
@@ -134,9 +134,9 @@ describe('generateDocument', () => {
     const sqsClientArgs = sqsClientSpy.mock.calls[0]?.[0];
     expect(sqsClientArgs).toBeInstanceOf(SendMessageCommand);
     expect(sqsClientArgs.input).toEqual({
+      DelaySeconds: 90,
       MessageBody: expectedUploadS3Key,
       QueueUrl: 'https://sqs.example.com/sample-delete-expired-s3-objects-queue',
-      DelaySeconds: 90,
     });
   });
 

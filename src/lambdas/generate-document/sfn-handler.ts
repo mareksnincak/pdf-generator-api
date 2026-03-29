@@ -13,8 +13,8 @@ import {
   type GenerateDocumentFromSfnEventInputDto,
 } from './dtos/sfn-input.dto';
 import {
-  type GenerateDocumentFromSfnEventOutputDto,
   type GenerateDocumentFromSfnEventErrorOutputDto,
+  type GenerateDocumentFromSfnEventOutputDto,
   type GenerateDocumentFromSfnEventSuccessOutputDto,
 } from './dtos/sfn-output.dto';
 import { DocumentGenerationStatus } from './enums/status.enum';
@@ -24,32 +24,32 @@ export async function generateDocumentFromSfnEvent(
   input: GenerateDocumentFromSfnEventInputDto,
   context: Context,
 ): Promise<GenerateDocumentFromSfnEventOutputDto> {
-  let documentRef: string | null = null;
+  let documentRef: null | string = null;
   try {
     setLoggerContext({}, context);
     logger.info('generateDocumentFromSfnEvent.input');
 
     const validatedData = validate(input, generateDocumentFromSfnEventInputDto);
     logger.info(validatedData, 'generateDocumentFromSfnEvent.validatedData');
-    const { templateId, data, userId, ref } = validatedData;
+    const { data, ref, templateId, userId } = validatedData;
     documentRef = ref;
 
     const bucket = getEnvVariableOrFail('S3_BUCKET');
 
-    const pdf = await generateDocument({ userId, templateId, data });
+    const pdf = await generateDocument({ data, templateId, userId });
 
     const documentId = randomUUID();
     const s3Key = `${userId}/documents/${documentId}.pdf`;
     await putObject({
       bucket,
-      key: s3Key,
       data: pdf,
+      key: s3Key,
     });
 
     const output: GenerateDocumentFromSfnEventSuccessOutputDto = {
-      status: DocumentGenerationStatus.success,
       ref,
       s3Key,
+      status: DocumentGenerationStatus.success,
     };
     logger.info(output, 'generateDocumentFromSfnEvent.successOutput');
     return output;
@@ -57,9 +57,9 @@ export async function generateDocumentFromSfnEvent(
     const { response } = handleError({ error, logPrefix: 'generateDocumentFromSfnEvent' });
 
     const output: GenerateDocumentFromSfnEventErrorOutputDto = {
-      status: DocumentGenerationStatus.error,
-      ref: documentRef,
       message: response.message,
+      ref: documentRef,
+      status: DocumentGenerationStatus.error,
     };
 
     logger.info(output, 'generateDocumentFromSfnEvent.errorOutput');

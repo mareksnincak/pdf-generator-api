@@ -18,13 +18,13 @@ async function renderHtmlTemplate(template: TemplateEntity, data: Record<string,
 }
 
 export async function generateDocument({
-  userId,
-  templateId,
   data,
+  templateId,
+  userId,
 }: {
-  userId: string;
-  templateId: string;
   data: Record<string, unknown>;
+  templateId: string;
+  userId: string;
 }) {
   const template = await templateRepository.getByIdOrFail({ id: templateId, userId });
 

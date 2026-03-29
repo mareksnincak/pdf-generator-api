@@ -1,3 +1,3 @@
 import { type Lambda } from '../../infra/cdk/enums/lambda.enum';
 
-export type EnvVars = Map<Lambda | 'global', Record<string, string>>;
+export type EnvVars = Map<'global' | Lambda, Record<string, string>>;

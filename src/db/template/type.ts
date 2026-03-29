@@ -3,12 +3,12 @@ import { type PrimaryKey } from '../common/types/entity.type';
 import { type TemplateType } from './enum';
 
 export type Template = {
+  createdAt: Date;
   id: string;
   name: string;
-  type: TemplateType;
   s3Key: string;
+  type: TemplateType;
   userId: string;
-  createdAt: Date;
 };
 
 export type StoredTemplate = PrimaryKey &

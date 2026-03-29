@@ -6,11 +6,9 @@ import { generateDocumentFromApiEventRequestDto } from '../dtos/api-request.dto'
 import { generateDocumentFromApiEventResponseDto } from '../dtos/api-response.dto';
 
 export const generateDocumentRoute: RouteConfig = {
+  description: 'Generate document.',
   method: 'post',
   path: '/documents/generate',
-  tags: ['documents'],
-  summary: 'Generate document',
-  description: 'Generate document.',
   request: {
     body: {
       content: {
@@ -22,28 +20,30 @@ export const generateDocumentRoute: RouteConfig = {
   },
   responses: {
     200: {
-      description: 'Success.',
       content: {
         'application/json': {
           schema: generateDocumentFromApiEventResponseDto,
         },
       },
+      description: 'Success.',
     },
     400: {
-      description: ErrorMessage.validationError,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.validationError,
     },
     404: {
-      description: ErrorMessage.templateNotFound,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.templateNotFound,
     },
   },
+  summary: 'Generate document',
+  tags: ['documents'],
 };

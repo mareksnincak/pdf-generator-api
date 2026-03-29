@@ -1,4 +1,4 @@
-import { OpenAPIRegistry, OpenApiGeneratorV3 } from '@asteasolutions/zod-to-openapi';
+import { OpenApiGeneratorV3, OpenAPIRegistry } from '@asteasolutions/zod-to-openapi';
 
 import { customOAuthScopes } from '../../infra/cdk/enums/authorization.enum';
 import * as packageJson from '../../package.json';
@@ -35,30 +35,30 @@ export function generateOpenApi({
   }
 
   const oAuth2Auth = registry.registerComponent('securitySchemes', 'oauth2Auth', {
-    type: 'oauth2',
     flows: {
       implicit: {
         authorizationUrl: authUrl,
         scopes: oAuth2AuthScopes,
       },
     },
+    type: 'oauth2',
   });
 
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
   const openApiDocument = generator.generateDocument({
-    openapi: '3.0.0',
     info: {
-      version: packageJson.version,
-      title: 'PDF generator API',
       description: packageJson.description,
+      title: 'PDF generator API',
+      version: packageJson.version,
     },
-    servers: [{ url: apiUrl }],
+    openapi: '3.0.0',
     security: [
       {
         [oAuth2Auth.name]: Object.keys(oAuth2AuthScopes),
       },
     ],
+    servers: [{ url: apiUrl }],
   });
 
   return openApiDocument;

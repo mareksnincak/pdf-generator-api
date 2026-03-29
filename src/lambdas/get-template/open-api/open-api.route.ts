@@ -6,38 +6,38 @@ import { httpErrorDto } from '../../../errors/dtos/http-error.dto';
 import { getTemplateResponseDto } from '../dtos/response.dto';
 
 export const getTemplateRoute: RouteConfig = {
+  description: 'Get template.',
   method: 'get',
   path: '/templates/{id}',
-  tags: ['templates'],
-  summary: 'Get template',
-  description: 'Get template.',
   request: {
     params: templateIdDto,
   },
   responses: {
     200: {
-      description: 'Success.',
       content: {
         'application/json': {
           schema: getTemplateResponseDto,
         },
       },
+      description: 'Success.',
     },
     400: {
-      description: ErrorMessage.validationError,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.validationError,
     },
     404: {
-      description: ErrorMessage.templateNotFound,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.templateNotFound,
     },
   },
+  summary: 'Get template',
+  tags: ['templates'],
 };

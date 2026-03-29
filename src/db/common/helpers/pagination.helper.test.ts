@@ -24,8 +24,8 @@ describe('encryptPaginationToken', () => {
     const paginationToken = { PK: { S: 'sample-pk' } };
 
     const result = await encryptPaginationToken({
-      userId,
       paginationToken,
+      userId,
     });
 
     expect(Buffer.from(result ?? '', 'base64url').toString()).toEqual(encryptedValue);
@@ -36,8 +36,8 @@ describe('encryptPaginationToken', () => {
     const paginationToken = undefined;
 
     const result = await encryptPaginationToken({
-      userId,
       paginationToken,
+      userId,
     });
 
     expect(result).toEqual(undefined);
@@ -51,11 +51,11 @@ describe('decryptPaginationToken', () => {
 
     jest
       .spyOn(kmsHelper, 'decrypt')
-      .mockResolvedValue(Buffer.from(JSON.stringify({ userId, token: { PK: 'sample-pk' } })));
+      .mockResolvedValue(Buffer.from(JSON.stringify({ token: { PK: 'sample-pk' }, userId })));
 
     const result = await decryptPaginationToken({
-      userId,
       paginationToken,
+      userId,
     });
 
     expect(result).toEqual({ PK: { S: 'sample-pk' } });
@@ -66,8 +66,8 @@ describe('decryptPaginationToken', () => {
     const paginationToken = undefined;
 
     const result = await decryptPaginationToken({
-      userId,
       paginationToken,
+      userId,
     });
 
     expect(result).toEqual(undefined);
@@ -83,7 +83,7 @@ describe('decryptPaginationToken', () => {
       .mockRejectedValue(new Error('commonDb.paginationHelperTest.expectedError'));
 
     try {
-      await decryptPaginationToken({ userId, paginationToken });
+      await decryptPaginationToken({ paginationToken, userId });
       expect(true).toEqual(false);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestError);
@@ -99,11 +99,11 @@ describe('decryptPaginationToken', () => {
     jest
       .spyOn(kmsHelper, 'decrypt')
       .mockResolvedValue(
-        Buffer.from(JSON.stringify({ userId: 'other-user-id', token: { PK: 'sample-pk' } })),
+        Buffer.from(JSON.stringify({ token: { PK: 'sample-pk' }, userId: 'other-user-id' })),
       );
 
     try {
-      await decryptPaginationToken({ userId, paginationToken });
+      await decryptPaginationToken({ paginationToken, userId });
       expect(true).toEqual(false);
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestError);

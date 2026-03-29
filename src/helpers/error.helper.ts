@@ -6,8 +6,8 @@ import { HttpError, type HttpErrorResponse } from '../errors/http.error';
 import { logger } from './logger.helper';
 
 export function handleError({ error, logPrefix }: { error: unknown; logPrefix: string }): {
-  statusCode: number;
   response: HttpErrorResponse;
+  statusCode: number;
 } {
   if (error instanceof HttpError) {
     const errorData = error.getData();
@@ -17,7 +17,7 @@ export function handleError({ error, logPrefix }: { error: unknown; logPrefix: s
   }
 
   logger.error(error, `${logPrefix}.unknownError`);
-  return { statusCode: 500, response: { message: ErrorMessage.internalServerError } };
+  return { response: { message: ErrorMessage.internalServerError }, statusCode: 500 };
 }
 
 export function handleApiError({
@@ -27,10 +27,10 @@ export function handleApiError({
   error: unknown;
   logPrefix: string;
 }): APIGatewayProxyResult {
-  const { statusCode, response } = handleError({ error, logPrefix });
+  const { response, statusCode } = handleError({ error, logPrefix });
 
   return {
-    statusCode,
     body: JSON.stringify(response),
+    statusCode,
   };
 }

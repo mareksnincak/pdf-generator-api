@@ -26,10 +26,10 @@ export async function getTemplates(
 
     const userId = getUserIdFromEventOrFail(event);
     const { limit, paginationToken } = validatedQueryParams;
-    const { templates, nextPaginationToken } = await templateRepository.getMany({
-      userId,
+    const { nextPaginationToken, templates } = await templateRepository.getMany({
       limit,
       paginationToken,
+      userId,
     });
 
     const response: GetTemplatesResponseDto = {
@@ -38,8 +38,8 @@ export async function getTemplates(
     };
     logger.info('getTemplates.success');
     return {
-      statusCode: 200,
       body: JSON.stringify(response),
+      statusCode: 200,
     };
   } catch (error) {
     return handleApiError({ error, logPrefix: 'getTemplates' });

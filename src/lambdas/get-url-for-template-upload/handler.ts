@@ -33,17 +33,17 @@ async function createPresignedUrl({
   const [url] = await Promise.all([
     getPresignedUploadUrl({
       bucket,
-      key,
-      fileSizeBytes,
       expiresInSeconds,
+      fileSizeBytes,
+      key,
     }),
     scheduleObjectDeletion({
-      key,
       deleteInSeconds,
+      key,
     }),
   ]);
 
-  return { url, uploadId };
+  return { uploadId, url };
 }
 
 export async function getUrlForTemplateUpload(
@@ -60,7 +60,7 @@ export async function getUrlForTemplateUpload(
     const { fileSizeBytes } = validatedQueryParams;
 
     const userId = getUserIdFromEventOrFail(event);
-    const { url, uploadId } = await createPresignedUrl({ fileSizeBytes, userId });
+    const { uploadId, url } = await createPresignedUrl({ fileSizeBytes, userId });
 
     const response: GetUrlForTemplateUploadResponseDto = {
       uploadId,

@@ -6,7 +6,7 @@ import { LOCAL_USER_ID } from '../constants/user.constant';
 import { isLocal } from './env.helper';
 
 export function getUserIdFromEvent(
-  event: PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent> | PartialDeep<APIGatewayEvent>,
+  event: PartialDeep<APIGatewayEvent> | PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent>,
 ): string | undefined {
   const authorizerClaims = event.requestContext?.authorizer?.claims as { sub?: string } | undefined;
   const userId = authorizerClaims?.sub;

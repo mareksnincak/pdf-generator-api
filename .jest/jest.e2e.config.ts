@@ -1,4 +1,5 @@
 import type { Config } from 'jest';
+
 import { commonConfig } from './jest.common.config';
 
 const config: Config = {

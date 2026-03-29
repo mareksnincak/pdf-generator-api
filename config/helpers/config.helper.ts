@@ -19,7 +19,7 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
     lambda: Partial<Record<Lambda, Record<string, string>>>;
   };
 
-  const envVarsMap = new Map<Lambda | 'global', Record<string, string>>();
+  const envVarsMap = new Map<'global' | Lambda, Record<string, string>>();
 
   envVarsMap.set('global', config.global);
 

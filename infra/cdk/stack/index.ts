@@ -18,15 +18,15 @@ import { createStringParameters } from './ssm-parameters';
 
 export class CdkStack extends Stack {
   constructor({
-    scope: stackScope,
+    cdkEnvVars,
     id,
     props,
-    cdkEnvVars,
+    scope: stackScope,
   }: {
-    scope: Construct;
+    cdkEnvVars: CdkEnvVarsDto;
     id: string;
     props?: StackProps;
-    cdkEnvVars: CdkEnvVarsDto;
+    scope: Construct;
   }) {
     super(stackScope, id, props);
 
@@ -35,51 +35,51 @@ export class CdkStack extends Stack {
       ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
       : RemovalPolicy.DESTROY;
 
-    const dynamoDbTable = createDynamoDbTable({ scope: this, stackId: id, removalPolicy });
+    const dynamoDbTable = createDynamoDbTable({ removalPolicy, scope: this, stackId: id });
     const s3Bucket = createS3Bucket({
+      autoDeleteObjects: !retainStatefulResources,
+      removalPolicy,
       scope: this,
       stackId: id,
-      removalPolicy,
-      autoDeleteObjects: !retainStatefulResources,
     });
-    const kmsKey = createKmsKey({ scope: this, stackId: id, removalPolicy });
+    const kmsKey = createKmsKey({ removalPolicy, scope: this, stackId: id });
 
     const s3BucketName = s3Bucket.bucketName;
     const openApiParamsSsmParamName = `${id}-open-api-params`;
 
     const sqsQueues = createSqsQueues({ scope: this, stackId: id });
     const lambdas = createLambdas({
-      scope: this,
-      s3BucketName,
-      openApiParamsSsmParamName,
       cdkEnvVars,
       dynamoDbTable,
       kmsKey,
+      openApiParamsSsmParamName,
       retainStatefulResources,
+      s3BucketName,
+      scope: this,
       sqsQueues,
     });
 
-    const stateMachines = createStateMachines({ scope: this, lambdas });
+    const stateMachines = createStateMachines({ lambdas, scope: this });
     const stateMachineStartupLambdas = createStateMachineStartupLambdas({
-      scope: this,
       cdkEnvVars,
-      stateMachines,
-      retainStatefulResources,
       dynamoDbTable,
+      retainStatefulResources,
+      scope: this,
+      stateMachines,
     });
 
-    const cognito = createCognito({ scope: this, stackId: id, lambdas, removalPolicy });
+    const cognito = createCognito({ lambdas, removalPolicy, scope: this, stackId: id });
 
     const api = createApi({
-      scope: this,
-      lambdas,
-      stateMachineStartupLambdas,
       cognito,
+      lambdas,
+      scope: this,
+      stateMachineStartupLambdas,
     });
 
     createSqsEventSources({
-      sqsQueues,
       lambdas,
+      sqsQueues,
     });
 
     createDynamoDbEventSources({
@@ -88,26 +88,26 @@ export class CdkStack extends Stack {
     });
 
     grantPermissions({
-      region: this.region,
       account: this.account,
-      lambdas,
-      s3Bucket,
-      openApiParamsSsmParamName,
-      dynamoDbTable,
       cognito,
+      dynamoDbTable,
       kmsKey,
+      lambdas,
+      openApiParamsSsmParamName,
+      region: this.region,
+      s3Bucket,
       sqsQueues,
       stateMachines,
       stateMachineStartupLambdas,
     });
 
     createStringParameters({
-      scope: this,
       api,
-      openApiParamsSsmParamName,
       cognito,
+      openApiParamsSsmParamName,
+      scope: this,
     });
 
-    createOutputs({ scope: this, api, cognito, sqsQueues });
+    createOutputs({ api, cognito, scope: this, sqsQueues });
   }
 }

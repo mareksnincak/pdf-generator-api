@@ -1,4 +1,4 @@
-import { type SQSRecord, type SQSEvent } from 'aws-lambda';
+import { type SQSEvent, type SQSRecord } from 'aws-lambda';
 import { type PartialDeep } from 'type-fest';
 
 import { SqsRecordMockFactory } from './sqs-record.mock-factory';

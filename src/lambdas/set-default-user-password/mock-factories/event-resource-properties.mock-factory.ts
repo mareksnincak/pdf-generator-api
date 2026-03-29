@@ -7,8 +7,8 @@ export class SetDefaultUserPasswordResourcePropertiesMockFactory {
     overrides: Partial<SetDefaultUserPasswordResourceProperties> = {},
   ): SetDefaultUserPasswordResourceProperties {
     return {
-      ServiceToken: randomUUID(),
       physicalResourceId: randomUUID(),
+      ServiceToken: randomUUID(),
       userCredentialsSecretName: randomUUID(),
       userPoolId: randomUUID(),
       ...overrides,

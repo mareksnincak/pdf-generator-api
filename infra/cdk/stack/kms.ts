@@ -3,13 +3,13 @@ import { Key } from 'aws-cdk-lib/aws-kms';
 import { type Construct } from 'constructs';
 
 export function createKmsKey({
+  removalPolicy,
   scope,
   stackId,
-  removalPolicy,
 }: {
+  removalPolicy: RemovalPolicy;
   scope: Construct;
   stackId: string;
-  removalPolicy: RemovalPolicy;
 }) {
   const kmsKey = new Key(scope, 'kms-key', {
     alias: `alias/${stackId}`,

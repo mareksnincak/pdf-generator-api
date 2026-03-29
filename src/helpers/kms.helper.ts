@@ -10,7 +10,7 @@ export function getKmsClient() {
   return kmsClient;
 }
 
-export async function encrypt({ keyId, data }: { keyId: string; data: Buffer }) {
+export async function encrypt({ data, keyId }: { data: Buffer; keyId: string }) {
   const { CiphertextBlob } = await getKmsClient().send(
     new EncryptCommand({
       KeyId: keyId,

@@ -16,8 +16,8 @@ export class HttpError extends Error {
 
   public getData() {
     return {
-      statusCode: this.statusCode,
       response: this.response,
+      statusCode: this.statusCode,
     };
   }
 }

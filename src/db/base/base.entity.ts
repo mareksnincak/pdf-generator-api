@@ -16,15 +16,15 @@ export abstract class BaseEntity {
   public readonly expiresAt?: Date;
 
   constructor({
-    primaryKey: { PK, SK },
-    gsi1Key: { GSI1PK, GSI1SK } = {},
     createdAt,
     expiresAt,
+    gsi1Key: { GSI1PK, GSI1SK } = {},
+    primaryKey: { PK, SK },
   }: {
-    primaryKey: PrimaryKey;
-    gsi1Key?: Gsi1Key;
     createdAt: Date;
     expiresAt?: Date;
+    gsi1Key?: Gsi1Key;
+    primaryKey: PrimaryKey;
   }) {
     this.PK = PK;
     this.SK = SK;
@@ -54,5 +54,5 @@ export abstract class BaseEntity {
     throw new Error('BaseEntity.fromDynamoDbItem.notImplemented');
   }
 
-  abstract toDynamoItem(): Record<string, AttributeValue> | Promise<Record<string, AttributeValue>>;
+  abstract toDynamoItem(): Promise<Record<string, AttributeValue>> | Record<string, AttributeValue>;
 }

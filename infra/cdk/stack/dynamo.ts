@@ -9,27 +9,27 @@ import { DynamoIndex } from '../../../src/db/common/enums/dynamo.enum';
 import { type createLambdas } from './lambdas';
 
 export function createDynamoDbTable({
+  removalPolicy,
   scope,
   stackId,
-  removalPolicy,
 }: {
+  removalPolicy: RemovalPolicy;
   scope: Construct;
   stackId: string;
-  removalPolicy: RemovalPolicy;
 }) {
   const table = new Table(scope, 'dynamo-db', {
-    tableName: stackId,
     partitionKey: {
       name: 'PK',
       type: AttributeType.STRING,
     },
+    removalPolicy,
     sortKey: {
       name: 'SK',
       type: AttributeType.STRING,
     },
-    removalPolicy,
-    timeToLiveAttribute: 'expiresAt',
     stream: StreamViewType.OLD_IMAGE,
+    tableName: stackId,
+    timeToLiveAttribute: 'expiresAt',
   });
 
   table.addGlobalSecondaryIndex({
@@ -38,11 +38,11 @@ export function createDynamoDbTable({
       name: 'GSI1PK',
       type: AttributeType.STRING,
     },
+    projectionType: ProjectionType.ALL,
     sortKey: {
       name: 'GSI1SK',
       type: AttributeType.STRING,
     },
-    projectionType: ProjectionType.ALL,
   });
 
   return table;
@@ -56,10 +56,10 @@ export function createDynamoDbEventSources({
   lambdas: ReturnType<typeof createLambdas>;
 }) {
   const itemRemovalEventSource = new DynamoEventSource(dynamoDbTable, {
-    startingPosition: StartingPosition.LATEST,
-    filters: [FilterCriteria.filter({ eventName: FilterRule.isEqual('REMOVE') as unknown })],
     bisectBatchOnError: true,
+    filters: [FilterCriteria.filter({ eventName: FilterRule.isEqual('REMOVE') as unknown })],
     retryAttempts: 10,
+    startingPosition: StartingPosition.LATEST,
   });
 
   lambdas.deleteOrphanedS3Objects.addEventSource(itemRemovalEventSource);

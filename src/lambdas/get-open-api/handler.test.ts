@@ -25,11 +25,11 @@ describe('getOpenApi', () => {
     jest.spyOn(ssmHelper, 'getSsmParam').mockResolvedValue(JSON.stringify(ssmParamValue));
 
     const openApi = {
-      openapi: '3.0.0',
       info: {
         title: 'title',
         version: 'version',
       },
+      openapi: '3.0.0',
       paths: {},
     };
 

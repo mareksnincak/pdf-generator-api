@@ -87,9 +87,9 @@ describe('generateDocumentFromSfnEvent', () => {
     const s3PutObjectArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3PutObjectArgs).toBeInstanceOf(PutObjectCommand);
     expect(s3PutObjectArgs.input).toEqual({
+      Body: expect.any(Uint8Array),
       Bucket: expectedUploadBucket,
       Key: expectedUploadS3Key,
-      Body: expect.any(Uint8Array),
     });
 
     const generatedDocument = (s3PutObjectArgs as PutObjectCommand).input.Body as Buffer;
@@ -112,8 +112,8 @@ describe('generateDocumentFromSfnEvent', () => {
     const result = await generateDocumentFromSfnEvent(input, context);
 
     expect(result).toEqual({
-      ref: input.ref,
       message: ErrorMessage.templateNotFound,
+      ref: input.ref,
       status: DocumentGenerationStatus.error,
     });
   });

@@ -9,18 +9,18 @@ import { type Construct } from 'constructs';
 import { oAuthScopes } from '../enums/authorization.enum';
 
 import { type createCognito } from './cognito';
-import { type createStateMachineStartupLambdas, type createLambdas } from './lambdas';
+import { type createLambdas, type createStateMachineStartupLambdas } from './lambdas';
 
 export function createApi({
-  scope,
-  lambdas,
-  stateMachineStartupLambdas,
   cognito,
+  lambdas,
+  scope,
+  stateMachineStartupLambdas,
 }: {
-  scope: Construct;
-  lambdas: ReturnType<typeof createLambdas>;
-  stateMachineStartupLambdas: ReturnType<typeof createStateMachineStartupLambdas>;
   cognito: ReturnType<typeof createCognito>;
+  lambdas: ReturnType<typeof createLambdas>;
+  scope: Construct;
+  stateMachineStartupLambdas: ReturnType<typeof createStateMachineStartupLambdas>;
 }) {
   const api = new RestApi(scope, 'api', {
     cloudWatchRole: false,
@@ -34,8 +34,8 @@ export function createApi({
   });
 
   const commonAuthorizationOptions = {
-    authorizer,
     authorizationType: AuthorizationType.COGNITO,
+    authorizer,
   } as const;
 
   api.root.addMethod('GET', new LambdaIntegration(lambdas.getOpenApi));

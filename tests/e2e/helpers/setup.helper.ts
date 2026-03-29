@@ -21,13 +21,13 @@ export async function getAccessToken(envVars: E2eEnvVarsDto, isLocal: boolean) {
   const client = new CognitoIdentityProviderClient();
   const response = await client.send(
     new AdminInitiateAuthCommand({
-      UserPoolId: envVars.E2E_AUTH_USER_POOL_ID,
-      ClientId: envVars.E2E_AUTH_USER_POOL_CLIENT_ID,
       AuthFlow: AuthFlowType.ADMIN_USER_PASSWORD_AUTH,
       AuthParameters: {
-        USERNAME: credentials.username,
         PASSWORD: credentials.password,
+        USERNAME: credentials.username,
       },
+      ClientId: envVars.E2E_AUTH_USER_POOL_CLIENT_ID,
+      UserPoolId: envVars.E2E_AUTH_USER_POOL_ID,
     }),
   );
 
@@ -50,7 +50,7 @@ export async function getE2eSetup() {
   const accessToken = await getAccessToken(envVars, isLocal);
 
   return {
-    baseUrl: envVars.E2E_BASE_URL,
     accessToken,
+    baseUrl: envVars.E2E_BASE_URL,
   };
 }

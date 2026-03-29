@@ -32,8 +32,8 @@ export async function getTemplate(
     const response: GetTemplateResponseDto = await template.toPublicJsonWithDataUrl();
     logger.info('getTemplate.success');
     return {
-      statusCode: 200,
       body: JSON.stringify(response),
+      statusCode: 200,
     };
   } catch (error) {
     return handleApiError({ error, logPrefix: 'getTemplate' });

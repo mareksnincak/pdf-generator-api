@@ -1,25 +1,20 @@
 import {
   CreateTableCommand,
-  ResourceInUseException,
   type CreateTableCommandInput,
   type DynamoDBClient,
+  ResourceInUseException,
 } from '@aws-sdk/client-dynamodb';
 
 export async function initDb(client: DynamoDBClient) {
   try {
     const table: CreateTableCommandInput = {
-      TableName: 'PdfGenerator',
-      BillingMode: 'PAY_PER_REQUEST',
-      KeySchema: [
-        { AttributeName: 'PK', KeyType: 'HASH' },
-        { AttributeName: 'SK', KeyType: 'RANGE' },
-      ],
       AttributeDefinitions: [
         { AttributeName: 'PK', AttributeType: 'S' },
         { AttributeName: 'SK', AttributeType: 'S' },
         { AttributeName: 'GSI1PK', AttributeType: 'S' },
         { AttributeName: 'GSI1SK', AttributeType: 'S' },
       ],
+      BillingMode: 'PAY_PER_REQUEST',
       GlobalSecondaryIndexes: [
         {
           IndexName: 'GSI1',
@@ -30,6 +25,11 @@ export async function initDb(client: DynamoDBClient) {
           Projection: { ProjectionType: 'ALL' },
         },
       ],
+      KeySchema: [
+        { AttributeName: 'PK', KeyType: 'HASH' },
+        { AttributeName: 'SK', KeyType: 'RANGE' },
+      ],
+      TableName: 'PdfGenerator',
     };
 
     const command = new CreateTableCommand(table);

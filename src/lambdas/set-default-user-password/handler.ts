@@ -14,8 +14,8 @@ import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { getSecret } from '../../helpers/secret-manager.helper';
 
 import {
-  type SetDefaultUserPasswordResourceProperties,
   type SetDefaultUserPasswordResourceCustomProperties,
+  type SetDefaultUserPasswordResourceProperties,
 } from './types/properties.type';
 import { type UserCredentialsSecret } from './types/secret.type';
 
@@ -32,10 +32,10 @@ async function onCreate({
 
   await cognitoIdentityProviderClient.send(
     new AdminSetUserPasswordCommand({
-      UserPoolId: userPoolId,
-      Username: userCredentials.username,
       Password: userCredentials.password,
       Permanent: true,
+      Username: userCredentials.username,
+      UserPoolId: userPoolId,
     }),
   );
 
@@ -53,9 +53,9 @@ export async function setDefaultUserPassword(
 
   const commonResponse: Omit<CloudFormationCustomResourceResponse, 'Status'> = {
     LogicalResourceId: event.LogicalResourceId,
-    StackId: event.StackId,
-    RequestId: event.RequestId,
     PhysicalResourceId: resourceProperties.physicalResourceId,
+    RequestId: event.RequestId,
+    StackId: event.StackId,
   };
 
   try {
@@ -79,8 +79,8 @@ export async function setDefaultUserPassword(
 
     const response: CloudFormationCustomResourceFailedResponse = {
       ...commonResponse,
-      Status: 'FAILED',
       Reason: reason,
+      Status: 'FAILED',
     };
     logger.info(response, 'setDefaultUserPassword.response');
     return response;

@@ -8,7 +8,7 @@ import { createTemplateE2e, deleteTemplateE2e } from './shared.e2e';
 let baseUrl: string;
 let accessToken: string;
 
-let templateId: string | null = null;
+let templateId: null | string = null;
 
 beforeAll(async () => {
   const e2eSetup = await getE2eSetup();
@@ -21,13 +21,13 @@ afterAll(async () => {
     /**
      * Try to delete task it wasn't deleted it delete test e.g. if running only create test
      */
-    await deleteTemplateE2e({ baseUrl, accessToken, templateId });
+    await deleteTemplateE2e({ accessToken, baseUrl, templateId });
   }
 });
 
 describe('Templates', () => {
   it('should create template', async () => {
-    templateId = await createTemplateE2e({ baseUrl, accessToken });
+    templateId = await createTemplateE2e({ accessToken, baseUrl });
     expect(true).toEqual(true);
   });
 
@@ -59,7 +59,7 @@ describe('Templates', () => {
   it('should delete template', async () => {
     expect(templateId).toBeDefined();
 
-    await deleteTemplateE2e({ baseUrl, accessToken, templateId: templateId! });
+    await deleteTemplateE2e({ accessToken, baseUrl, templateId: templateId! });
 
     templateId = null;
   });

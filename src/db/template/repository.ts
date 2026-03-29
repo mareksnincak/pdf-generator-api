@@ -22,16 +22,16 @@ import {
 import { TemplateEntity } from './entity';
 import { type Template } from './type';
 
-export async function createOrFail(template: SetOptional<Template, 'id' | 'createdAt'>) {
+export async function createOrFail(template: SetOptional<Template, 'createdAt' | 'id'>) {
   try {
     logger.info('templateRepository.createOrReplace');
 
     const templateEntity = new TemplateEntity(template);
     const item = templateEntity.toDynamoItem();
     const command = new PutItemCommand({
-      TableName: getTableName(),
-      Item: item,
       ConditionExpression: 'attribute_not_exists(PK)',
+      Item: item,
+      TableName: getTableName(),
     });
 
     await getDynamoDbClient().send(command);
@@ -53,8 +53,8 @@ export async function getById(params: { id: string; userId: string }) {
   logger.info(params, 'templateRepository.getById');
 
   const command = new GetItemCommand({
-    TableName: getTableName(),
     Key: TemplateEntity.getDynamoPrimaryKey(params),
+    TableName: getTableName(),
   });
 
   const { Item } = await getDynamoDbClient().send(command);
@@ -84,29 +84,29 @@ export async function getByIdOrFail(params: { id: string; userId: string }) {
 }
 
 export async function getMany({
-  userId,
   limit,
   paginationToken,
+  userId,
 }: {
-  userId: string;
   limit?: number;
   paginationToken?: string;
+  userId: string;
 }) {
   logger.info({ userId }, 'templateRepository.getMany');
 
   const ExclusiveStartKey = await decryptPaginationToken({
-    userId,
     paginationToken,
+    userId,
   });
   const partitionKey = TemplateEntity.getGsi1PartitionKey({ userId });
 
   const command = new QueryCommand({
-    TableName: getTableName(),
-    IndexName: DynamoIndex.GSI1,
     ExclusiveStartKey,
-    Limit: limit,
-    KeyConditionExpression: 'GSI1PK = :GSI1PK',
     ExpressionAttributeValues: marshall({ ':GSI1PK': partitionKey }),
+    IndexName: DynamoIndex.GSI1,
+    KeyConditionExpression: 'GSI1PK = :GSI1PK',
+    Limit: limit,
+    TableName: getTableName(),
   });
 
   const { Items = [], LastEvaluatedKey } = await getDynamoDbClient().send(command);
@@ -114,8 +114,8 @@ export async function getMany({
   const templates = Items.map((item) => TemplateEntity.fromDynamoItem(item));
 
   const nextPaginationToken = await encryptPaginationToken({
-    userId,
     paginationToken: LastEvaluatedKey,
+    userId,
   });
 
   logger.info(
@@ -125,8 +125,8 @@ export async function getMany({
     'templateRepository.getMany.success',
   );
   return {
-    templates,
     nextPaginationToken,
+    templates,
   };
 }
 
@@ -134,9 +134,9 @@ export async function deleteByIdOrFail(params: { id: string; userId: string }) {
   logger.info(params, 'templateRepository.deleteByIdOrFail');
 
   const command = new DeleteItemCommand({
-    TableName: getTableName(),
     Key: TemplateEntity.getDynamoPrimaryKey(params),
     ReturnValues: 'ALL_OLD',
+    TableName: getTableName(),
   });
 
   const { Attributes } = await getDynamoDbClient().send(command);

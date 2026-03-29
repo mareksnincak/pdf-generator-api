@@ -26,7 +26,7 @@ export async function storeDocumentBatchResult(
     const validatedData = validate(input, storeDocumentBatchResultInputDto);
     logger.info(validatedData, 'storeDocumentBatchResult.validatedData');
 
-    const { id, userId, status, results } = validatedData;
+    const { id, results, status, userId } = validatedData;
 
     const errors: DocumentBatchError[] = [];
     const generatedDocuments: DocumentBatchGeneratedDocument[] = [];
@@ -40,14 +40,14 @@ export async function storeDocumentBatchResult(
       }
 
       errors.push({
-        ref: result.ref,
         message: result.message,
+        ref: result.ref,
       });
     }
 
     await documentBatchRepository.updateById(
       { id, userId },
-      { status, errors, generatedDocuments },
+      { errors, generatedDocuments, status },
     );
 
     logger.info('storeDocumentBatchResult.success');

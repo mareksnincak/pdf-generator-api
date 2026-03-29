@@ -6,11 +6,9 @@ import { startDocumentBatchGenerationRequestDto } from '../dtos/request.dto';
 import { startDocumentBatchGenerationResponseDto } from '../dtos/response.dto';
 
 export const startDocumentBatchGenerationRoute: RouteConfig = {
+  description: 'Generate document batch.',
   method: 'post',
   path: '/documents/batch/generate',
-  tags: ['documents'],
-  summary: 'Generate document batch',
-  description: 'Generate document batch.',
   request: {
     body: {
       content: {
@@ -22,20 +20,22 @@ export const startDocumentBatchGenerationRoute: RouteConfig = {
   },
   responses: {
     202: {
-      description: 'Success. Batch was accepted for processing.',
       content: {
         'application/json': {
           schema: startDocumentBatchGenerationResponseDto,
         },
       },
+      description: 'Success. Batch was accepted for processing.',
     },
     400: {
-      description: ErrorMessage.validationError,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.validationError,
     },
   },
+  summary: 'Generate document batch',
+  tags: ['documents'],
 };

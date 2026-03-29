@@ -18,8 +18,8 @@ describe('scheduleObjectDeletion', () => {
     const sendSqsMessageSpy = jest.spyOn(sqsHelper, 'sendSqsMessage').mockResolvedValue();
 
     await scheduleObjectDeletion({
-      key,
       deleteInSeconds,
+      key,
     });
 
     expect(sendSqsMessageSpy).toHaveBeenCalledWith({
