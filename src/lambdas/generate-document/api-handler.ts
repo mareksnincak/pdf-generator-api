@@ -25,7 +25,7 @@ async function getShareableUrl({
 }: {
   bucket: string;
   keyPrefix: string;
-  data: Buffer;
+  data: Uint8Array;
 }) {
   const expiresInSeconds = Number(getEnvVariableOrFail('PRESIGNED_URL_EXPIRATION_SECONDS'));
 

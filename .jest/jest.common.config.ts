@@ -4,12 +4,7 @@ export const commonConfig: Config = {
   maxWorkers: '50%',
   preset: 'ts-jest',
   transform: {
-    '^.+\\.(t|j)s$': [
-      'ts-jest',
-      {
-        isolatedModules: true,
-      },
-    ],
+    '^.+\\.(t|j)s$': 'ts-jest',
   },
   setupFiles: ['<rootDir>/.jest/jest.setup.ts'],
   rootDir: '../',

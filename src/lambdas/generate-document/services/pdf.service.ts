@@ -1,12 +1,11 @@
 import chromium from '@sparticuz/chromium';
-import puppeteer, { type PuppeteerLaunchOptions } from 'puppeteer-core';
+import puppeteer, { type LaunchOptions } from 'puppeteer-core';
 
 import { logger } from '../../../helpers/logger.helper';
 
-chromium.setHeadlessMode = true;
 chromium.setGraphicsMode = false;
 
-let launchOptions: PuppeteerLaunchOptions | undefined;
+let launchOptions: LaunchOptions | undefined;
 
 async function getLaunchOptions() {
   if (launchOptions) {
@@ -14,9 +13,16 @@ async function getLaunchOptions() {
   }
 
   const defaultArgs = chromium.args;
-  const defaultLaunchOptions: PuppeteerLaunchOptions = {
+  const defaultLaunchOptions: LaunchOptions = {
     args: defaultArgs,
-    defaultViewport: chromium.defaultViewport,
+    defaultViewport: {
+      deviceScaleFactor: 1,
+      hasTouch: false,
+      height: 1080,
+      isLandscape: true,
+      isMobile: false,
+      width: 1920,
+    },
     headless: true,
     executablePath: await chromium.executablePath(),
   };

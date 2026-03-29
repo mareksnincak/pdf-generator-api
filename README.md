@@ -22,6 +22,7 @@ npm run open-api:generate
 
 ## How to run
 
+1. [install AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html#install-sam-cli-instructions)
 1. install dependencies
    ```bash
    npm i
@@ -32,10 +33,10 @@ npm run open-api:generate
    cp config/values/local.config.example.json config/values/local.config.json
    # update values in config/values/local.config.json
    ```
-1. expose AWS credentials in CLI:
-   ```bash
-   aws-vault exec dev
-   ```
+1. [set up AWS credentials](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) that can be used by the app. Suggested setups:
+   1. use AWS SSO and setup default credentials in `~/.aws/config`
+   1. use AWS SSO with custom profile and export profile name in `AWS_PROFILE` environment variable
+   1. use aws-vault to expose credentials in CLI
 1. run infrastructure
    ```bash
    npm run infra:up

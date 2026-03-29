@@ -110,7 +110,7 @@ describe('generateDocument', () => {
     expect(s3PutObjectArgs.input).toEqual({
       Bucket: expectedUploadBucket,
       Key: expectedUploadS3Key,
-      Body: expect.any(Buffer),
+      Body: expect.any(Uint8Array),
     });
 
     const generatedDocument = (s3PutObjectArgs as PutObjectCommand).input.Body as Buffer;

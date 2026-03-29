@@ -53,7 +53,7 @@ describe('Documents', () => {
     const { body: generatedDocumentData } = (await request(generateDocumentResponse.url as string)
       .get('')
       .responseType('blob')
-      .expect(200)) as { body: Buffer };
+      .expect(200)) as { body: Uint8Array };
 
     const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
     expect(await isSamePdfFile(generatedDocumentData, expectedDocument)).toEqual(true);
@@ -126,7 +126,7 @@ describe('Documents', () => {
     const { body: generatedDocumentData } = (await request(generatedDocument!.url)
       .get('')
       .responseType('blob')
-      .expect(200)) as { body: Buffer };
+      .expect(200)) as { body: Uint8Array };
 
     const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
     expect(await isSamePdfFile(generatedDocumentData, expectedDocument)).toEqual(true);

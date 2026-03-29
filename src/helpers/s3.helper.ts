@@ -44,7 +44,7 @@ export async function putObject({
 }: {
   bucket: string;
   key: string;
-  data: Buffer;
+  data: Uint8Array;
 }) {
   await getS3Client().send(
     new PutObjectCommand({
