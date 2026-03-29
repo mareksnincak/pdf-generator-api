@@ -1,10 +1,10 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { type ZodTypeAny, type z } from 'zod';
+import { type ZodType, type z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
 import { BadRequestError } from '../errors/bad-request.error';
 
-export function validate<T extends ZodTypeAny>(data: unknown, dto: T): z.infer<T> {
+export function validate<T extends ZodType>(data: unknown, dto: T): z.infer<T> {
   const parsedData = dto.safeParse(data ?? {});
 
   if (!parsedData.success) {
@@ -15,21 +15,21 @@ export function validate<T extends ZodTypeAny>(data: unknown, dto: T): z.infer<T
   return parsedData.data;
 }
 
-export function validateQueryParams<T extends ZodTypeAny>(
+export function validateQueryParams<T extends ZodType>(
   event: Pick<APIGatewayProxyEvent, 'queryStringParameters'>,
   dto: T,
 ): z.infer<T> {
   return validate(event.queryStringParameters, dto);
 }
 
-export function validatePathParams<T extends ZodTypeAny>(
+export function validatePathParams<T extends ZodType>(
   event: Pick<APIGatewayProxyEvent, 'pathParameters'>,
   dto: T,
 ): z.infer<T> {
   return validate(event.pathParameters, dto);
 }
 
-export function validateBody<T extends ZodTypeAny>(
+export function validateBody<T extends ZodType>(
   event: Pick<APIGatewayProxyEvent, 'body'>,
   dto: T,
 ): z.infer<T> {
