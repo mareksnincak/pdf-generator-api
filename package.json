@@ -50,8 +50,8 @@
     "@aws-sdk/util-dynamodb": "^3.996.2",
     "@sparticuz/chromium": "143.0.4",
     "handlebars": "^4.7.9",
-    "pino": "^8.19.0",
-    "pino-lambda": "^4.4.0",
+    "pino": "^10.3.1",
+    "pino-lambda": "^4.4.1",
     "puppeteer-core": "~24.35.0",
     "zod": "^4.3.6",
     "zod-validation-error": "^5.0.0"
@@ -88,6 +88,6 @@
     "tsx": "^4.21.0",
     "type-fest": "^5.5.0",
     "typescript": "~6.0.2",
-    "wait-for-expect": "^3.0.2"
+    "wait-for-expect": "^4.0.0"
   }
 }

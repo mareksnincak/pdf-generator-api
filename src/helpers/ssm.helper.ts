@@ -13,7 +13,7 @@ export function getSsmClient() {
 }
 
 export async function getSsmParam(name: string): Promise<string> {
-  logger.info(name, 'ssmHelper.getSsmParam.ssmParamName');
+  logger.info({ name }, 'ssmHelper.getSsmParam.ssmParamName');
 
   const ssmParam = await getSsmClient().send(
     new GetParameterCommand({
