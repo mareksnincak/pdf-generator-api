@@ -10,6 +10,7 @@
     "healthcheck",
     "linebreak",
     "metafile",
+    "nodenext",
     "numpages",
     "numrender",
     "nvmrc",
