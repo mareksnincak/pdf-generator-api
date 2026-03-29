@@ -1,6 +1,10 @@
+### Description
+
+<!-- What does this PR do and why? -->
+
 ### Checklist
 
 - [ ] I have performed self-review of my code
-- [ ] I have updated OpenAPI documentation to reflect the changes
-- [ ] I wrote the tests that cover the newly added logic
-- [ ] Changes are backward compatible
+- [ ] I have updated the OpenAPI documentation
+- [ ] I have written tests covering the newly added or changed logic
+- [ ] Changes are backward compatible (if not, specify breaking changes)
