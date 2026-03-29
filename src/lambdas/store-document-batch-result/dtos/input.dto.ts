@@ -5,9 +5,9 @@ import { generateDocumentFromSfnEventOutputDto } from '../../generate-document/d
 
 export const storeDocumentBatchResultInputDto = z.object({
   id: z.string(),
-  userId: z.string(),
-  status: z.enum(DocumentBatchStatus),
   results: z.array(generateDocumentFromSfnEventOutputDto).optional().default([]),
+  status: z.enum(DocumentBatchStatus),
+  userId: z.string(),
 });
 
 export type StoreDocumentBatchResultInputDto = z.infer<typeof storeDocumentBatchResultInputDto>;

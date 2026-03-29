@@ -1,6 +1,6 @@
 import * as crypto from 'node:crypto';
 
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
 
 import { EnvironmentName } from '../../../config/enums/config.enum';
@@ -75,9 +75,9 @@ describe('getUrlForTemplateUpload', () => {
     const sqsClientArgs = sqsClientSpy.mock.calls[0]?.[0];
     expect(sqsClientArgs).toBeInstanceOf(SendMessageCommand);
     expect(sqsClientArgs.input).toEqual({
+      DelaySeconds: 120,
       MessageBody: expectedUploadS3Key,
       QueueUrl: 'https://sqs.example.com/sample-delete-expired-s3-objects-queue',
-      DelaySeconds: 120,
     });
   });
 });

@@ -1,5 +1,5 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { type ZodType, type z } from 'zod';
+import { type z, type ZodType } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
 import { BadRequestError } from '../errors/bad-request.error';

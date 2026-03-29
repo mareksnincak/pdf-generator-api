@@ -6,14 +6,14 @@ import { type createCognito } from './cognito';
 import { type createSqsQueues } from './sqs';
 
 export function createOutputs({
-  scope,
   api,
   cognito,
+  scope,
   sqsQueues,
 }: {
-  scope: Construct;
   api: RestApi;
   cognito: ReturnType<typeof createCognito>;
+  scope: Construct;
   sqsQueues: ReturnType<typeof createSqsQueues>;
 }) {
   new CfnOutput(scope, 'apiUrl', {

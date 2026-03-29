@@ -7,10 +7,10 @@ import { type createLambdas } from './lambdas';
 
 export function createSqsQueues({ scope, stackId }: { scope: Construct; stackId: string }) {
   const deleteExpiredS3ObjectsQueue = new Queue(scope, 'delete-expired-s3-objects-queue', {
-    queueName: `${stackId}-delete-expired-s3-objects-queue`,
     deliveryDelay: Duration.minutes(15),
-    receiveMessageWaitTime: Duration.seconds(20),
     enforceSSL: true,
+    queueName: `${stackId}-delete-expired-s3-objects-queue`,
+    receiveMessageWaitTime: Duration.seconds(20),
   });
 
   return {
@@ -19,11 +19,11 @@ export function createSqsQueues({ scope, stackId }: { scope: Construct; stackId:
 }
 
 export function createSqsEventSources({
-  sqsQueues,
   lambdas,
+  sqsQueues,
 }: {
-  sqsQueues: ReturnType<typeof createSqsQueues>;
   lambdas: ReturnType<typeof createLambdas>;
+  sqsQueues: ReturnType<typeof createSqsQueues>;
 }) {
   const deleteExpiredS3ObjectsEventSource = new SqsEventSource(
     sqsQueues.deleteExpiredS3ObjectsQueue,

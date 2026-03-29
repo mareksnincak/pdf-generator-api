@@ -29,7 +29,7 @@ describe('getTemplates', () => {
     const template = templateResponseMockFactory.create();
     jest
       .spyOn(templateRepository, 'getMany')
-      .mockResolvedValue({ templates: [templateEntity], nextPaginationToken: undefined });
+      .mockResolvedValue({ nextPaginationToken: undefined, templates: [templateEntity] });
     jest.spyOn(templateEntity, 'toPublicJson').mockReturnValue(template);
 
     const queryStringParameters = requestMockFactory.create();
@@ -41,8 +41,8 @@ describe('getTemplates', () => {
 
     expect(result.statusCode).toEqual(200);
     expect(JSON.parse(result.body)).toEqual({
-      templates: [template],
       nextPaginationToken: null,
+      templates: [template],
     });
   });
 });

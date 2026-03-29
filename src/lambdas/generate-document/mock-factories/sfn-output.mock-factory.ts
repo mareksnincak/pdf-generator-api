@@ -12,9 +12,9 @@ export class GenerateDocumentFromSfnEventSuccessOutputMockFactory {
     overrides: Partial<GenerateDocumentFromSfnEventSuccessOutputDto> = {},
   ): GenerateDocumentFromSfnEventSuccessOutputDto {
     return {
-      status: DocumentGenerationStatus.success,
       ref: randomUUID(),
       s3Key: randomUUID(),
+      status: DocumentGenerationStatus.success,
       ...overrides,
     };
   }
@@ -25,9 +25,9 @@ export class GenerateDocumentFromSfnEventErrorOutputMockFactory {
     overrides: Partial<GenerateDocumentFromSfnEventErrorOutputDto> = {},
   ): GenerateDocumentFromSfnEventErrorOutputDto {
     return {
-      status: DocumentGenerationStatus.error,
-      ref: randomUUID(),
       message: ErrorMessage.templateNotFound,
+      ref: randomUUID(),
+      status: DocumentGenerationStatus.error,
       ...overrides,
     };
   }

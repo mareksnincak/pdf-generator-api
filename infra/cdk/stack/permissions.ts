@@ -4,31 +4,31 @@ import { type Key } from 'aws-cdk-lib/aws-kms';
 import { type Bucket } from 'aws-cdk-lib/aws-s3';
 
 import { type createCognito } from './cognito';
-import { type createStateMachineStartupLambdas, type createLambdas } from './lambdas';
+import { type createLambdas, type createStateMachineStartupLambdas } from './lambdas';
 import { type createStateMachines } from './sfn';
 import { type createSqsQueues } from './sqs';
 
 export function grantPermissions({
-  region,
   account,
-  lambdas,
-  s3Bucket,
-  openApiParamsSsmParamName,
-  dynamoDbTable,
   cognito,
+  dynamoDbTable,
   kmsKey,
+  lambdas,
+  openApiParamsSsmParamName,
+  region,
+  s3Bucket,
   sqsQueues,
   stateMachines,
   stateMachineStartupLambdas,
 }: {
-  region: string;
   account: string;
-  lambdas: ReturnType<typeof createLambdas>;
-  s3Bucket: Bucket;
-  openApiParamsSsmParamName: string;
-  dynamoDbTable: Table;
   cognito: ReturnType<typeof createCognito>;
+  dynamoDbTable: Table;
   kmsKey: Key;
+  lambdas: ReturnType<typeof createLambdas>;
+  openApiParamsSsmParamName: string;
+  region: string;
+  s3Bucket: Bucket;
   sqsQueues: ReturnType<typeof createSqsQueues>;
   stateMachines: ReturnType<typeof createStateMachines>;
   stateMachineStartupLambdas: ReturnType<typeof createStateMachineStartupLambdas>;
@@ -47,8 +47,8 @@ export function grantPermissions({
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(
     new PolicyStatement({
-      resources: [`arn:aws:ssm:${region}:${account}:parameter/${openApiParamsSsmParamName}`],
       actions: ['ssm:GetParameter'],
+      resources: [`arn:aws:ssm:${region}:${account}:parameter/${openApiParamsSsmParamName}`],
     }),
   );
 

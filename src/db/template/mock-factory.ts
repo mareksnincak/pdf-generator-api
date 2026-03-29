@@ -7,8 +7,8 @@ export class TemplateEntityMockFactory {
   create(overrides: Partial<TemplateEntity> = {}): TemplateEntity {
     return new TemplateEntity({
       name: randomBytes(8).toString('hex'),
-      type: TemplateType.htmlHandlebars,
       s3Key: randomBytes(8).toString('hex'),
+      type: TemplateType.htmlHandlebars,
       userId: randomUUID(),
       ...overrides,
     });

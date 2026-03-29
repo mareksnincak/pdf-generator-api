@@ -10,12 +10,12 @@ export class CloudFormationCustomResourceEventMockFactory {
   ): CloudFormationCustomResourceEvent {
     return {
       LogicalResourceId: randomUUID(),
-      StackId: randomUUID(),
       RequestId: randomUUID(),
       RequestType: 'Create',
       ResourceProperties: new SetDefaultUserPasswordResourcePropertiesMockFactory().create(
         overrides.ResourceProperties,
       ),
+      StackId: randomUUID(),
       ...overrides,
     } satisfies Partial<CloudFormationCustomResourceEvent> as CloudFormationCustomResourceEvent;
   }

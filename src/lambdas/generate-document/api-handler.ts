@@ -20,31 +20,31 @@ import { generateDocument } from './services/document-generation.service';
 
 async function getShareableUrl({
   bucket,
-  keyPrefix,
   data,
+  keyPrefix,
 }: {
   bucket: string;
-  keyPrefix: string;
   data: Uint8Array;
+  keyPrefix: string;
 }) {
   const expiresInSeconds = Number(getEnvVariableOrFail('PRESIGNED_URL_EXPIRATION_SECONDS'));
 
   const key = `${keyPrefix}/${randomUUID()}.pdf`;
 
   const [url] = await Promise.all([
-    getPresignedShareUrl({ bucket, key, expiresInSeconds }),
+    getPresignedShareUrl({ bucket, expiresInSeconds, key }),
     putObject({
       bucket,
-      key,
       data,
+      key,
     }),
     scheduleObjectDeletion({
-      key,
       /**
        * We are adding 30s as a safety buffer to make sure
        * object isn't deleted before presigned url expires.
        */
       deleteInSeconds: expiresInSeconds + 30,
+      key,
     }),
   ]);
 
@@ -62,21 +62,21 @@ export async function generateDocumentFromApiEvent(
     const validatedData = validateBody(event, generateDocumentFromApiEventRequestDto);
     logger.info(validatedData, 'generateDocumentFromApiEvent.validatedData');
 
-    const { templateId, data } = validatedData;
+    const { data, templateId } = validatedData;
 
     const userId = getUserIdFromEventOrFail(event);
     const bucket = getEnvVariableOrFail('S3_BUCKET');
 
     const pdf = await generateDocument({
-      userId,
-      templateId,
       data,
+      templateId,
+      userId,
     });
 
     const url = await getShareableUrl({
       bucket,
-      keyPrefix: `${userId}/documents`,
       data: pdf,
+      keyPrefix: `${userId}/documents`,
     });
 
     const response: GenerateDocumentFromApiEventResponseDto = {

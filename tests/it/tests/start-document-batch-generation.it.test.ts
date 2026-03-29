@@ -70,13 +70,13 @@ describe('startDocumentBatchGeneration', () => {
 
     const createdDocumentBatch = await documentBatchRepository.getByIdOrFail({ id, userId });
     expect(createdDocumentBatch).toEqual({
-      PK: `DOCUMENT_BATCH#USER#${userId}#ID#${id}`,
-      SK: '#',
       createdAt: mockedDate,
       errors: [],
       expiresAt: mockedDatePlusOneHour,
       generatedDocuments: [],
       id,
+      PK: `DOCUMENT_BATCH#USER#${userId}#ID#${id}`,
+      SK: '#',
       status: DocumentBatchStatus.inProgress,
       userId,
     });

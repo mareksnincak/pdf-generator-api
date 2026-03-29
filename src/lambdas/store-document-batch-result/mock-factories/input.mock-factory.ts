@@ -9,9 +9,9 @@ export class StoreDocumentBatchResultInputMockFactory {
   ): StoreDocumentBatchResultInputDto {
     return {
       id: randomUUID(),
-      userId: randomUUID(),
-      status: DocumentBatchStatus.completed,
       results: [],
+      status: DocumentBatchStatus.completed,
+      userId: randomUUID(),
       ...overrides,
     };
   }

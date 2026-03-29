@@ -8,8 +8,8 @@ extendZodWithOpenApi(z);
 export const createTemplateRequestDto = z.object({
   id: templateDto.shape.id.optional(),
   name: templateDto.shape.name,
-  uploadId: z.uuid().openapi({ description: 'Upload id from GET /templates/upload-url api call.' }),
   type: templateDto.shape.type,
+  uploadId: z.uuid().openapi({ description: 'Upload id from GET /templates/upload-url api call.' }),
 });
 
 export type CreateTemplateRequestDto = z.infer<typeof createTemplateRequestDto>;

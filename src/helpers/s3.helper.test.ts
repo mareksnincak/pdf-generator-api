@@ -66,14 +66,14 @@ describe('putObject', () => {
     const key = 'sample-key';
     const data = Buffer.from(randomUUID());
 
-    await putObject({ bucket, key, data });
+    await putObject({ bucket, data, key });
 
     const s3ClientArgs = s3ClientSpy.mock.calls[0]?.[0];
     expect(s3ClientArgs).toBeInstanceOf(PutObjectCommand);
     expect(s3ClientArgs.input).toEqual({
+      Body: data,
       Bucket: bucket,
       Key: key,
-      Body: data,
     });
   });
 });
@@ -165,7 +165,7 @@ describe('copyObject', () => {
     const destinationBucket = 'destination-bucket';
     const destinationKey = 'destination-key';
 
-    await copyObject({ sourceBucket, sourceKey, destinationBucket, destinationKey });
+    await copyObject({ destinationBucket, destinationKey, sourceBucket, sourceKey });
 
     const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
     expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
@@ -186,7 +186,7 @@ describe('moveObject', () => {
     const destinationBucket = 'destination-bucket';
     const destinationKey = 'destination-key';
 
-    await moveObject({ sourceBucket, sourceKey, destinationBucket, destinationKey });
+    await moveObject({ destinationBucket, destinationKey, sourceBucket, sourceKey });
 
     const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
     expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
@@ -239,7 +239,7 @@ describe('getPresignedUploadUrl', () => {
     const key = 'sample-key';
     const fileSizeBytes = 1;
 
-    const result = await getPresignedUploadUrl({ bucket, key, fileSizeBytes });
+    const result = await getPresignedUploadUrl({ bucket, fileSizeBytes, key });
 
     expect(result).toEqual(mockedUrl);
 
@@ -247,8 +247,8 @@ describe('getPresignedUploadUrl', () => {
     expect(getSignedUrlArgs[1]).toBeInstanceOf(PutObjectCommand);
     expect(getSignedUrlArgs[1].input).toEqual({
       Bucket: bucket,
-      Key: key,
       ContentLength: fileSizeBytes,
+      Key: key,
     });
   });
 });

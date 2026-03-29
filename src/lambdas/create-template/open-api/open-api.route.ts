@@ -6,12 +6,10 @@ import { createTemplateRequestDto } from '../dtos/request.dto';
 import { createTemplateResponseDto } from '../dtos/response.dto';
 
 export const createTemplateRoute: RouteConfig = {
-  method: 'post',
-  path: '/templates',
-  tags: ['templates'],
-  summary: 'Create template',
   description:
     'Before calling this endpoint `GET /templates/upload-url` should be called and file should be uploaded to returned url.',
+  method: 'post',
+  path: '/templates',
   request: {
     body: {
       content: {
@@ -23,36 +21,38 @@ export const createTemplateRoute: RouteConfig = {
   },
   responses: {
     201: {
-      description: 'Success.',
       content: {
         'application/json': {
           schema: createTemplateResponseDto,
         },
       },
+      description: 'Success.',
     },
     400: {
-      description: ErrorMessage.validationError,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.validationError,
     },
     404: {
-      description: ErrorMessage.templateDataNotFound,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.templateDataNotFound,
     },
     409: {
-      description: ErrorMessage.templateAlreadyExists,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.templateAlreadyExists,
     },
   },
+  summary: 'Create template',
+  tags: ['templates'],
 };

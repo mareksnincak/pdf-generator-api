@@ -12,4 +12,4 @@ const cdkEnvVars = validate(process.env, cdkEnvVarsDto);
 
 const stackId = `${packageJson.name}-${cdkEnvVars.ENVIRONMENT_NAME}`;
 
-new CdkStack({ scope: app, id: stackId, cdkEnvVars });
+new CdkStack({ cdkEnvVars, id: stackId, scope: app });

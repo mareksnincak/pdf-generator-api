@@ -11,21 +11,21 @@ import { BaseEntity } from '../base/base.entity';
 import { type Gsi1Key, type PrimaryKey } from '../common/types/entity.type';
 
 import { type TemplateType } from './enum';
-import { type Template, type StoredTemplate } from './type';
+import { type StoredTemplate, type Template } from './type';
 
 export class TemplateEntity extends BaseEntity {
   constructor({
+    createdAt = new Date(),
     id = randomUUID(),
     name,
-    type,
     s3Key,
+    type,
     userId,
-    createdAt = new Date(),
-  }: SetOptional<Template, 'id' | 'createdAt'>) {
+  }: SetOptional<Template, 'createdAt' | 'id'>) {
     const primaryKey = TemplateEntity.getPrimaryKey({ id, userId });
-    const gsi1Key = TemplateEntity.getGsi1Key({ userId, name });
+    const gsi1Key = TemplateEntity.getGsi1Key({ name, userId });
 
-    super({ primaryKey, gsi1Key, createdAt });
+    super({ createdAt, gsi1Key, primaryKey });
 
     this.id = id;
     this.name = name;
@@ -50,12 +50,12 @@ export class TemplateEntity extends BaseEntity {
     const item: StoredTemplate = {
       ...this.primaryKey,
       ...this.gsi1Key,
+      createdAt: toUnixTimestamp(this.createdAt),
       id: this.id,
       name: this.name,
-      type: this.type,
       s3Key: this.s3Key,
+      type: this.type,
       userId: this.userId,
-      createdAt: toUnixTimestamp(this.createdAt),
     };
 
     const result = marshall(item, {
@@ -89,7 +89,7 @@ export class TemplateEntity extends BaseEntity {
     return `TEMPLATE#USER#${userId}`;
   }
 
-  public static getGsi1Key({ userId, name }: { userId: string; name: string }): Gsi1Key {
+  public static getGsi1Key({ name, userId }: { name: string; userId: string }): Gsi1Key {
     return {
       GSI1PK: TemplateEntity.getGsi1PartitionKey({ userId }),
       GSI1SK: `NAME#${name}`,
@@ -110,8 +110,8 @@ export class TemplateEntity extends BaseEntity {
 
     const dataUrl = await getPresignedShareUrl({
       bucket,
-      key: this.s3Key,
       expiresInSeconds: urlExpirationSeconds,
+      key: this.s3Key,
     });
 
     return {

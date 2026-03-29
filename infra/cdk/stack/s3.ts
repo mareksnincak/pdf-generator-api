@@ -3,20 +3,20 @@ import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { type Construct } from 'constructs';
 
 export function createS3Bucket({
+  autoDeleteObjects,
+  removalPolicy,
   scope,
   stackId,
-  removalPolicy,
-  autoDeleteObjects,
 }: {
+  autoDeleteObjects: boolean;
+  removalPolicy: RemovalPolicy;
   scope: Construct;
   stackId: string;
-  removalPolicy: RemovalPolicy;
-  autoDeleteObjects: boolean;
 }) {
   return new Bucket(scope, 's3-bucket', {
-    enforceSSL: true,
-    bucketName: stackId,
-    removalPolicy,
     autoDeleteObjects,
+    bucketName: stackId,
+    enforceSSL: true,
+    removalPolicy,
   });
 }

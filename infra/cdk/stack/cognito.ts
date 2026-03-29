@@ -13,42 +13,42 @@ import { PhysicalResourceId, Provider } from 'aws-cdk-lib/custom-resources';
 import { type Construct } from 'constructs';
 
 import { type SetDefaultUserPasswordResourceCustomProperties } from '../../../src/lambdas/set-default-user-password/types/properties.type';
-import { ResourceServerIdentifier, customOAuthScopes } from '../enums/authorization.enum';
+import { customOAuthScopes, ResourceServerIdentifier } from '../enums/authorization.enum';
 
 import { type createLambdas } from './lambdas';
 
 function createDefaultUser({
+  lambdas,
   scope,
   stackId,
   userPool,
-  lambdas,
 }: {
+  lambdas: ReturnType<typeof createLambdas>;
   scope: Construct;
   stackId: string;
   userPool: UserPool;
-  lambdas: ReturnType<typeof createLambdas>;
 }) {
   const defaultUserUsername = 'default-user';
 
   const defaultUsersCredentialsSecret = new Secret(scope, 'default-user-credentials', {
-    removalPolicy: RemovalPolicy.DESTROY,
-    secretName: `${stackId}-default-user-credentials`,
     generateSecretString: {
-      secretStringTemplate: JSON.stringify({ username: defaultUserUsername }),
       generateStringKey: 'password',
       passwordLength: 16,
       requireEachIncludedType: true,
+      secretStringTemplate: JSON.stringify({ username: defaultUserUsername }),
     },
+    removalPolicy: RemovalPolicy.DESTROY,
+    secretName: `${stackId}-default-user-credentials`,
   });
 
   const user = new CfnUserPoolUser(scope, 'default-user', {
-    userPoolId: userPool.userPoolId,
-    username: defaultUserUsername,
+    desiredDeliveryMediums: ['EMAIL'],
     userAttributes: [
       { name: 'email', value: 'pdfgenerator.team@gmail.com' },
       { name: 'email_verified', value: 'true' },
     ],
-    desiredDeliveryMediums: ['EMAIL'],
+    username: defaultUserUsername,
+    userPoolId: userPool.userPoolId,
   });
 
   const setDefaultUserPasswordProvider = new Provider(scope, 'set-default-user-password-provider', {
@@ -65,12 +65,12 @@ function createDefaultUser({
     scope,
     'set-default-user-password-custom-resource',
     {
-      serviceToken: setDefaultUserPasswordProvider.serviceToken,
       properties: {
         physicalResourceId,
         userCredentialsSecretName: defaultUsersCredentialsSecret.secretName,
         userPoolId: userPool.userPoolId,
       } satisfies SetDefaultUserPasswordResourceCustomProperties,
+      serviceToken: setDefaultUserPasswordProvider.serviceToken,
     },
   );
 
@@ -81,38 +81,38 @@ function createDefaultUser({
 }
 
 export function createCognito({
-  scope,
-  stackId,
   lambdas,
   removalPolicy,
+  scope,
+  stackId,
 }: {
-  scope: Construct;
-  stackId: string;
   lambdas: ReturnType<typeof createLambdas>;
   removalPolicy: RemovalPolicy;
+  scope: Construct;
+  stackId: string;
 }) {
   const userPool = new UserPool(scope, 'user-pool', {
-    userPoolName: stackId,
-    selfSignUpEnabled: false,
     removalPolicy,
+    selfSignUpEnabled: false,
+    userPoolName: stackId,
   });
 
   const userPoolDomain = new UserPoolDomain(scope, 'user-pool-domain', {
-    userPool,
     cognitoDomain: {
       domainPrefix: stackId,
     },
+    userPool,
   });
 
   const userPoolScopes: ResourceServerScope[] = Object.values(customOAuthScopes).map((scope) => ({
-    scopeName: scope.name,
     scopeDescription: scope.description,
+    scopeName: scope.name,
   }));
 
   const userPoolResourceServer = new UserPoolResourceServer(scope, 'user-pool-resource-server', {
-    userPool,
     identifier: ResourceServerIdentifier.pdfGenerator,
     scopes: userPoolScopes,
+    userPool,
   });
 
   const userPoolClientScopes = Object.values(customOAuthScopes).map((scope) =>
@@ -120,27 +120,27 @@ export function createCognito({
   );
 
   const userPoolClient = new UserPoolClient(scope, 'user-pool-client', {
-    generateSecret: false,
-    userPool,
-    userPoolClientName: stackId,
     authFlows: {
-      userSrp: true,
       adminUserPassword: true,
+      userSrp: true,
     },
-    preventUserExistenceErrors: true,
+    generateSecret: false,
     oAuth: {
       scopes: [OAuthScope.COGNITO_ADMIN, ...userPoolClientScopes],
     },
+    preventUserExistenceErrors: true,
+    userPool,
+    userPoolClientName: stackId,
   });
 
   userPoolClient.node.addDependency(userPoolResourceServer);
 
   const { defaultUsersCredentialsSecret } = createDefaultUser({
+    lambdas,
     scope,
     stackId,
     userPool,
-    lambdas,
   });
 
-  return { userPool, userPoolClient, userPoolDomain, defaultUsersCredentialsSecret };
+  return { defaultUsersCredentialsSecret, userPool, userPoolClient, userPoolDomain };
 }

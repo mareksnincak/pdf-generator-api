@@ -7,8 +7,8 @@ export class CreateTemplateRequestMockFactory {
   create(overrides: Partial<CreateTemplateRequestDto> = {}): CreateTemplateRequestDto {
     return {
       name: randomBytes(8).toString('hex'),
-      uploadId: randomUUID(),
       type: TemplateType.htmlHandlebars,
+      uploadId: randomUUID(),
       ...overrides,
     };
   }

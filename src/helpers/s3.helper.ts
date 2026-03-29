@@ -39,18 +39,18 @@ export async function getObject({ bucket, key }: { bucket: string; key: string }
 
 export async function putObject({
   bucket,
-  key,
   data,
+  key,
 }: {
   bucket: string;
-  key: string;
   data: Uint8Array;
+  key: string;
 }) {
   await getS3Client().send(
     new PutObjectCommand({
+      Body: data,
       Bucket: bucket,
       Key: key,
-      Body: data,
     }),
   );
 }
@@ -99,48 +99,48 @@ export async function deleteObjects({ bucket, keys }: { bucket: string; keys: st
 }
 
 export async function copyObject({
-  sourceBucket,
-  sourceKey,
   destinationBucket,
   destinationKey,
+  sourceBucket,
+  sourceKey,
 }: {
-  sourceBucket: string;
-  sourceKey: string;
   destinationBucket: string;
   destinationKey: string;
+  sourceBucket: string;
+  sourceKey: string;
 }) {
   await getS3Client().send(
     new CopyObjectCommand({
-      CopySource: `${sourceBucket}/${sourceKey}`,
       Bucket: destinationBucket,
+      CopySource: `${sourceBucket}/${sourceKey}`,
       Key: destinationKey,
     }),
   );
 }
 
 export async function moveObject({
-  sourceBucket,
-  sourceKey,
   destinationBucket,
   destinationKey,
+  sourceBucket,
+  sourceKey,
 }: {
-  sourceBucket: string;
-  sourceKey: string;
   destinationBucket: string;
   destinationKey: string;
+  sourceBucket: string;
+  sourceKey: string;
 }) {
-  await copyObject({ sourceBucket, sourceKey, destinationBucket, destinationKey });
+  await copyObject({ destinationBucket, destinationKey, sourceBucket, sourceKey });
   await deleteObject({ bucket: sourceBucket, key: sourceKey });
 }
 
 export async function getPresignedShareUrl({
   bucket,
-  key,
   expiresInSeconds = 3600,
+  key,
 }: {
   bucket: string;
-  key: string;
   expiresInSeconds?: number;
+  key: string;
 }) {
   const client = getS3Client();
 
@@ -154,21 +154,21 @@ export async function getPresignedShareUrl({
 
 export async function getPresignedUploadUrl({
   bucket,
-  key,
-  fileSizeBytes,
   expiresInSeconds = 3600,
+  fileSizeBytes,
+  key,
 }: {
   bucket: string;
-  key: string;
-  fileSizeBytes: number;
   expiresInSeconds?: number;
+  fileSizeBytes: number;
+  key: string;
 }) {
   const client = getS3Client();
 
   const command = new PutObjectCommand({
     Bucket: bucket,
-    Key: key,
     ContentLength: fileSizeBytes,
+    Key: key,
   });
 
   return await getSignedUrl(client, command, {

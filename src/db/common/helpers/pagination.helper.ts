@@ -8,24 +8,24 @@ import { decrypt, encrypt } from '../../../helpers/kms.helper';
 import { logger } from '../../../helpers/logger.helper';
 
 type PaginationTokenData = {
-  userId: string;
   token: Record<string, unknown>;
+  userId: string;
 };
 
 export async function encryptPaginationToken(params: {
-  userId: string;
   paginationToken: Record<string, AttributeValue> | undefined;
+  userId: string;
 }) {
   logger.debug(params, 'commonDb.paginationHelper.encryptPaginationToken.input');
-  const { userId, paginationToken } = params;
+  const { paginationToken, userId } = params;
 
   if (!paginationToken) {
     return;
   }
 
   const data: PaginationTokenData = {
-    userId,
     token: unmarshall(paginationToken),
+    userId,
   };
 
   const kmsKeyId = getEnvVariableOrFail('KMS_KEY_ID');
@@ -44,10 +44,10 @@ export async function encryptPaginationToken(params: {
   return encodedData;
 }
 
-export async function decryptPaginationToken(params: { userId: string; paginationToken?: string }) {
+export async function decryptPaginationToken(params: { paginationToken?: string; userId: string }) {
   try {
     logger.debug(params, 'commonDb.paginationHelper.decryptPaginationToken.input');
-    const { userId, paginationToken } = params;
+    const { paginationToken, userId } = params;
 
     if (!paginationToken) {
       return;

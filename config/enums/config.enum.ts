@@ -1,6 +1,6 @@
 export enum EnvironmentName {
-  local = 'local',
   dev = 'dev',
-  manualDeploy = 'manual-deploy',
+  local = 'local',
   localTest = 'local-test',
+  manualDeploy = 'manual-deploy',
 }

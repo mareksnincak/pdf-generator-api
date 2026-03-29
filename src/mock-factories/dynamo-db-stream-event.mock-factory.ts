@@ -1,4 +1,4 @@
-import { type DynamoDBStreamEvent, type DynamoDBRecord } from 'aws-lambda';
+import { type DynamoDBRecord, type DynamoDBStreamEvent } from 'aws-lambda';
 import { type PartialDeep } from 'type-fest';
 
 import { DynamoDbRecordMockFactory } from './dynamo-db-record.mock-factory';

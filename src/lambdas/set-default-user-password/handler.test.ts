@@ -23,7 +23,7 @@ afterEach(() => {
 
 describe('setDefaultUserPassword', () => {
   it('should set default user password on create', async () => {
-    const userCredentials = { username: 'sample-username', password: 'sample-password' };
+    const userCredentials = { password: 'sample-password', username: 'sample-username' };
     jest.spyOn(secretManagerHelper, 'getSecret').mockResolvedValue(JSON.stringify(userCredentials));
 
     jest.spyOn(CognitoIdentityProviderClient.prototype, 'send').mockImplementation();
@@ -45,7 +45,7 @@ describe('setDefaultUserPassword', () => {
 
   it.each(['Update', 'Delete'])('should return SUCCESS on %s event', async (requestType) => {
     const event = eventMockFactory.create({
-      RequestType: requestType as 'Update' | 'Delete',
+      RequestType: requestType as 'Delete' | 'Update',
     });
 
     const result = await setDefaultUserPassword(event, context);

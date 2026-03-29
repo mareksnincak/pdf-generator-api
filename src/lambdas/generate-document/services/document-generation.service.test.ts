@@ -25,9 +25,9 @@ describe('generateDocument', () => {
     jest.spyOn(pdfService, 'createPdfFromHtml').mockResolvedValue(generatedPdf);
 
     const result = await generateDocument({
-      userId,
-      templateId: templateEntity.id,
       data,
+      templateId: templateEntity.id,
+      userId,
     });
 
     expect(result).toEqual(generatedPdf);

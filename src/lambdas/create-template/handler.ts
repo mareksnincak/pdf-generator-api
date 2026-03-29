@@ -36,10 +36,10 @@ async function moveTemplateDataToPermanentLocation({
     const storedDataS3Key = `${userId}/templates/data/${randomUUID()}`;
 
     await moveObject({
-      sourceBucket: bucket,
-      sourceKey: uploadedDataS3Key,
       destinationBucket: bucket,
       destinationKey: storedDataS3Key,
+      sourceBucket: bucket,
+      sourceKey: uploadedDataS3Key,
     });
 
     return storedDataS3Key;
@@ -55,18 +55,18 @@ async function moveTemplateDataToPermanentLocation({
 }
 
 export async function createTemplateWithData({
+  requestData: { id, name, type, uploadId },
   userId,
-  requestData: { id, name, uploadId, type },
 }: {
-  userId: string;
   requestData: CreateTemplateRequestDto;
+  userId: string;
 }) {
   const bucket = getEnvVariableOrFail('S3_BUCKET');
 
-  const s3Key = await moveTemplateDataToPermanentLocation({ userId, uploadId, bucket });
+  const s3Key = await moveTemplateDataToPermanentLocation({ bucket, uploadId, userId });
 
   try {
-    const template = await templateRepository.createOrFail({ id, name, type, s3Key, userId });
+    const template = await templateRepository.createOrFail({ id, name, s3Key, type, userId });
     return template;
   } catch (error) {
     await deleteObject({ bucket, key: s3Key });
@@ -87,7 +87,7 @@ export async function createTemplate(
     logger.info(validatedData, 'createTemplate.validatedData');
 
     const userId = getUserIdFromEventOrFail(event);
-    const template = await createTemplateWithData({ userId, requestData: validatedData });
+    const template = await createTemplateWithData({ requestData: validatedData, userId });
 
     const response: CreateTemplateResponseDto = template.toPublicJson();
     logger.info('createTemplate.success');

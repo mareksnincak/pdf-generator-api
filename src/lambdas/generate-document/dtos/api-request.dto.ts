@@ -6,13 +6,13 @@ import { templateDto } from '../../../dtos/template.dto';
 extendZodWithOpenApi(z);
 
 export const generateDocumentFromApiEventRequestDto = z.object({
-  templateId: templateDto.shape.id,
   data: z.record(z.string(), z.unknown()).openapi({
     description: 'Data to insert to template.',
     example: {
       name: 'John Smith',
     },
   }),
+  templateId: templateDto.shape.id,
 });
 
 export type GenerateDocumentFromApiEventRequestDto = z.infer<

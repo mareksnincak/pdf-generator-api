@@ -23,8 +23,8 @@ async function getLaunchOptions() {
       isMobile: false,
       width: 1920,
     },
-    headless: true,
     executablePath: await chromium.executablePath(),
+    headless: true,
   };
 
   const chromiumLocalExecutablePath = process.env.CHROMIUM_LOCAL_EXECUTABLE_PATH;

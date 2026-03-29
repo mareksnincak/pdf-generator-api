@@ -11,11 +11,11 @@ const mocksPath = path.join(__dirname, '..', '..', 'common', 'mocks');
 const createTemplateRequestMockFactory = new CreateTemplateRequestMockFactory();
 
 export async function createTemplateE2e({
-  baseUrl,
   accessToken,
+  baseUrl,
 }: {
-  baseUrl: string;
   accessToken: string;
+  baseUrl: string;
 }) {
   const templateData = await readFile(path.join(mocksPath, 'document.mock.html'));
 
@@ -53,12 +53,12 @@ export async function createTemplateE2e({
 }
 
 export async function deleteTemplateE2e({
-  baseUrl,
   accessToken,
+  baseUrl,
   templateId,
 }: {
-  baseUrl: string;
   accessToken: string;
+  baseUrl: string;
   templateId: string;
 }) {
   await request(baseUrl)

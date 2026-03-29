@@ -24,7 +24,7 @@ afterEach(() => {
 
 describe('setDefaultUserPassword', () => {
   it('should set default user password on create', async () => {
-    const userCredentials = { username: 'sample-username', password: 'sample-password' };
+    const userCredentials = { password: 'sample-password', username: 'sample-username' };
     const secretManagerSpy = jest
       .spyOn(SecretsManagerClient.prototype, 'send')
       .mockImplementation(() => ({
@@ -60,8 +60,8 @@ describe('setDefaultUserPassword', () => {
     expect(cognitoIdentityProviderClientArgs.input).toEqual({
       Password: userCredentials.password,
       Permanent: true,
-      UserPoolId: event.ResourceProperties.userPoolId,
       Username: userCredentials.username,
+      UserPoolId: event.ResourceProperties.userPoolId,
     });
   });
 });

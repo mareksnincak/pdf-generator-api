@@ -7,7 +7,7 @@ import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { logger, setLoggerContext } from '../../helpers/logger.helper';
 import { deleteObjects } from '../../helpers/s3.helper';
 
-function getKeysToDelete({ eventName, dynamodb }: DynamoDBRecord): string[] {
+function getKeysToDelete({ dynamodb, eventName }: DynamoDBRecord): string[] {
   logger.info({ eventName, keys: dynamodb?.Keys }, 'deleteOrphanedS3Objects.handleRecord');
   logger.debug({ dynamodb }, 'deleteOrphanedS3Objects.dynamoDbValue');
 

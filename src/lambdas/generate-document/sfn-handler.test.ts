@@ -66,8 +66,8 @@ describe('generateDocumentFromSfnEvent', () => {
     const result = await generateDocumentFromSfnEvent(input, context);
 
     expect(result).toEqual({
-      ref: input.ref,
       message: ErrorMessage.templateNotFound,
+      ref: input.ref,
       status: DocumentGenerationStatus.error,
     });
   });
@@ -84,8 +84,8 @@ describe('generateDocumentFromSfnEvent', () => {
     const result = await generateDocumentFromSfnEvent(input, context);
 
     expect(result).toEqual({
-      ref: input.ref,
       message: ErrorMessage.internalServerError,
+      ref: input.ref,
       status: DocumentGenerationStatus.error,
     });
   });

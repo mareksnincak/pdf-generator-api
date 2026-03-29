@@ -58,8 +58,8 @@ describe('storeDocumentBatchResult', () => {
     const inputSuccessResult = inputSuccessResultMockFactory.create();
     const input = inputMockFactory.create({
       id,
-      userId,
       results: [inputSuccessResult],
+      userId,
     });
 
     await storeDocumentBatchResult(input, context);
@@ -70,8 +70,6 @@ describe('storeDocumentBatchResult', () => {
     });
 
     expect(createdDocumentBatch).toEqual({
-      PK: `DOCUMENT_BATCH#USER#${userId}#ID#${id}`,
-      SK: '#',
       createdAt: mockedDate,
       errors: [],
       expiresAt: mockedDatePlusOneHour,
@@ -82,6 +80,8 @@ describe('storeDocumentBatchResult', () => {
         },
       ],
       id,
+      PK: `DOCUMENT_BATCH#USER#${userId}#ID#${id}`,
+      SK: '#',
       status: input.status,
       userId,
     });
@@ -97,8 +97,8 @@ describe('storeDocumentBatchResult', () => {
     const inputErrorResult = inputErrorResultMockFactory.create();
     const input = inputMockFactory.create({
       id,
-      userId,
       results: [inputSuccessResult, inputErrorResult],
+      userId,
     });
 
     await storeDocumentBatchResult(input, context);
@@ -110,8 +110,8 @@ describe('storeDocumentBatchResult', () => {
 
     expect(createdDocumentBatch.errors).toEqual([
       {
-        ref: inputErrorResult.ref,
         message: inputErrorResult.message,
+        ref: inputErrorResult.ref,
       },
     ]);
     expect(createdDocumentBatch.generatedDocuments).toEqual([
@@ -131,9 +131,9 @@ describe('storeDocumentBatchResult', () => {
 
     const input = inputMockFactory.create({
       id,
-      userId,
-      status: DocumentBatchStatus.failure,
       results: undefined,
+      status: DocumentBatchStatus.failure,
+      userId,
     });
 
     await storeDocumentBatchResult(input, context);

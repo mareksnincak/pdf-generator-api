@@ -44,8 +44,8 @@ describe('getTemplates', () => {
 
     const userId = event.requestContext.authorizer.claims.sub;
     const templateEntity = templateEntityMockFactory.create({
-      userId,
       name: 'a',
+      userId,
     });
 
     await templateRepository.createOrFail(templateEntity);
@@ -54,6 +54,7 @@ describe('getTemplates', () => {
 
     expect(result.statusCode).toEqual(200);
     expect(JSON.parse(result.body)).toEqual({
+      nextPaginationToken: null,
       templates: [
         {
           id: templateEntity.id,
@@ -61,7 +62,6 @@ describe('getTemplates', () => {
           type: templateEntity.type,
         },
       ],
-      nextPaginationToken: null,
     });
   });
 
@@ -73,13 +73,13 @@ describe('getTemplates', () => {
 
     const userId = event.requestContext.authorizer.claims.sub;
     const templateEntityA = templateEntityMockFactory.create({
-      userId,
       name: 'a',
+      userId,
     });
 
     const templateEntityB = templateEntityMockFactory.create({
-      userId,
       name: 'b',
+      userId,
     });
 
     await Promise.all([
@@ -129,13 +129,13 @@ describe('getTemplates', () => {
     const encryptCommandInput = (kmsClientArgs as EncryptCommand).input;
     expect(encryptCommandInput.KeyId).toEqual('sample-kms-key-id');
     expect(JSON.parse(Buffer.from(encryptCommandInput.Plaintext ?? '').toString())).toEqual({
-      userId,
       token: {
-        SK: '#',
-        PK: `TEMPLATE#USER#${userId}#ID#${templateEntity.id}`,
         GSI1PK: `TEMPLATE#USER#${userId}`,
         GSI1SK: `NAME#${templateEntity.name}`,
+        PK: `TEMPLATE#USER#${userId}#ID#${templateEntity.id}`,
+        SK: '#',
       },
+      userId,
     });
   });
 
@@ -151,18 +151,18 @@ describe('getTemplates', () => {
 
     const userId = event.requestContext.authorizer.claims.sub;
     const templateEntityA = templateEntityMockFactory.create({
-      userId,
       name: 'a',
+      userId,
     });
 
     const templateEntityB = templateEntityMockFactory.create({
-      userId,
       name: 'b',
+      userId,
     });
 
     const templateEntityC = templateEntityMockFactory.create({
-      userId,
       name: 'c',
+      userId,
     });
 
     await Promise.all([
@@ -174,13 +174,13 @@ describe('getTemplates', () => {
     const kmsClientSpy = jest.spyOn(KMSClient.prototype, 'send').mockImplementation(() => ({
       Plaintext: Buffer.from(
         JSON.stringify({
-          userId,
           token: {
-            SK: '#',
-            PK: `TEMPLATE#USER#${userId}#ID#${templateEntityB.id}`,
             GSI1PK: `TEMPLATE#USER#${userId}`,
             GSI1SK: `NAME#${templateEntityB.name}`,
+            PK: `TEMPLATE#USER#${userId}#ID#${templateEntityB.id}`,
+            SK: '#',
           },
+          userId,
         }),
       ),
     }));

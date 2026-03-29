@@ -25,9 +25,9 @@ describe('startExecution', () => {
       .mockImplementation(() => startExecutionCommandResult);
 
     const result = await startExecution({
-      stateMachineArn,
-      name,
       input,
+      name,
+      stateMachineArn,
     });
 
     expect(result).toEqual(startExecutionCommandResult);
@@ -35,9 +35,9 @@ describe('startExecution', () => {
     const sfnClientArgs = sfnClientSpy.mock.calls[0]?.[0];
     expect(sfnClientArgs).toBeInstanceOf(StartExecutionCommand);
     expect(sfnClientArgs.input).toEqual({
-      stateMachineArn,
-      name,
       input: JSON.stringify(input),
+      name,
+      stateMachineArn,
     });
   });
 });

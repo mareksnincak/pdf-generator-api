@@ -11,16 +11,16 @@ import { DocumentBatchEntity } from './entity';
 import { type DocumentBatch } from './type';
 
 export async function create(
-  documentBatch: SetOptional<DocumentBatch, 'id' | 'errors' | 'generatedDocuments' | 'createdAt'>,
+  documentBatch: SetOptional<DocumentBatch, 'createdAt' | 'errors' | 'generatedDocuments' | 'id'>,
 ) {
   logger.info('documentBatchRepository.create');
 
   const documentBatchEntity = new DocumentBatchEntity(documentBatch);
   const item = documentBatchEntity.toDynamoItem();
   const command = new PutItemCommand({
-    TableName: getTableName(),
-    Item: item,
     ConditionExpression: 'attribute_not_exists(PK)',
+    Item: item,
+    TableName: getTableName(),
   });
 
   await getDynamoDbClient().send(command);
@@ -33,8 +33,8 @@ export async function getById(params: { id: string; userId: string }) {
   logger.info(params, 'documentBatchRepository.getById');
 
   const command = new GetItemCommand({
-    TableName: getTableName(),
     Key: DocumentBatchEntity.getDynamoPrimaryKey(params),
+    TableName: getTableName(),
   });
 
   const { Item } = await getDynamoDbClient().send(command);
@@ -88,12 +88,12 @@ export async function updateById(
   const updateExpression = `SET ${updateExpressionItems.join(', ')}`;
 
   const command = new UpdateItemCommand({
-    TableName: getTableName(),
-    Key: DocumentBatchEntity.getDynamoPrimaryKey({ id, userId }),
     ConditionExpression: 'attribute_exists(PK)',
-    UpdateExpression: updateExpression,
     ExpressionAttributeNames: expressionAttributeNames,
     ExpressionAttributeValues: marshall(expressionAttributeValues),
+    Key: DocumentBatchEntity.getDynamoPrimaryKey({ id, userId }),
+    TableName: getTableName(),
+    UpdateExpression: updateExpression,
   });
 
   await getDynamoDbClient().send(command);

@@ -49,12 +49,12 @@ describe('startDocumentBatchGeneration', () => {
     const batchId = responseData.id;
     const userId = event.requestContext.authorizer.claims.sub;
     expect(startExecutionSpy).toHaveBeenCalledWith({
+      input: {
+        requestData: body,
+        userId,
+      },
       name: batchId,
       stateMachineArn: 'sample-state-machine-arn',
-      input: {
-        userId,
-        requestData: body,
-      },
     });
   });
 

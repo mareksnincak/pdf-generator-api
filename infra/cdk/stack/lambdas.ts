@@ -24,35 +24,33 @@ function getLambdaEntryPath(lambdaDirName: Lambda | string, handlerFilename = 'h
 }
 
 function getCommonNodeJsFunctionProps({
-  scope,
-  lambda,
-  cdkEnvVars,
-  retainStatefulResources,
   architecture = Architecture.ARM_64,
-  memorySize,
   bundlingOptions,
+  cdkEnvVars,
   handlerFilename,
+  lambda,
   lambdaDirName,
+  memorySize,
+  retainStatefulResources,
+  scope,
 }: {
-  scope: Construct;
-  lambda: Lambda;
-  cdkEnvVars: CdkEnvVarsDto;
-  retainStatefulResources: boolean;
   architecture?: Architecture;
-  memorySize?: number;
   bundlingOptions?: BundlingOptions;
+  cdkEnvVars: CdkEnvVarsDto;
   handlerFilename?: string;
+  lambda: Lambda;
   lambdaDirName?: string;
+  memorySize?: number;
+  retainStatefulResources: boolean;
+  scope: Construct;
 }) {
   const logGroup = new LogGroup(scope, `${lambda}-log-group`, {
-    retention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
     removalPolicy: RemovalPolicy.DESTROY, // This matches Lambda's default for auto-created log groups
+    retention: retainStatefulResources ? RetentionDays.ONE_MONTH : RetentionDays.ONE_DAY,
   });
 
   return {
-    runtime: Runtime.NODEJS_24_X,
     architecture,
-    entry: getLambdaEntryPath(lambdaDirName ?? lambda, handlerFilename),
     bundling: {
       /**
        * We are using static hash to be able to use local watch.
@@ -62,132 +60,134 @@ function getCommonNodeJsFunctionProps({
       assetHash: cdkEnvVars.FORCE_STATIC_HASH ? lambda : undefined,
       ...bundlingOptions,
     },
+    entry: getLambdaEntryPath(lambdaDirName ?? lambda, handlerFilename),
     logGroup,
-    timeout: Duration.seconds(30),
     memorySize,
+    runtime: Runtime.NODEJS_24_X,
+    timeout: Duration.seconds(30),
   } satisfies NodejsFunctionProps;
 }
 
 export function createLambdas({
-  scope,
   cdkEnvVars,
-  openApiParamsSsmParamName,
-  s3BucketName,
   dynamoDbTable,
   kmsKey,
+  openApiParamsSsmParamName,
   retainStatefulResources,
+  s3BucketName,
+  scope,
   sqsQueues,
 }: {
-  scope: Construct;
   cdkEnvVars: CdkEnvVarsDto;
-  openApiParamsSsmParamName: string;
-  s3BucketName: string;
   dynamoDbTable: Table;
   kmsKey: Key;
+  openApiParamsSsmParamName: string;
   retainStatefulResources: boolean;
+  s3BucketName: string;
+  scope: Construct;
   sqsQueues: ReturnType<typeof createSqsQueues>;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
 
   const getOpenApi = new NodejsFunction(scope, Lambda.getOpenApi, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.getOpenApi,
       cdkEnvVars,
+      lambda: Lambda.getOpenApi,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'getOpenApi',
     environment: {
       OPEN_API_SSM_PARAM_NAME: openApiParamsSsmParamName,
       ...envVars.get(Lambda.getOpenApi),
     },
+    handler: 'getOpenApi',
   });
 
   const getUrlForTemplateUpload = new NodejsFunction(scope, Lambda.getUrlForTemplateUpload, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.getUrlForTemplateUpload,
       cdkEnvVars,
+      lambda: Lambda.getUrlForTemplateUpload,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'getUrlForTemplateUpload',
     environment: {
-      S3_BUCKET: s3BucketName,
       DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
+      S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.getUrlForTemplateUpload),
     },
+    handler: 'getUrlForTemplateUpload',
   });
 
   const createTemplate = new NodejsFunction(scope, Lambda.createTemplate, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.createTemplate,
       cdkEnvVars,
+      lambda: Lambda.createTemplate,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'createTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.createTemplate),
     },
+    handler: 'createTemplate',
   });
 
   const getTemplate = new NodejsFunction(scope, Lambda.getTemplate, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.getTemplate,
       cdkEnvVars,
+      lambda: Lambda.getTemplate,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'getTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.getTemplate),
     },
+    handler: 'getTemplate',
   });
 
   const getTemplates = new NodejsFunction(scope, Lambda.getTemplates, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.getTemplates,
       cdkEnvVars,
+      lambda: Lambda.getTemplates,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'getTemplates',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       KMS_KEY_ID: kmsKey.keyId,
       ...envVars.get(Lambda.getTemplates),
     },
+    handler: 'getTemplates',
   });
 
   const deleteTemplate = new NodejsFunction(scope, Lambda.deleteTemplate, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.deleteTemplate,
       cdkEnvVars,
+      lambda: Lambda.deleteTemplate,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'deleteTemplate',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       ...envVars.get(Lambda.deleteTemplate),
     },
+    handler: 'deleteTemplate',
   });
 
   const setDefaultUserPassword = new NodejsFunction(scope, Lambda.setDefaultUserPassword, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.setDefaultUserPassword,
       cdkEnvVars,
+      lambda: Lambda.setDefaultUserPassword,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'setDefaultUserPassword',
     environment: {
       ...envVars.get(Lambda.setDefaultUserPassword),
     },
+    handler: 'setDefaultUserPassword',
   });
 
   const generateDocumentFromApiEvent = new NodejsFunction(
@@ -195,25 +195,25 @@ export function createLambdas({
     Lambda.generateDocumentFromApiEvent,
     {
       ...getCommonNodeJsFunctionProps({
-        scope,
-        lambda: Lambda.generateDocumentFromApiEvent,
-        cdkEnvVars,
-        retainStatefulResources,
         architecture: Architecture.X86_64,
-        memorySize: 2048,
         bundlingOptions: {
           nodeModules: ['@sparticuz/chromium'],
         },
-        lambdaDirName: 'generate-document',
+        cdkEnvVars,
         handlerFilename: 'api-handler.ts',
+        lambda: Lambda.generateDocumentFromApiEvent,
+        lambdaDirName: 'generate-document',
+        memorySize: 2048,
+        retainStatefulResources,
+        scope,
       }),
-      handler: 'generateDocumentFromApiEvent',
       environment: {
+        DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
         DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
         S3_BUCKET: s3BucketName,
-        DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
         ...envVars.get(Lambda.generateDocumentFromApiEvent),
       },
+      handler: 'generateDocumentFromApiEvent',
     },
   );
 
@@ -222,98 +222,98 @@ export function createLambdas({
     Lambda.generateDocumentFromSfnEvent,
     {
       ...getCommonNodeJsFunctionProps({
-        scope,
-        lambda: Lambda.generateDocumentFromSfnEvent,
-        cdkEnvVars,
-        retainStatefulResources,
         architecture: Architecture.X86_64,
-        memorySize: 2048,
         bundlingOptions: {
           nodeModules: ['@sparticuz/chromium'],
         },
-        lambdaDirName: 'generate-document',
+        cdkEnvVars,
         handlerFilename: 'sfn-handler.ts',
+        lambda: Lambda.generateDocumentFromSfnEvent,
+        lambdaDirName: 'generate-document',
+        memorySize: 2048,
+        retainStatefulResources,
+        scope,
       }),
-      handler: 'generateDocumentFromSfnEvent',
       environment: {
         DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
         S3_BUCKET: s3BucketName,
         ...envVars.get(Lambda.generateDocumentFromSfnEvent),
       },
+      handler: 'generateDocumentFromSfnEvent',
     },
   );
 
   const getDocumentBatchResult = new NodejsFunction(scope, Lambda.getDocumentBatchResult, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.getDocumentBatchResult,
       cdkEnvVars,
+      lambda: Lambda.getDocumentBatchResult,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'getDocumentBatchResult',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.getDocumentBatchResult),
     },
+    handler: 'getDocumentBatchResult',
   });
 
   const storeDocumentBatchResult = new NodejsFunction(scope, Lambda.storeDocumentBatchResult, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.storeDocumentBatchResult,
       cdkEnvVars,
+      lambda: Lambda.storeDocumentBatchResult,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'storeDocumentBatchResult',
     environment: {
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       ...envVars.get(Lambda.storeDocumentBatchResult),
     },
+    handler: 'storeDocumentBatchResult',
   });
 
   const deleteExpiredS3Objects = new NodejsFunction(scope, Lambda.deleteExpiredS3Objects, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.deleteExpiredS3Objects,
       cdkEnvVars,
+      lambda: Lambda.deleteExpiredS3Objects,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'deleteExpiredS3Objects',
     environment: {
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.deleteExpiredS3Objects),
     },
+    handler: 'deleteExpiredS3Objects',
   });
 
   const deleteOrphanedS3Objects = new NodejsFunction(scope, Lambda.deleteOrphanedS3Objects, {
     ...getCommonNodeJsFunctionProps({
-      scope,
-      lambda: Lambda.deleteOrphanedS3Objects,
       cdkEnvVars,
+      lambda: Lambda.deleteOrphanedS3Objects,
       retainStatefulResources,
+      scope,
     }),
-    handler: 'deleteOrphanedS3Objects',
     environment: {
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.deleteOrphanedS3Objects),
     },
+    handler: 'deleteOrphanedS3Objects',
   });
 
   return {
-    getOpenApi,
-    getUrlForTemplateUpload,
     createTemplate,
-    getTemplate,
-    getTemplates,
+    deleteExpiredS3Objects,
+    deleteOrphanedS3Objects,
     deleteTemplate,
-    setDefaultUserPassword,
     generateDocumentFromApiEvent,
     generateDocumentFromSfnEvent,
     getDocumentBatchResult,
+    getOpenApi,
+    getTemplate,
+    getTemplates,
+    getUrlForTemplateUpload,
+    setDefaultUserPassword,
     storeDocumentBatchResult,
-    deleteExpiredS3Objects,
-    deleteOrphanedS3Objects,
   };
 }
 
@@ -323,17 +323,17 @@ export function createLambdas({
  * state machine ARN therefore we create them separately later.
  */
 export function createStateMachineStartupLambdas({
-  scope,
   cdkEnvVars,
-  stateMachines,
-  retainStatefulResources,
   dynamoDbTable,
+  retainStatefulResources,
+  scope,
+  stateMachines,
 }: {
-  scope: Construct;
   cdkEnvVars: CdkEnvVarsDto;
-  retainStatefulResources: boolean;
-  stateMachines: ReturnType<typeof createStateMachines>;
   dynamoDbTable: Table;
+  retainStatefulResources: boolean;
+  scope: Construct;
+  stateMachines: ReturnType<typeof createStateMachines>;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
 
@@ -342,17 +342,17 @@ export function createStateMachineStartupLambdas({
     Lambda.startDocumentBatchGeneration,
     {
       ...getCommonNodeJsFunctionProps({
-        scope,
-        lambda: Lambda.startDocumentBatchGeneration,
         cdkEnvVars,
+        lambda: Lambda.startDocumentBatchGeneration,
         retainStatefulResources,
+        scope,
       }),
-      handler: 'startDocumentBatchGeneration',
       environment: {
         DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
         STATE_MACHINE_ARN: stateMachines.documentBatchGeneration.stateMachineArn,
         ...envVars.get(Lambda.startDocumentBatchGeneration),
       },
+      handler: 'startDocumentBatchGeneration',
     },
   );
 

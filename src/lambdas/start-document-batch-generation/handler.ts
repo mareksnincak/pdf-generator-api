@@ -22,12 +22,12 @@ import { type StartDocumentBatchGenerationResponseDto } from './dtos/response.dt
 
 async function startStateMachineExecution({
   name,
-  userId,
   requestData,
+  userId,
 }: {
   name: string;
-  userId: string;
   requestData: StartDocumentBatchGenerationRequestDto;
+  userId: string;
 }) {
   if (isLocal()) {
     logger.info('startDocumentBatchGeneration.startStateMachineExecution.skippingLocal');
@@ -36,12 +36,12 @@ async function startStateMachineExecution({
 
   const stateMachineArn = getEnvVariableOrFail('STATE_MACHINE_ARN');
   await startExecution({
-    stateMachineArn,
-    name,
     input: {
-      userId,
       requestData,
+      userId,
     },
+    name,
+    stateMachineArn,
   });
 }
 
@@ -60,15 +60,15 @@ export async function startDocumentBatchGeneration(
     const documentBatchTtlHours = Number(getEnvVariableOrFail('DOCUMENT_BATCH_TTL_HOURS'));
 
     const { id } = await documentBatchRepository.create({
-      userId,
-      status: DocumentBatchStatus.inProgress,
       expiresAt: addHoursToDate(new Date(), documentBatchTtlHours),
+      status: DocumentBatchStatus.inProgress,
+      userId,
     });
 
     await startStateMachineExecution({
       name: id,
-      userId,
       requestData: validatedData,
+      userId,
     });
 
     const response: StartDocumentBatchGenerationResponseDto = {

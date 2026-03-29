@@ -1,4 +1,4 @@
-import { SQSClient, SendMessageCommand } from '@aws-sdk/client-sqs';
+import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 
 import { sendSqsMessage } from './sqs.helper';
 
@@ -16,16 +16,16 @@ describe('sendSqsMessage', () => {
 
     await sendSqsMessage({
       body,
-      queueUrl,
       delaySeconds,
+      queueUrl,
     });
 
     const sqsClientArgs = sqsClientSpy.mock.calls[0]?.[0];
     expect(sqsClientArgs).toBeInstanceOf(SendMessageCommand);
     expect(sqsClientArgs.input).toEqual({
+      DelaySeconds: delaySeconds,
       MessageBody: body,
       QueueUrl: queueUrl,
-      DelaySeconds: delaySeconds,
     });
   });
 });

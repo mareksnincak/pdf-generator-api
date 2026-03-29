@@ -3,15 +3,15 @@ import { z } from 'zod';
 import { DocumentGenerationStatus } from '../enums/status.enum';
 
 export const generateDocumentFromSfnEventSuccessOutputDto = z.object({
-  status: z.literal(DocumentGenerationStatus.success),
   ref: z.string().min(1),
   s3Key: z.string().min(1),
+  status: z.literal(DocumentGenerationStatus.success),
 });
 
 export const generateDocumentFromSfnEventErrorOutputDto = z.object({
-  status: z.literal(DocumentGenerationStatus.error),
-  ref: z.string().min(1).nullable(),
   message: z.string().min(1),
+  ref: z.string().min(1).nullable(),
+  status: z.literal(DocumentGenerationStatus.error),
 });
 
 export const generateDocumentFromSfnEventOutputDto =

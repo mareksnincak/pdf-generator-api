@@ -1,8 +1,8 @@
 enum ScopeName {
   admin = 'aws.cognito.signin.user.admin',
+  generateDocuments = 'documents:generate',
   readTemplates = 'templates:read',
   writeTemplates = 'templates:write',
-  generateDocuments = 'documents:generate',
 }
 
 export enum ResourceServerIdentifier {
@@ -10,27 +10,27 @@ export enum ResourceServerIdentifier {
 }
 
 export const customOAuthScopes = {
-  readTemplates: {
-    name: ScopeName.readTemplates,
-    pdfGeneratorName: `${ResourceServerIdentifier.pdfGenerator}/${ScopeName.readTemplates}`,
-    description: 'Read templates',
-  },
-  writeTemplates: {
-    name: ScopeName.writeTemplates,
-    pdfGeneratorName: `${ResourceServerIdentifier.pdfGenerator}/${ScopeName.writeTemplates}`,
-    description: 'Modify templates',
-  },
   generateDocuments: {
+    description: 'Generate documents',
     name: ScopeName.generateDocuments,
     pdfGeneratorName: `${ResourceServerIdentifier.pdfGenerator}/${ScopeName.generateDocuments}`,
-    description: 'Generate documents',
+  },
+  readTemplates: {
+    description: 'Read templates',
+    name: ScopeName.readTemplates,
+    pdfGeneratorName: `${ResourceServerIdentifier.pdfGenerator}/${ScopeName.readTemplates}`,
+  },
+  writeTemplates: {
+    description: 'Modify templates',
+    name: ScopeName.writeTemplates,
+    pdfGeneratorName: `${ResourceServerIdentifier.pdfGenerator}/${ScopeName.writeTemplates}`,
   },
 } as const;
 
 export const oAuthScopes = {
   ...customOAuthScopes,
   admin: {
-    scope: ScopeName.admin,
     pdfGeneratorScope: ScopeName.admin,
+    scope: ScopeName.admin,
   },
 } as const;

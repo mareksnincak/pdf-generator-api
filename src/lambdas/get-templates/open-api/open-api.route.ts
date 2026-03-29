@@ -6,30 +6,30 @@ import { getTemplatesRequestDto } from '../dtos/request.dto';
 import { getTemplatesResponseDto } from '../dtos/response.dto';
 
 export const getTemplatesRoute: RouteConfig = {
+  description: 'Get templates.',
   method: 'get',
   path: '/templates',
-  tags: ['templates'],
-  summary: 'Get templates',
-  description: 'Get templates.',
   request: {
     query: getTemplatesRequestDto,
   },
   responses: {
     200: {
-      description: 'Success.',
       content: {
         'application/json': {
           schema: getTemplatesResponseDto,
         },
       },
+      description: 'Success.',
     },
     400: {
-      description: ErrorMessage.validationError,
       content: {
         'application/json': {
           schema: httpErrorDto,
         },
       },
+      description: ErrorMessage.validationError,
     },
   },
+  summary: 'Get templates',
+  tags: ['templates'],
 };

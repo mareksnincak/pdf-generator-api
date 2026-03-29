@@ -6,13 +6,13 @@ import { addHoursToDate } from '../../helpers/date.helper';
 
 import { DocumentBatchEntity } from './entity';
 import { DocumentBatchStatus } from './enum';
-import { type DocumentBatchGeneratedDocument, type DocumentBatchError } from './type';
+import { type DocumentBatchError, type DocumentBatchGeneratedDocument } from './type';
 
 export class DocumentBatchErrorMockFactory {
   create(overrides: Partial<DocumentBatchError> = {}): DocumentBatchError {
     return {
-      ref: randomUUID(),
       message: randomUUID(),
+      ref: randomUUID(),
       ...overrides,
     };
   }
@@ -49,9 +49,9 @@ export class DocumentBatchEntityMockFactory {
     }
 
     return new DocumentBatchEntity({
-      userId: randomUUID(),
-      status: DocumentBatchStatus.inProgress,
       expiresAt: addHoursToDate(new Date(), 1),
+      status: DocumentBatchStatus.inProgress,
+      userId: randomUUID(),
       ...overrides,
       errors,
       generatedDocuments,

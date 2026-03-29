@@ -2,18 +2,18 @@ import { type PrimaryKey } from '../common/types/entity.type';
 
 import { type DocumentBatchStatus } from './enum';
 
-export type DocumentBatchError = { ref: string | null; message: string };
+export type DocumentBatchError = { message: string; ref: null | string };
 
 export type DocumentBatchGeneratedDocument = { ref: string; s3Key: string };
 
 export type DocumentBatch = {
-  id: string;
-  userId: string;
-  status: DocumentBatchStatus;
-  errors: DocumentBatchError[];
-  generatedDocuments: DocumentBatchGeneratedDocument[];
   createdAt: Date;
+  errors: DocumentBatchError[];
   expiresAt: Date;
+  generatedDocuments: DocumentBatchGeneratedDocument[];
+  id: string;
+  status: DocumentBatchStatus;
+  userId: string;
 };
 
 export type StoredDocumentBatch = PrimaryKey &

@@ -93,14 +93,14 @@ describe('createTemplate', () => {
 
     const createdTemplate = await templateRepository.getByIdOrFail({ id, userId });
     expect(createdTemplate).toEqual({
-      PK: `TEMPLATE#USER#${userId}#ID#${id}`,
-      SK: '#',
+      createdAt: new Date(mockedDate.setMilliseconds(0)),
       GSI1PK: `TEMPLATE#USER#${userId}`,
       GSI1SK: `NAME#${requestBody.name}`,
-      createdAt: new Date(mockedDate.setMilliseconds(0)),
       id,
       name: requestBody.name,
+      PK: `TEMPLATE#USER#${userId}#ID#${id}`,
       s3Key: `${userId}/templates/data/${requestBody.uploadId}`,
+      SK: '#',
       type: 'html/handlebars',
       userId,
     });
@@ -110,7 +110,7 @@ describe('createTemplate', () => {
     mockLogger();
 
     jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
-      throw new NoSuchKey({ message: 'No such key', $metadata: {} });
+      throw new NoSuchKey({ $metadata: {}, message: 'No such key' });
     });
 
     const requestBody = requestMockFactory.create();
