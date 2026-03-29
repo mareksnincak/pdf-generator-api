@@ -27,9 +27,9 @@
     "presynth": "shx rm -rf ./infra/cdk/cdk.out",
     "synth": "cd ./infra/cdk && cdk synth",
     "synth:watch": "chokidar src/** package-lock.json config/values/local.config.json -c 'npm run synth'",
-    "test": "jest --config ./.jest/jest.unit.config.ts",
-    "test:e2e": "jest --config ./.jest/jest.e2e.config.ts",
-    "test:it": "npm run it-infra:up && jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.unit.config.ts",
+    "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.e2e.config.ts",
+    "test:it": "npm run it-infra:up && NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.5.0",
