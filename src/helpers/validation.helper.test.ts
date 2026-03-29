@@ -48,7 +48,7 @@ describe('validate', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestError);
       expect((error as BadRequestError).message).toEqual(
-        'Expected number, received string at "foo"',
+        'Invalid input: expected number, received string at "foo"',
       );
     }
   });
@@ -96,7 +96,7 @@ describe('validateQueryParams', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestError);
       expect((error as BadRequestError).message).toEqual(
-        'Expected number, received string at "foo"',
+        'Invalid input: expected number, received string at "foo"',
       );
     }
   });
@@ -144,7 +144,7 @@ describe('validatePathParams', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestError);
       expect((error as BadRequestError).message).toEqual(
-        'Expected number, received string at "foo"',
+        'Invalid input: expected number, received string at "foo"',
       );
     }
   });
@@ -192,7 +192,7 @@ describe('validateBody', () => {
     } catch (error) {
       expect(error).toBeInstanceOf(BadRequestError);
       expect((error as BadRequestError).message).toEqual(
-        'Expected number, received string at "foo"',
+        'Invalid input: expected number, received string at "foo"',
       );
     }
   });
