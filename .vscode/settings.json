@@ -27,5 +27,6 @@
   ],
   "jestrunner.configPath": ".jest/jest.common.config.ts",
   "jestrunner.runOptions": ["--runInBand"],
-  "jestrunner.enableESM": true
+  "jestrunner.enableESM": true,
+  "eslint.workingDirectories": [{ "mode": "auto" }]
 }
