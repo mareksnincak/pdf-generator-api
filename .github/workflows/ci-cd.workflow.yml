@@ -15,7 +15,7 @@ jobs:
         with:
           node-version-file: '.nvmrc'
       - run: npm ci
-      - run: npm run lint
+      - run: npm run lint -- --max-warnings 0
   test:
     runs-on: ubuntu-latest
     steps:
