@@ -55,7 +55,7 @@ export async function decryptPaginationToken(params: { userId: string; paginatio
 
     const decryptedData = await decrypt({ data: Buffer.from(paginationToken, 'base64url') });
     const decodedData = decryptedData.toString('utf8');
-    const parsedData: PaginationTokenData = JSON.parse(decodedData);
+    const parsedData = JSON.parse(decodedData) as PaginationTokenData;
 
     if (userId !== parsedData.userId) {
       const errorMsg = 'commonDb.paginationHelper.decryptPaginationToken.userMismatch';

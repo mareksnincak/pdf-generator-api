@@ -59,7 +59,7 @@ export class CdkStack extends Stack {
       sqsQueues,
     });
 
-    const stateMachines = createStateMachines({ scope: this, lambdas, dynamoDbTable });
+    const stateMachines = createStateMachines({ scope: this, lambdas });
     const stateMachineStartupLambdas = createStateMachineStartupLambdas({
       scope: this,
       cdkEnvVars,

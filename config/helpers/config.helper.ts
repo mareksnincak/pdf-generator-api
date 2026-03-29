@@ -16,7 +16,7 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
   const configFile = readFileSync(configPath);
   const config = JSON.parse(configFile.toString()) as {
     global: Record<string, string>;
-    lambda: Record<Lambda, Record<string, string>>;
+    lambda: Partial<Record<Lambda, Record<string, string>>>;
   };
 
   const envVarsMap = new Map<Lambda | 'global', Record<string, string>>();
@@ -54,6 +54,6 @@ export function setEnvVarsFromConfig(environmentName: EnvironmentName, lambda?: 
   }
 
   for (const [name, value] of Object.entries(values)) {
-    process.env[name as keyof NodeJS.ProcessEnv] = String(value);
+    process.env[name as keyof NodeJS.ProcessEnv] = value;
   }
 }

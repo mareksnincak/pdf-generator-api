@@ -2,7 +2,7 @@ import { DynamoDBClient, type DynamoDBClientConfig } from '@aws-sdk/client-dynam
 
 import { getEnvVariableOrFail } from '../../../helpers/env.helper';
 
-let client: DynamoDBClient;
+let client: DynamoDBClient | undefined;
 let tableName: string;
 
 export function getDynamoDbClient() {

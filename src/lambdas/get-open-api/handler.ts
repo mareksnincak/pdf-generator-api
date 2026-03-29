@@ -8,7 +8,7 @@ import { generateOpenApi } from '../../open-api/generate-open-api.schema';
 
 import { type OpenApiParamsSsmParam } from './types/input.type';
 
-let openApiDocument: ReturnType<typeof generateOpenApi>;
+let openApiDocument: ReturnType<typeof generateOpenApi> | undefined;
 
 async function getOpenApiParams() {
   if (isLocal()) {

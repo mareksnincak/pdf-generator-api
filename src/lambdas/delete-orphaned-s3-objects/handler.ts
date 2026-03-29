@@ -12,7 +12,7 @@ function getKeysToDelete({ eventName, dynamodb }: DynamoDBRecord): string[] {
   logger.debug({ dynamodb }, 'deleteOrphanedS3Objects.dynamoDbValue');
 
   const PK = dynamodb?.Keys?.PK.S;
-  const item = dynamodb?.OldImage as Record<string, AttributeValue>;
+  const item = dynamodb?.OldImage as Record<string, AttributeValue> | undefined;
   if (eventName !== 'REMOVE' || !PK || !item) {
     logger.warn('deleteOrphanedS3Objects.handleRecord.invalidEvent');
     return [];

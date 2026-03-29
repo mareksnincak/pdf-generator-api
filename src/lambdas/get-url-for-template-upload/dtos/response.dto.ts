@@ -4,7 +4,7 @@ import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 export const getUrlForTemplateUploadResponseDto = z.object({
-  uploadId: z.string().uuid().openapi({ description: 'Unique id identifying current upload.' }),
+  uploadId: z.uuid().openapi({ description: 'Unique id identifying current upload.' }),
   url: z.string().openapi({
     description:
       'Url where data should be uploaded by sending PUT request with binary data payload.',

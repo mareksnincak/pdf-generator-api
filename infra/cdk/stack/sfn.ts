@@ -1,4 +1,3 @@
-import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import {
   DefinitionBody,
   Fail,
@@ -18,11 +17,9 @@ import { type createLambdas } from './lambdas';
 function createDocumentBatchGenerationStateMachine({
   scope,
   lambdas,
-  dynamoDbTable,
 }: {
   scope: Construct;
   lambdas: ReturnType<typeof createLambdas>;
-  dynamoDbTable: Table;
 }) {
   const generateDocumentsTask = new SfnMap(scope, 'Generate documents', {
     itemsPath: JsonPath.stringAt('$.requestData.documents'),
@@ -84,16 +81,13 @@ function createDocumentBatchGenerationStateMachine({
 export function createStateMachines({
   scope,
   lambdas,
-  dynamoDbTable,
 }: {
   scope: Construct;
   lambdas: ReturnType<typeof createLambdas>;
-  dynamoDbTable: Table;
 }) {
   const documentBatchGeneration = createDocumentBatchGenerationStateMachine({
     scope,
     lambdas,
-    dynamoDbTable,
   });
 
   return { documentBatchGeneration };

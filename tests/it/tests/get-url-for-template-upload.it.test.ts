@@ -29,7 +29,7 @@ const requestMockFactory = new GetUrlForTemplateUploadRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
 const context = new ContextMockFactory().create();
 
-beforeAll(async () => {
+beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getUrlForTemplateUpload);
 });
 

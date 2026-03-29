@@ -88,7 +88,10 @@ describe('Documents', () => {
     const batchId = generateDocumentBatchResponse.id as string;
 
     if (!isCi) {
-      // As state machine doesn't run locally, we just check if document batch was created and exit
+      /**
+       * As state machine doesn't run locally, we just check if document
+       * batch was created and exit
+       */
       const { body } = await request(baseUrl)
         .get(`/documents/batch/${batchId}`)
         .auth(accessToken, { type: 'bearer' })

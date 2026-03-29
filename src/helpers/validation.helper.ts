@@ -34,7 +34,7 @@ export function validateBody<T extends ZodType>(
   dto: T,
 ): z.infer<T> {
   try {
-    const data = JSON.parse(event.body ?? '');
+    const data = JSON.parse(event.body ?? '') as unknown;
     return validate(data, dto);
   } catch (error) {
     if (error instanceof SyntaxError) {

@@ -13,7 +13,7 @@ const eventMockFactory = new DynamoDbStreamEventMockFactory();
 const context = new ContextMockFactory().create();
 const templateMockFactory = new TemplateEntityMockFactory();
 
-beforeAll(async () => {
+beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.deleteExpiredS3Objects);
 });
 

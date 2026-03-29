@@ -8,7 +8,7 @@ extendZodWithOpenApi(z);
 
 export const getDocumentBatchResultResponseDto = z.object({
   id: batchIdDto.shape.id,
-  status: z.nativeEnum(DocumentBatchStatus).openapi({
+  status: z.enum(DocumentBatchStatus).openapi({
     description: 'Status.',
   }),
   errors: z

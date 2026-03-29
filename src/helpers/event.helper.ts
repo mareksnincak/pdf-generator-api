@@ -8,7 +8,8 @@ import { isLocal } from './env.helper';
 export function getUserIdFromEvent(
   event: PartialDeep<APIGatewayProxyWithCognitoAuthorizerEvent> | PartialDeep<APIGatewayEvent>,
 ): string | undefined {
-  const userId = event.requestContext?.authorizer?.claims?.sub;
+  const authorizerClaims = event.requestContext?.authorizer?.claims as { sub?: string } | undefined;
+  const userId = authorizerClaims?.sub;
 
   if (userId) {
     return userId;

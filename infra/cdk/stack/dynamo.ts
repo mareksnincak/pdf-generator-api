@@ -57,7 +57,7 @@ export function createDynamoDbEventSources({
 }) {
   const itemRemovalEventSource = new DynamoEventSource(dynamoDbTable, {
     startingPosition: StartingPosition.LATEST,
-    filters: [FilterCriteria.filter({ eventName: FilterRule.isEqual('REMOVE') })],
+    filters: [FilterCriteria.filter({ eventName: FilterRule.isEqual('REMOVE') as unknown })],
     bisectBatchOnError: true,
     retryAttempts: 10,
   });
