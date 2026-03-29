@@ -31,11 +31,6 @@
     "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.e2e.config.ts",
     "test:it": "npm run it-infra:up && NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down"
   },
-  "overrides": {
-    "ts-jest": {
-      "typescript": "$typescript"
-    }
-  },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.1019.0",
@@ -87,7 +82,7 @@
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "type-fest": "^5.5.0",
-    "typescript": "~6.0.2",
+    "typescript": "~5.9.3",
     "wait-for-expect": "^4.0.0"
   }
 }
