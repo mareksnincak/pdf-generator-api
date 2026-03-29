@@ -17,7 +17,7 @@ export const templateDto = z.object({
     .min(1)
     .max(64)
     .openapi({ description: 'Template name.', example: 'Template name' }),
-  type: z.nativeEnum(TemplateType).openapi({ description: 'Template type.' }),
+  type: z.enum(TemplateType).openapi({ description: 'Template type.' }),
 });
 
 export type TemplateDto = z.infer<typeof templateDto>;

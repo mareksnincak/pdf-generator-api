@@ -4,7 +4,7 @@ import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 export const batchIdDto = z.object({
-  id: z.string().uuid().openapi({
+  id: z.uuid().openapi({
     description: 'Batch id.',
   }),
 });

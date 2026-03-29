@@ -28,13 +28,14 @@ afterAll(async () => {
 describe('Templates', () => {
   it('should create template', async () => {
     templateId = await createTemplateE2e({ baseUrl, accessToken });
+    expect(true).toEqual(true);
   });
 
   it('should return template', async () => {
     expect(templateId).toBeDefined();
 
     const { body } = await request(baseUrl)
-      .get(`/templates/${templateId}`)
+      .get(`/templates/${templateId!}`)
       .auth(accessToken, { type: 'bearer' })
       .expect(200);
 

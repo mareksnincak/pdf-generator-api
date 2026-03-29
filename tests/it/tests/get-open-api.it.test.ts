@@ -10,7 +10,7 @@ import { ContextMockFactory } from '../../../src/mock-factories/context.mock-fac
 const event = new ApiGatewayProxyEventMockFactory().create();
 const context = new ContextMockFactory().create();
 
-beforeAll(async () => {
+beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getOpenApi);
 });
 

@@ -10,7 +10,7 @@ import { SqsEventMockFactory } from '../../../src/mock-factories/sqs-event.mock-
 const eventMockFactory = new SqsEventMockFactory();
 const context = new ContextMockFactory().create();
 
-beforeAll(async () => {
+beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.deleteExpiredS3Objects);
 });
 

@@ -1,7 +1,7 @@
 import * as crypto from 'node:crypto';
 import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import path from 'node:path';
 
 import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
@@ -47,8 +47,8 @@ afterEach(() => {
 
 describe('generateDocumentFromSfnEvent', () => {
   it('should generate document', async () => {
-    const mocksPath = join(__dirname, '..', '..', 'common', 'mocks');
-    const htmlTemplate = await readFile(join(mocksPath, 'document.mock.html'));
+    const mocksPath = path.join(__dirname, '..', '..', 'common', 'mocks');
+    const htmlTemplate = await readFile(path.join(mocksPath, 'document.mock.html'));
 
     const s3ClientSpy = jest
       .spyOn(S3Client.prototype, 'send')
@@ -93,7 +93,7 @@ describe('generateDocumentFromSfnEvent', () => {
     });
 
     const generatedDocument = (s3PutObjectArgs as PutObjectCommand).input.Body as Buffer;
-    const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
+    const expectedDocument = await readFile(path.join(mocksPath, 'document.mock.pdf'));
     expect(await isSamePdfFile(generatedDocument, expectedDocument)).toEqual(true);
 
     const s3GetObjectArgs = s3ClientSpy.mock.calls[0]?.[0];

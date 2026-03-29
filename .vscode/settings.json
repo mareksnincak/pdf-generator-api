@@ -28,5 +28,10 @@
   "jestrunner.configPath": ".jest/jest.common.config.ts",
   "jestrunner.runOptions": ["--runInBand"],
   "jestrunner.enableESM": true,
-  "eslint.workingDirectories": [{ "mode": "auto" }]
+  "eslint.workingDirectories": [{ "mode": "auto" }],
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "never",
+    "source.fixAll.eslint": "explicit"
+  }
 }

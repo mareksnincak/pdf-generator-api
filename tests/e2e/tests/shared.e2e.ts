@@ -1,12 +1,12 @@
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import path from 'node:path';
 
 import request from 'supertest';
 
 import { CreateTemplateRequestMockFactory } from '../../../src/lambdas/create-template/mock-factories/request.mock-factory';
 import { type GetUrlForTemplateUploadResponseDto } from '../../../src/lambdas/get-url-for-template-upload/dtos/response.dto';
 
-const mocksPath = join(__dirname, '..', '..', 'common', 'mocks');
+const mocksPath = path.join(__dirname, '..', '..', 'common', 'mocks');
 
 const createTemplateRequestMockFactory = new CreateTemplateRequestMockFactory();
 
@@ -17,7 +17,7 @@ export async function createTemplateE2e({
   baseUrl: string;
   accessToken: string;
 }) {
-  const templateData = await readFile(join(mocksPath, 'document.mock.html'));
+  const templateData = await readFile(path.join(mocksPath, 'document.mock.html'));
 
   // Get url for template upload
   const { body: getUrlForTemplateUploadResponse } = await request(baseUrl)

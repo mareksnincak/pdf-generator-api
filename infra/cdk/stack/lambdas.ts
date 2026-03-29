@@ -1,4 +1,4 @@
-import { join } from 'node:path';
+import path from 'node:path';
 
 import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
@@ -20,7 +20,7 @@ import { type createStateMachines } from './sfn';
 import { type createSqsQueues } from './sqs';
 
 function getLambdaEntryPath(lambdaDirName: Lambda | string, handlerFilename = 'handler.ts') {
-  return join(__dirname, '..', '..', '..', 'src', 'lambdas', lambdaDirName, handlerFilename);
+  return path.join(__dirname, '..', '..', '..', 'src', 'lambdas', lambdaDirName, handlerFilename);
 }
 
 function getCommonNodeJsFunctionProps({

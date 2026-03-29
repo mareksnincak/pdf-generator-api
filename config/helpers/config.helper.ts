@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import path from 'node:path';
 
 import { Lambda } from '../../infra/cdk/enums/lambda.enum';
 import { type EnvironmentName } from '../enums/config.enum';
@@ -12,11 +12,11 @@ export function getEnvVars(environmentName: EnvironmentName): EnvVars {
     return envVars;
   }
 
-  const configPath = join(__dirname, '..', 'values', `${environmentName}.config.json`);
+  const configPath = path.join(__dirname, '..', 'values', `${environmentName}.config.json`);
   const configFile = readFileSync(configPath);
   const config = JSON.parse(configFile.toString()) as {
     global: Record<string, string>;
-    lambda: Record<Lambda, Record<string, string>>;
+    lambda: Partial<Record<Lambda, Record<string, string>>>;
   };
 
   const envVarsMap = new Map<Lambda | 'global', Record<string, string>>();
@@ -54,6 +54,6 @@ export function setEnvVarsFromConfig(environmentName: EnvironmentName, lambda?: 
   }
 
   for (const [name, value] of Object.entries(values)) {
-    process.env[name as keyof NodeJS.ProcessEnv] = String(value);
+    process.env[name as keyof NodeJS.ProcessEnv] = value;
   }
 }

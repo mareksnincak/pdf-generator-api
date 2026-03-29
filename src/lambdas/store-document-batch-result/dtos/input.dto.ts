@@ -6,7 +6,7 @@ import { generateDocumentFromSfnEventOutputDto } from '../../generate-document/d
 export const storeDocumentBatchResultInputDto = z.object({
   id: z.string(),
   userId: z.string(),
-  status: z.nativeEnum(DocumentBatchStatus),
+  status: z.enum(DocumentBatchStatus),
   results: z.array(generateDocumentFromSfnEventOutputDto).optional().default([]),
 });
 
