@@ -1,5 +1,7 @@
 import eslint from '@eslint/js';
+import tsParser from '@typescript-eslint/parser';
 import commentLengthPlugin from 'eslint-plugin-comment-length';
+import importPlugin from 'eslint-plugin-import-x';
 import jestPlugin from 'eslint-plugin-jest';
 import perfectionistPlugin from 'eslint-plugin-perfectionist';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
@@ -44,13 +46,18 @@ export default defineConfig(
   },
 
   {
-    extends: [tsEslint.configs.strictTypeChecked, tsEslint.configs.stylisticTypeChecked],
+    extends: [
+      tsEslint.configs.strictTypeChecked,
+      tsEslint.configs.stylisticTypeChecked,
+      importPlugin.flatConfigs.recommended,
+      importPlugin.flatConfigs.typescript,
+    ],
 
     files: ['**/*.ts'],
 
     languageOptions: {
       globals: globals.node,
-      parser: tsEslint.parser,
+      parser: tsParser,
       parserOptions: {
         projectService: true,
       },
@@ -60,6 +67,7 @@ export default defineConfig(
       '@typescript-eslint/consistent-type-definitions': 'off',
       '@typescript-eslint/no-non-null-assertion': 'off',
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
+
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {
@@ -78,6 +86,29 @@ export default defineConfig(
           allowNumber: true,
         },
       ],
+
+      'import-x/extensions': [
+        'error',
+        'ignorePackages',
+        {
+          js: 'never',
+          json: 'always',
+          ts: 'never',
+        },
+      ],
+
+      'import-x/no-extraneous-dependencies': [
+        'error',
+        {
+          devDependencies: ['tests/**/*.ts', 'infra/**/*.ts'],
+        },
+      ],
+
+      'import-x/no-mutable-exports': 'error',
+
+      'import-x/no-named-as-default-member': 'off',
+
+      'import-x/prefer-default-export': 'off',
     },
   },
 

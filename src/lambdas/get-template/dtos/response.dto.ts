@@ -1,5 +1,5 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
-import z from 'zod';
+import { z } from 'zod';
 
 import { templateDto } from '../../../dtos/template.dto';
 
