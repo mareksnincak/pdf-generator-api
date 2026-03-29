@@ -1,4 +1,4 @@
-import pino from 'pino';
+import { pino } from 'pino';
 import { lambdaRequestTracker, pinoLambdaDestination } from 'pino-lambda';
 
 import { getUserIdFromEvent } from './event.helper';
