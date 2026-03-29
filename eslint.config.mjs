@@ -2,6 +2,7 @@ import eslint from '@eslint/js';
 import commentLengthPlugin from 'eslint-plugin-comment-length';
 import jestPlugin from 'eslint-plugin-jest';
 import prettierPlugin from 'eslint-plugin-prettier/recommended';
+import unicornPlugin from 'eslint-plugin-unicorn';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
 import tsEslint from 'typescript-eslint';
@@ -9,12 +10,16 @@ import tsEslint from 'typescript-eslint';
 export default defineConfig(
   eslint.configs.recommended,
   commentLengthPlugin.configs['flat/recommended'],
+  unicornPlugin.configs.unopinionated,
   prettierPlugin,
 
   {
     rules: {
       'comment-length/limit-single-line-comments': ['warn', { maxLength: 97 }],
       'comment-length/limit-multi-line-comments': ['warn', { maxLength: 97 }],
+      'unicorn/prefer-module': ['off'],
+      'unicorn/no-array-for-each': ['off'],
+      'unicorn/numeric-separators-style': ['off'],
     },
   },
 

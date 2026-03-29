@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import path from 'node:path';
 
 import isCi from 'is-ci';
 import request from 'supertest';
@@ -33,7 +33,7 @@ afterAll(async () => {
   }
 });
 
-const mocksPath = join(__dirname, '..', '..', 'common', 'mocks');
+const mocksPath = path.join(__dirname, '..', '..', 'common', 'mocks');
 
 describe('Documents', () => {
   it('should generate document', async () => {
@@ -55,7 +55,7 @@ describe('Documents', () => {
       .responseType('blob')
       .expect(200)) as { body: Uint8Array };
 
-    const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
+    const expectedDocument = await readFile(path.join(mocksPath, 'document.mock.pdf'));
     expect(await isSamePdfFile(generatedDocumentData, expectedDocument)).toEqual(true);
   });
 
@@ -131,7 +131,7 @@ describe('Documents', () => {
       .responseType('blob')
       .expect(200)) as { body: Uint8Array };
 
-    const expectedDocument = await readFile(join(mocksPath, 'document.mock.pdf'));
+    const expectedDocument = await readFile(path.join(mocksPath, 'document.mock.pdf'));
     expect(await isSamePdfFile(generatedDocumentData, expectedDocument)).toEqual(true);
   }, 30000);
 });
