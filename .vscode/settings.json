@@ -26,5 +26,6 @@
     "unmarshall"
   ],
   "jestrunner.configPath": ".jest/jest.common.config.ts",
-  "jestrunner.runOptions": ["--runInBand"]
+  "jestrunner.runOptions": ["--runInBand"],
+  "jestrunner.enableESM": true
 }
