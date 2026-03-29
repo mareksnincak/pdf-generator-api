@@ -22,6 +22,7 @@ npm run open-api:generate
 
 ## How to run
 
+1. [install AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html#install-sam-cli-instructions)
 1. install dependencies
    ```bash
    npm i

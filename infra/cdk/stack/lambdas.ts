@@ -43,7 +43,7 @@ function getCommonNodeJsFunctionProps({
   lambdaDirName?: string;
 }) {
   return {
-    runtime: Runtime.NODEJS_20_X,
+    runtime: Runtime.NODEJS_24_X,
     architecture,
     entry: getLambdaEntryPath(lambdaDirName ?? lambda, handlerFilename),
     bundling: {
