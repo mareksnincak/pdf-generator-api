@@ -16,6 +16,7 @@ declare global {
       OPEN_API_SSM_PARAM_NAME?: string;
       PRESIGNED_URL_EXPIRATION_SECONDS?: string;
       S3_BUCKET?: string;
+      SENTRY_DSN?: string;
       STATE_MACHINE_ARN?: string;
     };
   }

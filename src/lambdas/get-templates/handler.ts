@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/aws-serverless';
 import type {
   APIGatewayProxyResult,
   APIGatewayProxyWithCognitoAuthorizerEvent,
@@ -45,3 +46,8 @@ export async function getTemplates(
     return handleApiError({ error, logPrefix: 'getTemplates' });
   }
 }
+
+// TODO improve this, we should consider e.g. using Middy or creating one wrapper. We also need
+// to improve IT tests, as due to type issue they are only testing underlying function, not main
+// handler.
+export const handler = Sentry.wrapHandler(getTemplates);

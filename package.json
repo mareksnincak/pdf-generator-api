@@ -43,6 +43,7 @@
     "@aws-sdk/client-ssm": "^3.1019.0",
     "@aws-sdk/s3-request-presigner": "^3.1019.0",
     "@aws-sdk/util-dynamodb": "^3.996.2",
+    "@sentry/aws-serverless": "^10.46.0",
     "@sparticuz/chromium": "143.0.4",
     "handlebars": "^4.7.9",
     "pino": "^10.3.1",

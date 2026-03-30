@@ -1,9 +1,20 @@
+import * as Sentry from '@sentry/aws-serverless';
 import { type APIGatewayProxyResult } from 'aws-lambda';
 
 import { ErrorMessage } from '../enums/error.enum';
 import { HttpError, type HttpErrorResponse } from '../errors/http.error';
 
 import { logger } from './logger.helper';
+
+const useSentry = !!process.env.SENTRY_DSN;
+
+if (useSentry) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    enableLogs: true,
+    integrations: [Sentry.pinoIntegration()],
+  });
+}
 
 export function handleError({ error, logPrefix }: { error: unknown; logPrefix: string }): {
   response: HttpErrorResponse;
@@ -17,6 +28,11 @@ export function handleError({ error, logPrefix }: { error: unknown; logPrefix: s
   }
 
   logger.error(error, `${logPrefix}.unknownError`);
+
+  if (useSentry) {
+    Sentry.captureException(error);
+  }
+
   return { response: { message: ErrorMessage.internalServerError }, statusCode: 500 };
 }
 
