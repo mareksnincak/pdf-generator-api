@@ -160,6 +160,7 @@ export function createLambdas({
       KMS_KEY_ID: kmsKey.keyId,
       ...envVars.get(Lambda.getTemplates),
     },
+    handler: 'getTemplates',
   });
 
   const deleteTemplate = new NodejsFunction(scope, Lambda.deleteTemplate, {

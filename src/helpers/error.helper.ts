@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/aws-serverless';
 import { type APIGatewayProxyResult } from 'aws-lambda';
 
 import { ErrorMessage } from '../enums/error.enum';
@@ -6,36 +5,56 @@ import { HttpError, type HttpErrorResponse } from '../errors/http.error';
 
 import { logger } from './logger.helper';
 
-const useSentry = !!process.env.SENTRY_DSN;
-
-if (useSentry) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    enableLogs: true,
-    integrations: [Sentry.pinoIntegration()],
-  });
+export enum ErrorFormat {
+  API = 'api',
+  RAW = 'raw',
 }
 
-export function handleError({ error, logPrefix }: { error: unknown; logPrefix: string }): {
+interface ErrorData {
   response: HttpErrorResponse;
   statusCode: number;
-} {
-  if (error instanceof HttpError) {
-    const errorData = error.getData();
-
-    logger.warn(errorData, `${logPrefix}.httpError`);
-    return errorData;
-  }
-
-  logger.error(error, `${logPrefix}.unknownError`);
-
-  if (useSentry) {
-    Sentry.captureException(error);
-  }
-
-  return { response: { message: ErrorMessage.internalServerError }, statusCode: 500 };
 }
 
+export function handleError(params: {
+  error: unknown;
+  format: ErrorFormat.API;
+  logPrefix: string;
+}): APIGatewayProxyResult;
+export function handleError(params: {
+  error: unknown;
+  format?: ErrorFormat.RAW;
+  logPrefix: string;
+}): ErrorData;
+export function handleError({
+  error,
+  format,
+  logPrefix,
+}: {
+  error: unknown;
+  format?: ErrorFormat;
+  logPrefix: string;
+}): APIGatewayProxyResult | ErrorData {
+  let errorData: ErrorData;
+
+  if (error instanceof HttpError) {
+    errorData = error.getData();
+    logger.warn(errorData, `${logPrefix}.httpError`);
+  } else {
+    logger.error(error, `${logPrefix}.unknownError`);
+    errorData = { response: { message: ErrorMessage.internalServerError }, statusCode: 500 };
+  }
+
+  if (format === ErrorFormat.API) {
+    return {
+      body: JSON.stringify(errorData.response),
+      statusCode: errorData.statusCode,
+    };
+  }
+
+  return errorData;
+}
+
+/** @deprecated Use handleError with format: ErrorFormat.API or wrapApiHandler instead */
 export function handleApiError({
   error,
   logPrefix,
@@ -43,10 +62,5 @@ export function handleApiError({
   error: unknown;
   logPrefix: string;
 }): APIGatewayProxyResult {
-  const { response, statusCode } = handleError({ error, logPrefix });
-
-  return {
-    body: JSON.stringify(response),
-    statusCode,
-  };
+  return handleError({ error, format: ErrorFormat.API, logPrefix });
 }
