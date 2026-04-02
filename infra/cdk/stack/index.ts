@@ -35,7 +35,7 @@ export class CdkStack extends Stack {
       ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
       : RemovalPolicy.DESTROY;
 
-    const { sentryDsn } = getStringParameters({ scope: this, stackId: id });
+    const { sentryDsn } = getStringParameters(this);
 
     const dynamoDbTable = createDynamoDbTable({ removalPolicy, scope: this, stackId: id });
     const s3Bucket = createS3Bucket({
