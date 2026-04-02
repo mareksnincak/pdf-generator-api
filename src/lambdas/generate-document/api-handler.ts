@@ -1,15 +1,12 @@
 import { randomUUID } from 'node:crypto';
 
-import type {
-  APIGatewayProxyResult,
-  APIGatewayProxyWithCognitoAuthorizerEvent,
-  Context,
-} from 'aws-lambda';
+import type { APIGatewayProxyWithCognitoAuthorizerEvent } from 'aws-lambda';
 
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleApiError } from '../../helpers/error.helper';
+import { ErrorFormat } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { wrapHandler } from '../../helpers/handler.helper';
+import { logger } from '../../helpers/logger.helper';
 import { getPresignedShareUrl, putObject } from '../../helpers/s3.helper';
 import { validateBody } from '../../helpers/validation.helper';
 import { scheduleObjectDeletion } from '../delete-expired-s3-objects/helpers/schedule-deletion.helper';
@@ -51,43 +48,40 @@ async function getShareableUrl({
   return url;
 }
 
-export async function generateDocumentFromApiEvent(
-  event: APIGatewayProxyWithCognitoAuthorizerEvent,
-  context: Context,
-): Promise<APIGatewayProxyResult> {
-  try {
-    setLoggerContext(event, context);
-    logger.info('generateDocumentFromApiEvent.starting');
+async function handler(event: APIGatewayProxyWithCognitoAuthorizerEvent) {
+  logger.info('generateDocumentFromApiEvent.starting');
 
-    const validatedData = validateBody(event, generateDocumentFromApiEventRequestDto);
-    logger.info(validatedData, 'generateDocumentFromApiEvent.validatedData');
+  const validatedData = validateBody(event, generateDocumentFromApiEventRequestDto);
+  logger.info(validatedData, 'generateDocumentFromApiEvent.validatedData');
 
-    const { data, templateId } = validatedData;
+  const { data, templateId } = validatedData;
 
-    const userId = getUserIdFromEventOrFail(event);
-    const bucket = getEnvVariableOrFail('S3_BUCKET');
+  const userId = getUserIdFromEventOrFail(event);
+  const bucket = getEnvVariableOrFail('S3_BUCKET');
 
-    const pdf = await generateDocument({
-      data,
-      templateId,
-      userId,
-    });
+  const pdf = await generateDocument({
+    data,
+    templateId,
+    userId,
+  });
 
-    const url = await getShareableUrl({
-      bucket,
-      data: pdf,
-      keyPrefix: `${userId}/documents`,
-    });
+  const url = await getShareableUrl({
+    bucket,
+    data: pdf,
+    keyPrefix: `${userId}/documents`,
+  });
 
-    const response: GenerateDocumentFromApiEventResponseDto = {
-      url,
-    };
-    logger.info('generateDocumentFromApiEvent.success');
-    return {
-      body: JSON.stringify(response),
-      statusCode: 200,
-    };
-  } catch (error) {
-    return handleApiError({ error, logPrefix: 'generateDocumentFromApiEvent' });
-  }
+  const response: GenerateDocumentFromApiEventResponseDto = {
+    url,
+  };
+  logger.info('generateDocumentFromApiEvent.success');
+  return {
+    body: JSON.stringify(response),
+    statusCode: 200,
+  };
 }
+
+export const generateDocumentFromApiEvent = wrapHandler(handler, {
+  errorFormat: ErrorFormat.API,
+  logPrefix: 'generateDocumentFromApiEvent',
+});

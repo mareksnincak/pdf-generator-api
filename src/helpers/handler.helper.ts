@@ -17,7 +17,7 @@ if (useSentry) {
 
 export function wrapHandler<TEvent extends object, TResult>(
   fn: (event: TEvent) => Promise<TResult>,
-  options: { errorFormat?: ErrorFormat; logPrefix: string },
+  options: { errorFormat: ErrorFormat; logPrefix: string },
 ): AsyncHandler<TEvent, TResult> {
   const { errorFormat, logPrefix } = options;
 
@@ -30,7 +30,7 @@ export function wrapHandler<TEvent extends object, TResult>(
         return handleError({ error, format: errorFormat, logPrefix }) as TResult;
       }
 
-      handleError({ error, logPrefix });
+      handleError({ error, format: errorFormat, logPrefix });
       throw error;
     }
   };

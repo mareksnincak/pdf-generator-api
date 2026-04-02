@@ -1,20 +1,17 @@
 import { randomUUID } from 'node:crypto';
 
 import { S3ServiceException } from '@aws-sdk/client-s3';
-import type {
-  APIGatewayProxyResult,
-  APIGatewayProxyWithCognitoAuthorizerEvent,
-  Context,
-} from 'aws-lambda';
+import type { APIGatewayProxyWithCognitoAuthorizerEvent } from 'aws-lambda';
 
 import * as templateRepository from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
 import { NotFoundError } from '../../errors/not-found.error';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleApiError } from '../../helpers/error.helper';
+import { ErrorFormat } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { wrapHandler } from '../../helpers/handler.helper';
+import { logger } from '../../helpers/logger.helper';
 import { deleteObject, moveObject } from '../../helpers/s3.helper';
 import { validateBody } from '../../helpers/validation.helper';
 
@@ -75,27 +72,24 @@ export async function createTemplateWithData({
   }
 }
 
-export async function createTemplate(
-  event: APIGatewayProxyWithCognitoAuthorizerEvent,
-  context: Context,
-): Promise<APIGatewayProxyResult> {
-  try {
-    setLoggerContext(event, context);
-    logger.info('createTemplate.starting');
+async function handler(event: APIGatewayProxyWithCognitoAuthorizerEvent) {
+  logger.info('createTemplate.starting');
 
-    const validatedData = validateBody(event, createTemplateRequestDto);
-    logger.info(validatedData, 'createTemplate.validatedData');
+  const validatedData = validateBody(event, createTemplateRequestDto);
+  logger.info(validatedData, 'createTemplate.validatedData');
 
-    const userId = getUserIdFromEventOrFail(event);
-    const template = await createTemplateWithData({ requestData: validatedData, userId });
+  const userId = getUserIdFromEventOrFail(event);
+  const template = await createTemplateWithData({ requestData: validatedData, userId });
 
-    const response: CreateTemplateResponseDto = template.toPublicJson();
-    logger.info('createTemplate.success');
-    return {
-      body: JSON.stringify(response),
-      statusCode: 201,
-    };
-  } catch (error) {
-    return handleApiError({ error, logPrefix: 'createTemplate' });
-  }
+  const response: CreateTemplateResponseDto = template.toPublicJson();
+  logger.info('createTemplate.success');
+  return {
+    body: JSON.stringify(response),
+    statusCode: 201,
+  };
 }
+
+export const createTemplate = wrapHandler(handler, {
+  errorFormat: ErrorFormat.API,
+  logPrefix: 'createTemplate',
+});

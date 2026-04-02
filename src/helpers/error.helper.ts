@@ -22,7 +22,7 @@ export function handleError(params: {
 }): APIGatewayProxyResult;
 export function handleError(params: {
   error: unknown;
-  format?: ErrorFormat.RAW;
+  format: ErrorFormat.RAW;
   logPrefix: string;
 }): ErrorData;
 export function handleError({
@@ -31,7 +31,7 @@ export function handleError({
   logPrefix,
 }: {
   error: unknown;
-  format?: ErrorFormat;
+  format: ErrorFormat;
   logPrefix: string;
 }): APIGatewayProxyResult | ErrorData {
   let errorData: ErrorData;
@@ -52,15 +52,4 @@ export function handleError({
   }
 
   return errorData;
-}
-
-/** @deprecated Use handleError with format: ErrorFormat.API or wrapApiHandler instead */
-export function handleApiError({
-  error,
-  logPrefix,
-}: {
-  error: unknown;
-  logPrefix: string;
-}): APIGatewayProxyResult {
-  return handleError({ error, format: ErrorFormat.API, logPrefix });
 }

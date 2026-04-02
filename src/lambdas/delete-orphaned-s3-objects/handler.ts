@@ -1,10 +1,12 @@
 import { type AttributeValue } from '@aws-sdk/client-dynamodb';
-import type { Context, DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
+import type { DynamoDBRecord, DynamoDBStreamEvent } from 'aws-lambda';
 
 import { DocumentBatchEntity } from '../../db/document-batch/entity';
 import { TemplateEntity } from '../../db/template/entity';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { ErrorFormat } from '../../helpers/error.helper';
+import { wrapHandler } from '../../helpers/handler.helper';
+import { logger } from '../../helpers/logger.helper';
 import { deleteObjects } from '../../helpers/s3.helper';
 
 function getKeysToDelete({ dynamodb, eventName }: DynamoDBRecord): string[] {
@@ -38,27 +40,23 @@ function getKeysToDelete({ dynamodb, eventName }: DynamoDBRecord): string[] {
   return [];
 }
 
-export async function deleteOrphanedS3Objects(
-  event: DynamoDBStreamEvent,
-  context: Context,
-): Promise<void> {
-  try {
-    setLoggerContext({}, context);
-    logger.info('deleteOrphanedS3Objects.starting');
-    logger.debug(event, 'deleteOrphanedS3Objects.event');
+async function handler(event: DynamoDBStreamEvent) {
+  logger.info('deleteOrphanedS3Objects.starting');
+  logger.debug(event, 'deleteOrphanedS3Objects.event');
 
-    const bucket = getEnvVariableOrFail('S3_BUCKET');
+  const bucket = getEnvVariableOrFail('S3_BUCKET');
 
-    const keysToDelete = event.Records.flatMap((record) => getKeysToDelete(record));
+  const keysToDelete = event.Records.flatMap((record) => getKeysToDelete(record));
 
-    await deleteObjects({
-      bucket,
-      keys: keysToDelete,
-    });
+  await deleteObjects({
+    bucket,
+    keys: keysToDelete,
+  });
 
-    logger.info('deleteOrphanedS3Objects.success');
-  } catch (error) {
-    logger.error(error, 'deleteOrphanedS3Objects.error');
-    throw error;
-  }
+  logger.info('deleteOrphanedS3Objects.success');
 }
+
+export const deleteOrphanedS3Objects = wrapHandler(handler, {
+  errorFormat: ErrorFormat.RAW,
+  logPrefix: 'deleteOrphanedS3Objects',
+});
