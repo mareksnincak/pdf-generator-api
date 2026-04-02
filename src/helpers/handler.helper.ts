@@ -15,7 +15,6 @@ if (useSentry) {
   });
 }
 
-// TODO add tests
 /**
  * Wraps an AWS Lambda handler with logging and error handling.
  * - On success, returns the handler result.
