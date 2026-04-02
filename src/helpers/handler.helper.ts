@@ -15,8 +15,20 @@ if (useSentry) {
   });
 }
 
+// TODO add tests
+/**
+ * Wraps an AWS Lambda handler with logging and error handling.
+ * - On success, returns the handler result.
+ * - On error:
+ *   - `ErrorFormat.API` - logs error and returns APIGatewayProxyResult
+ *   - `ErrorFormat.RAW` - logs error and rethrows error
+ *
+ * If `process.env.SENTRY_DSN` is set errors are also sent to Sentry.
+ *
+ * @returns Wrapped Lambda handler
+ */
 export function wrapHandler<TEvent extends object, TResult>(
-  fn: (event: TEvent) => Promise<TResult>,
+  fn: (event: TEvent, context: Context) => Promise<TResult>,
   options: { errorFormat: ErrorFormat; logPrefix: string },
 ): AsyncHandler<TEvent, TResult> {
   const { errorFormat, logPrefix } = options;
@@ -24,7 +36,7 @@ export function wrapHandler<TEvent extends object, TResult>(
   const wrapped: AsyncHandler<TEvent, TResult> = async (event, context) => {
     setLoggerContext(event, context);
     try {
-      return await fn(event);
+      return await fn(event, context);
     } catch (error) {
       if (errorFormat === ErrorFormat.API) {
         return handleError({ error, format: errorFormat, logPrefix }) as TResult;

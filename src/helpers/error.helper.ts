@@ -20,11 +20,20 @@ export function handleError(params: {
   format: ErrorFormat.API;
   logPrefix: string;
 }): APIGatewayProxyResult;
+
 export function handleError(params: {
   error: unknown;
   format: ErrorFormat.RAW;
   logPrefix: string;
 }): ErrorData;
+
+/**
+ * Normalizes and logs errors, returning either an API response or raw error data.
+ *
+ * Output depends on `format`:
+ * - `ErrorFormat.API` - returns APIGatewayProxyResult
+ * - `ErrorFormat.RAW` - returns `{ statusCode, response }` object
+ */
 export function handleError({
   error,
   format,
