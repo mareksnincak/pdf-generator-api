@@ -10,7 +10,7 @@ export enum ErrorFormat {
   RAW = 'raw',
 }
 
-interface ErrorData {
+export interface ErrorData {
   response: HttpErrorResponse;
   statusCode: number;
 }
