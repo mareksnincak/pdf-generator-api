@@ -6,6 +6,18 @@ import { type OpenApiParamsSsmParam } from '../../../src/lambdas/get-open-api/ty
 
 import { type createCognito } from './cognito';
 
+export function getStringParameters({ scope, stackId }: { scope: Construct; stackId: string }) {
+  const sentryDsn = StringParameter.fromStringParameterName(
+    scope,
+    'sentry-dsn',
+    `${stackId}-sentry-dsn`,
+  );
+
+  return {
+    sentryDsn: sentryDsn.stringValue,
+  };
+}
+
 export function createStringParameters({
   api,
   cognito,

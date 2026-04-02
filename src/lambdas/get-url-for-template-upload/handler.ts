@@ -1,15 +1,12 @@
 import { randomUUID } from 'node:crypto';
 
-import type {
-  APIGatewayProxyResult,
-  APIGatewayProxyWithCognitoAuthorizerEvent,
-  Context,
-} from 'aws-lambda';
+import type { APIGatewayProxyWithCognitoAuthorizerEvent } from 'aws-lambda';
 
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleApiError } from '../../helpers/error.helper';
+import { ErrorFormat } from '../../helpers/error.helper';
 import { getUserIdFromEventOrFail } from '../../helpers/event.helper';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { wrapHandler } from '../../helpers/handler.helper';
+import { logger } from '../../helpers/logger.helper';
 import { getPresignedUploadUrl } from '../../helpers/s3.helper';
 import { validateQueryParams } from '../../helpers/validation.helper';
 import { scheduleObjectDeletion } from '../delete-expired-s3-objects/helpers/schedule-deletion.helper';
@@ -46,32 +43,29 @@ async function createPresignedUrl({
   return { uploadId, url };
 }
 
-export async function getUrlForTemplateUpload(
-  event: APIGatewayProxyWithCognitoAuthorizerEvent,
-  context: Context,
-): Promise<APIGatewayProxyResult> {
-  try {
-    setLoggerContext(event, context);
-    logger.info('getUrlForTemplateUpload.starting');
+async function handler(event: APIGatewayProxyWithCognitoAuthorizerEvent) {
+  logger.info('getUrlForTemplateUpload.starting');
 
-    const validatedQueryParams = validateQueryParams(event, getUrlForTemplateUploadRequestDto);
-    logger.info(validatedQueryParams, 'getUrlForTemplateUpload.validatedQueryParams');
+  const validatedQueryParams = validateQueryParams(event, getUrlForTemplateUploadRequestDto);
+  logger.info(validatedQueryParams, 'getUrlForTemplateUpload.validatedQueryParams');
 
-    const { fileSizeBytes } = validatedQueryParams;
+  const { fileSizeBytes } = validatedQueryParams;
 
-    const userId = getUserIdFromEventOrFail(event);
-    const { uploadId, url } = await createPresignedUrl({ fileSizeBytes, userId });
+  const userId = getUserIdFromEventOrFail(event);
+  const { uploadId, url } = await createPresignedUrl({ fileSizeBytes, userId });
 
-    const response: GetUrlForTemplateUploadResponseDto = {
-      uploadId,
-      url,
-    };
-    logger.info(response, 'getUrlForTemplateUpload.response');
-    return {
-      body: JSON.stringify(response),
-      statusCode: 200,
-    };
-  } catch (error) {
-    return handleApiError({ error, logPrefix: 'getUrlForTemplateUpload' });
-  }
+  const response: GetUrlForTemplateUploadResponseDto = {
+    uploadId,
+    url,
+  };
+  logger.info(response, 'getUrlForTemplateUpload.response');
+  return {
+    body: JSON.stringify(response),
+    statusCode: 200,
+  };
 }
+
+export const getUrlForTemplateUpload = wrapHandler(handler, {
+  errorFormat: ErrorFormat.API,
+  logPrefix: 'getUrlForTemplateUpload',
+});

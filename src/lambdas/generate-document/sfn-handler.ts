@@ -1,10 +1,9 @@
 import { randomUUID } from 'node:crypto';
 
-import type { Context } from 'aws-lambda';
-
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
-import { handleError } from '../../helpers/error.helper';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { ErrorFormat, handleError } from '../../helpers/error.helper';
+import { wrapHandler } from '../../helpers/handler.helper';
+import { logger } from '../../helpers/logger.helper';
 import { putObject } from '../../helpers/s3.helper';
 import { validate } from '../../helpers/validation.helper';
 
@@ -20,13 +19,11 @@ import {
 import { DocumentGenerationStatus } from './enums/status.enum';
 import { generateDocument } from './services/document-generation.service';
 
-export async function generateDocumentFromSfnEvent(
+async function handler(
   input: GenerateDocumentFromSfnEventInputDto,
-  context: Context,
 ): Promise<GenerateDocumentFromSfnEventOutputDto> {
   let documentRef: null | string = null;
   try {
-    setLoggerContext({}, context);
     logger.info('generateDocumentFromSfnEvent.input');
 
     const validatedData = validate(input, generateDocumentFromSfnEventInputDto);
@@ -54,7 +51,11 @@ export async function generateDocumentFromSfnEvent(
     logger.info(output, 'generateDocumentFromSfnEvent.successOutput');
     return output;
   } catch (error) {
-    const { response } = handleError({ error, logPrefix: 'generateDocumentFromSfnEvent' });
+    const { response } = handleError({
+      error,
+      format: ErrorFormat.RAW,
+      logPrefix: 'generateDocumentFromSfnEvent',
+    });
 
     const output: GenerateDocumentFromSfnEventErrorOutputDto = {
       message: response.message,
@@ -66,3 +67,8 @@ export async function generateDocumentFromSfnEvent(
     return output;
   }
 }
+
+export const generateDocumentFromSfnEvent = wrapHandler(handler, {
+  errorFormat: ErrorFormat.RAW,
+  logPrefix: 'generateDocumentFromSfnEvent',
+});

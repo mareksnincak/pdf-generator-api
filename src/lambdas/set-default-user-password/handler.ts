@@ -7,10 +7,11 @@ import type {
   CloudFormationCustomResourceFailedResponse,
   CloudFormationCustomResourceResponse,
   CloudFormationCustomResourceSuccessResponse,
-  Context,
 } from 'aws-lambda';
 
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { ErrorFormat } from '../../helpers/error.helper';
+import { wrapHandler } from '../../helpers/handler.helper';
+import { logger } from '../../helpers/logger.helper';
 import { getSecret } from '../../helpers/secret-manager.helper';
 
 import {
@@ -42,11 +43,9 @@ async function onCreate({
   logger.info('setDefaultUserPassword.onCreate.success');
 }
 
-export async function setDefaultUserPassword(
+async function handler(
   event: CloudFormationCustomResourceEvent,
-  context: Context,
 ): Promise<CloudFormationCustomResourceResponse> {
-  setLoggerContext(event, context);
   logger.info(event, 'setDefaultUserPassword.event');
 
   const resourceProperties = event.ResourceProperties as SetDefaultUserPasswordResourceProperties;
@@ -86,3 +85,8 @@ export async function setDefaultUserPassword(
     return response;
   }
 }
+
+export const setDefaultUserPassword = wrapHandler(handler, {
+  errorFormat: ErrorFormat.RAW,
+  logPrefix: 'setDefaultUserPassword',
+});

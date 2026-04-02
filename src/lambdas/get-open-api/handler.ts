@@ -1,8 +1,9 @@
-import type { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import type { APIGatewayProxyEvent } from 'aws-lambda';
 
 import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
-import { handleApiError } from '../../helpers/error.helper';
-import { logger, setLoggerContext } from '../../helpers/logger.helper';
+import { ErrorFormat } from '../../helpers/error.helper';
+import { wrapHandler } from '../../helpers/handler.helper';
+import { logger } from '../../helpers/logger.helper';
 import { getSsmParam } from '../../helpers/ssm.helper';
 import { generateOpenApi } from '../../open-api/generate-open-api.schema';
 
@@ -29,24 +30,21 @@ async function getOpenApiDocument() {
   return generateOpenApi(openApiParams);
 }
 
-export async function getOpenApi(
-  event: APIGatewayProxyEvent,
-  context: Context,
-): Promise<APIGatewayProxyResult> {
-  try {
-    setLoggerContext(event, context);
-    logger.info('getOpenApi.starting');
+async function handler(_event: APIGatewayProxyEvent) {
+  logger.info('getOpenApi.starting');
 
-    if (!openApiDocument) {
-      openApiDocument = await getOpenApiDocument();
-    }
-
-    logger.info('getOpenApi.success');
-    return {
-      body: JSON.stringify(openApiDocument),
-      statusCode: 200,
-    };
-  } catch (error) {
-    return handleApiError({ error, logPrefix: 'getOpenApi' });
+  if (!openApiDocument) {
+    openApiDocument = await getOpenApiDocument();
   }
+
+  logger.info('getOpenApi.success');
+  return {
+    body: JSON.stringify(openApiDocument),
+    statusCode: 200,
+  };
 }
+
+export const getOpenApi = wrapHandler(handler, {
+  errorFormat: ErrorFormat.API,
+  logPrefix: 'getOpenApi',
+});

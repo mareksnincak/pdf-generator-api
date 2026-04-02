@@ -3,7 +3,7 @@ import { BadRequestError } from '../errors/bad-request.error';
 import { ConflictError } from '../errors/conflict.error';
 import { NotFoundError } from '../errors/not-found.error';
 
-import { handleApiError, handleError } from './error.helper';
+import { ErrorFormat, handleError } from './error.helper';
 import { mockLogger } from './test.helper';
 
 afterEach(() => {
@@ -11,65 +11,67 @@ afterEach(() => {
 });
 
 describe('handleError', () => {
-  it.each([
-    [400, BadRequestError],
-    [404, NotFoundError],
-    [409, ConflictError],
-  ])('should return %i response on HttpError', (statusCode, HttpError) => {
-    mockLogger();
-    const error = new HttpError({
-      message: 'Custom error message',
+  describe('raw format', () => {
+    it.each([
+      [400, BadRequestError],
+      [404, NotFoundError],
+      [409, ConflictError],
+    ])('should return %i response on HttpError', (statusCode, HttpError) => {
+      mockLogger();
+      const error = new HttpError({
+        message: 'Custom error message',
+      });
+
+      const result = handleError({ error, format: ErrorFormat.RAW, logPrefix: 'test' });
+
+      expect(result).toEqual({
+        response: { message: 'Custom error message' },
+        statusCode,
+      });
     });
 
-    const result = handleError({ error, logPrefix: 'test' });
+    it('should return 500 response on unknown error', () => {
+      mockLogger();
+      const error = new Error('Custom error message');
 
-    expect(result).toEqual({
-      response: { message: 'Custom error message' },
-      statusCode,
-    });
-  });
+      const result = handleError({ error, format: ErrorFormat.RAW, logPrefix: 'test' });
 
-  it('should return 500 response on unknown error', () => {
-    mockLogger();
-    const error = new Error('Custom error message');
-
-    const result = handleError({ error, logPrefix: 'test' });
-
-    expect(result).toEqual({
-      response: { message: ErrorMessage.internalServerError },
-      statusCode: 500,
-    });
-  });
-});
-
-describe('handleApiError', () => {
-  it.each([
-    [400, BadRequestError],
-    [404, NotFoundError],
-    [409, ConflictError],
-  ])('should return %i response on HttpError', (statusCode, HttpError) => {
-    mockLogger();
-    const error = new HttpError({
-      message: 'Custom error message',
-    });
-
-    const result = handleApiError({ error, logPrefix: 'test' });
-
-    expect(result).toEqual({
-      body: '{"message":"Custom error message"}',
-      statusCode,
+      expect(result).toEqual({
+        response: { message: ErrorMessage.internalServerError },
+        statusCode: 500,
+      });
     });
   });
 
-  it('should return 500 response on unknown error', () => {
-    mockLogger();
-    const error = new Error('Custom error message');
+  describe('api format', () => {
+    it.each([
+      [400, BadRequestError],
+      [404, NotFoundError],
+      [409, ConflictError],
+    ])('should return %i response on HttpError', (statusCode, HttpError) => {
+      mockLogger();
+      const error = new HttpError({
+        message: 'Custom error message',
+      });
 
-    const result = handleApiError({ error, logPrefix: 'test' });
+      const result = handleError({ error, format: ErrorFormat.API, logPrefix: 'test' });
 
-    expect(result).toEqual({
-      body: '{"message":"Internal server error."}',
-      statusCode: 500,
+      expect(result).toEqual({
+        body: '{"message":"Custom error message"}',
+        statusCode,
+      });
+    });
+
+    it('should return 500 response on unknown error', () => {
+      mockLogger();
+      const error = new Error('Custom error message');
+
+      const result = handleError({ error, format: ErrorFormat.API, logPrefix: 'test' });
+
+      expect(result).toEqual({
+        body: '{"message":"Internal server error."}',
+        statusCode: 500,
+      });
     });
   });
 });

@@ -14,7 +14,7 @@ import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
 import { createStateMachines } from './sfn';
 import { createSqsEventSources, createSqsQueues } from './sqs';
-import { createStringParameters } from './ssm-parameters';
+import { createStringParameters, getStringParameters } from './ssm-parameters';
 
 export class CdkStack extends Stack {
   constructor({
@@ -34,6 +34,8 @@ export class CdkStack extends Stack {
     const removalPolicy = retainStatefulResources
       ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
       : RemovalPolicy.DESTROY;
+
+    const { sentryDsn } = getStringParameters({ scope: this, stackId: id });
 
     const dynamoDbTable = createDynamoDbTable({ removalPolicy, scope: this, stackId: id });
     const s3Bucket = createS3Bucket({
@@ -56,6 +58,7 @@ export class CdkStack extends Stack {
       retainStatefulResources,
       s3BucketName,
       scope: this,
+      sentryDsn,
       sqsQueues,
     });
 
@@ -65,6 +68,7 @@ export class CdkStack extends Stack {
       dynamoDbTable,
       retainStatefulResources,
       scope: this,
+      sentryDsn,
       stateMachines,
     });
 
