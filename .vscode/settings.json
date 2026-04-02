@@ -23,6 +23,7 @@
     "singleline",
     "sparticuz",
     "stepfunctions",
+    "tfstate",
     "unmarshall"
   ],
   "jestrunner.configPath": ".jest/jest.common.config.ts",
