@@ -76,6 +76,7 @@ export function createLambdas({
   retainStatefulResources,
   s3BucketName,
   scope,
+  sentryDsn,
   sqsQueues,
 }: {
   cdkEnvVars: CdkEnvVarsDto;
@@ -85,9 +86,13 @@ export function createLambdas({
   retainStatefulResources: boolean;
   s3BucketName: string;
   scope: Construct;
+  sentryDsn?: string;
   sqsQueues: ReturnType<typeof createSqsQueues>;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
+  const commonEnvVars = {
+    SENTRY_DSN: sentryDsn ?? '',
+  };
 
   const getOpenApi = new NodejsFunction(scope, Lambda.getOpenApi, {
     ...getCommonNodeJsFunctionProps({
@@ -97,6 +102,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       OPEN_API_SSM_PARAM_NAME: openApiParamsSsmParamName,
       ...envVars.get(Lambda.getOpenApi),
     },
@@ -111,6 +117,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.getUrlForTemplateUpload),
@@ -126,6 +133,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.createTemplate),
@@ -141,6 +149,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.getTemplate),
@@ -156,6 +165,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       KMS_KEY_ID: kmsKey.keyId,
       ...envVars.get(Lambda.getTemplates),
@@ -171,6 +181,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       ...envVars.get(Lambda.deleteTemplate),
     },
@@ -185,6 +196,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       ...envVars.get(Lambda.setDefaultUserPassword),
     },
     handler: 'setDefaultUserPassword',
@@ -208,6 +220,7 @@ export function createLambdas({
         scope,
       }),
       environment: {
+        ...commonEnvVars,
         DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
         DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
         S3_BUCKET: s3BucketName,
@@ -235,6 +248,7 @@ export function createLambdas({
         scope,
       }),
       environment: {
+        ...commonEnvVars,
         DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
         S3_BUCKET: s3BucketName,
         ...envVars.get(Lambda.generateDocumentFromSfnEvent),
@@ -251,6 +265,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.getDocumentBatchResult),
@@ -266,6 +281,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
       ...envVars.get(Lambda.storeDocumentBatchResult),
     },
@@ -280,6 +296,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.deleteExpiredS3Objects),
     },
@@ -294,6 +311,7 @@ export function createLambdas({
       scope,
     }),
     environment: {
+      ...commonEnvVars,
       S3_BUCKET: s3BucketName,
       ...envVars.get(Lambda.deleteOrphanedS3Objects),
     },
@@ -327,15 +345,20 @@ export function createStateMachineStartupLambdas({
   dynamoDbTable,
   retainStatefulResources,
   scope,
+  sentryDsn,
   stateMachines,
 }: {
   cdkEnvVars: CdkEnvVarsDto;
   dynamoDbTable: Table;
   retainStatefulResources: boolean;
   scope: Construct;
+  sentryDsn?: string;
   stateMachines: ReturnType<typeof createStateMachines>;
 }) {
   const envVars = getEnvVars(cdkEnvVars.ENVIRONMENT_NAME);
+  const commonEnvVars = {
+    SENTRY_DSN: sentryDsn ?? '',
+  };
 
   const startDocumentBatchGeneration = new NodejsFunction(
     scope,
@@ -348,6 +371,7 @@ export function createStateMachineStartupLambdas({
         scope,
       }),
       environment: {
+        ...commonEnvVars,
         DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
         STATE_MACHINE_ARN: stateMachines.documentBatchGeneration.stateMachineArn,
         ...envVars.get(Lambda.startDocumentBatchGeneration),
