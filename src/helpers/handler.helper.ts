@@ -28,7 +28,7 @@ if (useSentry) {
  * @returns Wrapped Lambda handler
  */
 export function wrapHandler<TEvent extends object, TResult>(
-  fn: (event: TEvent, context: Context) => Promise<TResult>,
+  handler: (event: TEvent, context: Context) => Promise<TResult>,
   options: { errorFormat: ErrorFormat; logPrefix: string },
 ): AsyncHandler<TEvent, TResult> {
   const { errorFormat, logPrefix } = options;
@@ -36,7 +36,7 @@ export function wrapHandler<TEvent extends object, TResult>(
   const wrapped: AsyncHandler<TEvent, TResult> = async (event, context) => {
     setLoggerContext(event, context);
     try {
-      return await fn(event, context);
+      return await handler(event, context);
     } catch (error) {
       if (errorFormat === ErrorFormat.API) {
         return handleError({ error, format: errorFormat, logPrefix }) as TResult;
