@@ -14,6 +14,8 @@ API for generating dynamic PDF documents using serverless stack.
 
 ## Architecture highlights
 
+> Architectural decision records (ADRs) for key design choices are in [`docs/adr/`](docs/adr/).
+
 The API accepts requests authenticated via Cognito, generates PDFs inside Lambda using headless Chromium, stores templates and batch results in DynamoDB, and uses Step Functions to orchestrate multi-document jobs. Infrastructure is fully managed with CDK and Terraform.
 
 ### Serverless PDF generation
