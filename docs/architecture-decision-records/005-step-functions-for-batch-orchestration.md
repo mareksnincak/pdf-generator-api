@@ -8,7 +8,7 @@ Lambda has a 15-minute execution limit, making a single Lambda that loops over a
 
 ## Decision
 
-Use an AWS Step Functions state machine to orchestrate batch generation and provide interface to monitor the execution. Drawbacks of this are the additional incurred costs for each step transition.
+Use an AWS Step Functions state machine to orchestrate batch generation. A `Map` state fans out over the document array in parallel, invoking the generation Lambda for each item. Each item has its own `Catch` branch - failures are caught and persisted per item without affecting others. Execution history is visible in the AWS console, making debugging straightforward. Drawbacks are the additional costs for each step transition.
 
 ## Alternatives considered
 

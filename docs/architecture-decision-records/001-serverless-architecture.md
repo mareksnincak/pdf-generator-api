@@ -1,4 +1,4 @@
-# Serverless PDF generation
+# Serverless architecture
 
 ## Context
 

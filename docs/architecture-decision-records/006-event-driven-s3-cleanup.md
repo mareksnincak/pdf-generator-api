@@ -19,7 +19,7 @@ Simple to implement and would work reliably even if deletion fails due to some t
 
 ## Consequences
 
-- Objects are cleanup as soon as possible - there is minimal lag.
+- Objects are cleaned up as soon as possible - there is minimal lag.
 - DynamoDB is queried efficiently.
 - Concept may be harder to grasp.
-- When deletion fails, we need to handle it manually (e.g. by resending the DLQ message) - it won't be "fixed" on the next run.
+- When deletion fails, the SQS message is retried up to 3 times before landing in a dead-letter queue (DLQ) for manual inspection - it won't be "fixed" on the next run automatically.

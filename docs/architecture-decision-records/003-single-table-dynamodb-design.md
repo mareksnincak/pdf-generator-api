@@ -18,7 +18,7 @@ This would have advantage of being simpler to grasp. We choose not to use it, as
 
 ### Relational DB
 
-This would have an advantage of being simpler to grasp while still offering good enough performance. We choose not to use it due to incurred costs, as explained in [001-serverless-pdf-generation docs](docs/architecture-decision-records/001-serverless-pdf-generation.md).
+This would have an advantage of being simpler to grasp while still offering good enough performance. We choose not to use it due to incurred costs, as explained in [001-serverless-pdf-generation docs](./001-serverless-pdf-generation.md).
 
 ## Consequences
 
