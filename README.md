@@ -3,7 +3,7 @@
 API for generating dynamic PDF documents using serverless stack.
 
 - [Architecture highlights](#architecture-highlights)
-  - [Architecture decision records](docs/architecture-decision-records/)
+  - [Architecture decision records](docs/architecture-decision-records/README.md)
 - [API documentation](#api-documentation)
 - [How to run](#how-to-run)
 - [How to test](#how-to-test)
@@ -15,7 +15,7 @@ API for generating dynamic PDF documents using serverless stack.
 
 ## Architecture highlights
 
-> Key design decisions including alternatives considered and tradeoffs are documented as [Architecture decision records](docs/architecture-decision-records/).
+> Key design decisions including alternatives considered and tradeoffs are documented as [Architecture decision records](docs/architecture-decision-records/README.md).
 
 The API accepts requests authenticated via Cognito, generates PDFs inside Lambda using headless Chromium, stores templates and batch results in DynamoDB, and uses Step Functions to orchestrate multi-document jobs. Infrastructure is fully managed with CDK and Terraform.
 
