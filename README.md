@@ -1,6 +1,6 @@
 # PDF generator API
 
-API for generating dynamic PDF documents.
+API for generating dynamic PDF documents using serverless stack.
 
 - [Architecture highlights](#architecture-highlights)
 - [API documentation](#api-documentation)
@@ -18,21 +18,17 @@ API for generating dynamic PDF documents.
 
 PDF rendering runs inside AWS Lambda using [Puppeteer](https://pptr.dev/). HTML templates are rendered via [Handlebars](https://handlebarsjs.com/). See [`src/lambdas/generate-document/services/pdf.service.ts`](src/lambdas/generate-document/services/pdf.service.ts).
 
-### AWS Step Functions batch orchestration
+### KMS-encrypted pagination tokens
 
-Batch document generation is orchestrated by a [Step Functions state machine](https://aws.amazon.com/step-functions/) that maps over documents in parallel, invoking a Lambda for each one. See [`infra/cdk/stack/sfn.ts`](infra/cdk/stack/sfn.ts).
+DynamoDB's `LastEvaluatedKey` is encrypted with KMS before being returned to clients as a pagination token, preventing cursor tampering and leakage of internal table structure. See [`src/db/common/helpers/pagination.helper.ts`](src/db/common/helpers/pagination.helper.ts).
 
 ### DynamoDB single-table design
 
 Data is stored using [single table design pattern](https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/) - entities share one DynamoDB table using prefixed composite keys (`TEMPLATE#USER#{userId}#ID#{id}`) with a GSI for secondary access patterns. See [`src/db/`](src/db/).
 
-### KMS-encrypted pagination tokens
+### AWS Step Functions batch orchestration
 
-Pagination token - DynamoDB's `LastEvaluatedKey` is encrypted with KMS before being returned to clients, preventing cursor tampering and avoiding leakage of internal table structure. See [`src/db/common/helpers/pagination.helper.ts`](src/db/common/helpers/pagination.helper.ts).
-
-### Cognito OAuth2 with custom scopes
-
-Authentication uses Cognito with a custom OAuth2 resource server and fine-grained scopes: `templates:read`, `templates:write`, `documents:generate`, and `admin`. API Gateway enforces scopes per route. See [`infra/cdk/stack/cognito.ts`](infra/cdk/stack/cognito.ts).
+Batch document generation is orchestrated by a [Step Functions state machine](https://aws.amazon.com/step-functions/) that maps over documents in parallel, invoking a Lambda for each one. See [`infra/cdk/stack/sfn.ts`](infra/cdk/stack/sfn.ts).
 
 ### Event-driven S3 cleanup
 
@@ -42,6 +38,10 @@ S3 objects are cleaned up through two event-driven flows rather than scheduled j
 2. Temporary S3 objects (generated PDFs, unused template uploads) are deleted after a configurable delay via a delayed SQS message - scheduled at the time the object is created, timed to expire shortly after the presigned URL does.
 
 See [`infra/cdk/stack/dynamo.ts`](infra/cdk/stack/dynamo.ts) and [`infra/cdk/stack/sqs.ts`](infra/cdk/stack/sqs.ts).
+
+### Cognito OAuth2 with custom scopes
+
+Authentication uses Cognito with a custom OAuth2 resource server and fine-grained scopes: `templates:read`, `templates:write`, `documents:generate`, and `admin`. API Gateway enforces scopes per route. See [`infra/cdk/stack/cognito.ts`](infra/cdk/stack/cognito.ts).
 
 ### IaC: CDK + Terraform
 
@@ -58,7 +58,7 @@ The API schema is generated from the same Zod schemas used for runtime validatio
 
 ### Observability
 
-Structured logging uses [Pino](https://getpino.io/) with per-request context injection. [Sentry](https://sentry.io/) integration is connected to logger and sends all errors to Sentry as well. See [`src/helpers/handler.helper.ts`](src/helpers/handler.helper.ts).
+Structured logging uses [Pino](https://getpino.io/) with per-request context injection. [Sentry](https://sentry.io/) wraps each Lambda handler to automatically capture errors. Both are applied via a shared handler wrapper. See [`src/helpers/handler.helper.ts`](src/helpers/handler.helper.ts).
 
 ### CI/CD pipeline
 
