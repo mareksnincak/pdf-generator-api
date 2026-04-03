@@ -16,7 +16,7 @@ To do the deploy to new env follow these steps:
    ```
 1. Apply the terraform and fill in the values - only needed on the first deploy or when adding new value
    ```sh
-   AWS_PROFILE=<profile> terraform apply
+   cd ./infra/terraform && AWS_PROFILE=<profile> terraform apply
    ```
 1. Deploy the app - preferably let the CI deploy job handle this.
    ```sh

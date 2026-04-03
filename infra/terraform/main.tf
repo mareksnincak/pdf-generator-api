@@ -13,7 +13,7 @@ provider "aws" {
 
 resource "aws_ssm_parameter" "sentry_dsn" {
   name = "pdf-generator-api-sentry-dsn"
-  type = "SecureString"
+  type = "String"
   value = var.sentry_dsn
 
   lifecycle {
