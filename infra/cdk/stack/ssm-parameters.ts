@@ -9,7 +9,7 @@ import { type createCognito } from './cognito';
 export function getStringParameters(scope: Construct) {
   const sentryDsn = StringParameter.fromStringParameterName(
     scope,
-    'sentry-dsn',
+    'sentry-dsn-param',
     'pdf-generator-api-sentry-dsn',
   );
 
