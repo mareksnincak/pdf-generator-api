@@ -6,7 +6,17 @@ import { type Construct } from 'constructs';
 import { type createLambdas } from './lambdas';
 
 export function createSqsQueues({ scope, stackId }: { scope: Construct; stackId: string }) {
+  const deadLetterQueue = new Queue(scope, 'dead-letter-queue', {
+    enforceSSL: true,
+    queueName: `${stackId}-dead-letter-queue`,
+    receiveMessageWaitTime: Duration.seconds(20),
+  });
+
   const deleteExpiredS3ObjectsQueue = new Queue(scope, 'delete-expired-s3-objects-queue', {
+    deadLetterQueue: {
+      maxReceiveCount: 3,
+      queue: deadLetterQueue,
+    },
     deliveryDelay: Duration.minutes(15),
     enforceSSL: true,
     queueName: `${stackId}-delete-expired-s3-objects-queue`,
@@ -14,6 +24,7 @@ export function createSqsQueues({ scope, stackId }: { scope: Construct; stackId:
   });
 
   return {
+    deadLetterQueue,
     deleteExpiredS3ObjectsQueue,
   };
 }

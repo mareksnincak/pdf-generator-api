@@ -36,6 +36,10 @@ export function createOutputs({
     value: cognito.defaultUsersCredentialsSecret.secretName,
   });
 
+  new CfnOutput(scope, 'deadLetterQueueUrl', {
+    value: sqsQueues.deadLetterQueue.queueUrl,
+  });
+
   new CfnOutput(scope, 'deleteExpiredS3ObjectsQueueUrl', {
     value: sqsQueues.deleteExpiredS3ObjectsQueue.queueUrl,
   });
