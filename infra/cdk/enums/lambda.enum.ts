@@ -10,8 +10,8 @@ export enum Lambda {
   getTemplate = 'get-template',
   getTemplates = 'get-templates',
   getUrlForTemplateUpload = 'get-url-for-template-upload',
+  processMalwareScanResult = 'process-malware-scan-result',
   setDefaultUserPassword = 'set-default-user-password',
   startDocumentBatchGeneration = 'start-document-batch-generation',
-  processMalwareScanResult = 'process-malware-scan-result',
   storeDocumentBatchResult = 'store-document-batch-result',
 }
