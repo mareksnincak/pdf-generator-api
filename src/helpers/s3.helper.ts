@@ -10,12 +10,13 @@ import {
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 import { logger } from './logger.helper';
+import { captureAwsClient } from './tracing.helper';
 
 let s3Client: S3Client | undefined;
 
 export function getS3Client() {
   if (!s3Client) {
-    s3Client = new S3Client();
+    s3Client = captureAwsClient(new S3Client());
   }
 
   return s3Client;

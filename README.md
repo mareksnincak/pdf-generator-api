@@ -67,7 +67,7 @@ The API schema is generated from the same Zod schemas used for runtime validatio
 
 ### Observability
 
-Structured logging uses [Pino](https://getpino.io/) with per-request context injection. [Sentry](https://sentry.io/) wraps each Lambda handler to automatically capture errors. Both are applied via a shared handler wrapper. See [`src/helpers/handler.helper.ts`](src/helpers/handler.helper.ts).
+Structured logging uses [Pino](https://getpino.io/) with per-request context injection. [Sentry](https://sentry.io/) wraps each Lambda handler to automatically capture errors. [AWS X-Ray](https://aws.amazon.com/xray/) provides distributed tracing across async boundaries - every Lambda invocation is traced and DynamoDB, S3, SQS, SFN, and KMS calls appear as named subsegments, making it possible to follow a request across the full Lambda → SQS → Lambda and Step Functions chains. See [`src/helpers/handler.helper.ts`](src/helpers/handler.helper.ts), [`src/helpers/tracing.helper.ts`](src/helpers/tracing.helper.ts), [observability guide](docs/guides/observability.md) and [ADR: Distributed tracing](docs/architecture-decision-records/008-distributed-tracing.md).
 
 ### CI/CD pipeline
 

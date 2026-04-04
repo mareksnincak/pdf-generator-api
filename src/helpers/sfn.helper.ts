@@ -1,12 +1,13 @@
 import { SFNClient, StartExecutionCommand } from '@aws-sdk/client-sfn';
 
 import { logger } from './logger.helper';
+import { captureAwsClient } from './tracing.helper';
 
 let sfnClient: SFNClient | undefined;
 
 export function getSfnClient() {
   if (!sfnClient) {
-    sfnClient = new SFNClient();
+    sfnClient = captureAwsClient(new SFNClient());
   }
 
   return sfnClient;

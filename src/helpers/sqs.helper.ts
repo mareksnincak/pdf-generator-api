@@ -1,12 +1,13 @@
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
 
 import { logger } from './logger.helper';
+import { captureAwsClient } from './tracing.helper';
 
 let sqsClient: SQSClient | undefined;
 
 export function getSqsClient() {
   if (!sqsClient) {
-    sqsClient = new SQSClient();
+    sqsClient = captureAwsClient(new SQSClient());
   }
 
   return sqsClient;

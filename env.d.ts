@@ -2,6 +2,7 @@ declare namespace NodeJS {
   type ProcessEnv = {
     AWS_ACCESS_KEY_ID?: string;
     AWS_SECRET_ACCESS_KEY?: string;
+    AWS_XRAY_DAEMON_ADDRESS?: string;
     CHROMIUM_LOCAL_EXECUTABLE_PATH?: string;
     DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL?: string;
     DELETE_UPLOADED_OBJECT_IN_SECONDS?: string;
