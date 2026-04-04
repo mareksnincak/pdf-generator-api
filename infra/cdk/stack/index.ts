@@ -37,7 +37,7 @@ export class CdkStack extends Stack {
       ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
       : RemovalPolicy.DESTROY;
 
-    const { sentryDsn } = getStringParameters(this);
+    const { alarmEmail, sentryDsn } = getStringParameters(this);
 
     const dynamoDbTable = createDynamoDbTable({ removalPolicy, scope: this, stackId: id });
     const s3Bucket = createS3Bucket({
@@ -123,7 +123,7 @@ export class CdkStack extends Stack {
       scope: this,
     });
 
-    createAlarms({ scope: this, sqsQueues, stateMachines });
+    createAlarms({ alarmEmail, scope: this, sqsQueues, stateMachines });
 
     createOutputs({ api, cognito, scope: this, sqsQueues });
   }
