@@ -106,6 +106,7 @@ export class TemplateEntity extends BaseEntity {
   public toPublicJson() {
     return {
       id: this.id,
+      malwareScanStatus: this.malwareScanStatus,
       name: this.name,
       type: this.type,
     };

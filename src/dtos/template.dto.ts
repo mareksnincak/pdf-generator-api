@@ -1,7 +1,7 @@
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 
-import { TemplateType } from '../db/template/enum';
+import { MalwareScanStatus, TemplateType } from '../db/template/enum';
 
 extendZodWithOpenApi(z);
 
@@ -12,6 +12,9 @@ export const templateDto = z.object({
     .max(64)
     .regex(/^[a-zA-Z0-9\-_]+$/)
     .openapi({ description: 'Template id.', example: 'templateId' }),
+  malwareScanStatus: z
+    .enum(MalwareScanStatus)
+    .openapi({ description: 'Status of the malware scan.', example: MalwareScanStatus.clean }),
   name: z
     .string()
     .min(1)
