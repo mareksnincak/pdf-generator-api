@@ -5,7 +5,7 @@ import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
 import { ErrorMessage } from '../../enums/error.enum';
-import { ConflictError } from '../../errors/conflict.error';
+import { UnprocessableEntityError } from '../../errors/unprocessable-entity.error';
 import { fromUnixTimestamp, toUnixTimestamp } from '../../helpers/date.helper';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { getObject, getPresignedShareUrl } from '../../helpers/s3.helper';
@@ -130,7 +130,7 @@ export class TemplateEntity extends BaseEntity {
 
   public async getData() {
     if (this.malwareScanStatus === MalwareScanStatus.infected) {
-      throw new ConflictError({ message: ErrorMessage.templateInfected });
+      throw new UnprocessableEntityError({ message: ErrorMessage.templateInfected });
     }
 
     const bucket = getEnvVariableOrFail('S3_BUCKET');

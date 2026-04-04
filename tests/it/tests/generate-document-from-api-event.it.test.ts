@@ -176,7 +176,7 @@ describe('generateDocument', () => {
 
     const result = await generateDocumentFromApiEvent(event, context);
 
-    expect(result.statusCode).toEqual(409);
+    expect(result.statusCode).toEqual(422);
     expect(JSON.parse(result.body)).toEqual({ message: ErrorMessage.templateInfected });
   });
 });
