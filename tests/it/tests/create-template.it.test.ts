@@ -69,6 +69,7 @@ describe('createTemplate', () => {
     const body = JSON.parse(result.body) as CreateTemplateResponseDto;
     expect(body).toEqual({
       id,
+      malwareScanStatus: MalwareScanStatus.pending,
       name: requestBody.name,
       type: requestBody.type,
     });

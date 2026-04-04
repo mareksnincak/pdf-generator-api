@@ -3,6 +3,7 @@ import { NoSuchKey } from '@aws-sdk/client-s3';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { MalwareScanStatus } from '../../db/template/enum';
 import { TemplateEntityMockFactory } from '../../db/template/mock-factory';
 import * as templateRepository from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
@@ -17,7 +18,9 @@ import { CreateTemplateRequestMockFactory } from './mock-factories/request.mock-
 
 const requestMockFactory = new CreateTemplateRequestMockFactory();
 const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactory();
-const templateEntity = new TemplateEntityMockFactory().create();
+const templateEntity = new TemplateEntityMockFactory().create({
+  malwareScanStatus: MalwareScanStatus.pending,
+});
 const context = new ContextMockFactory().create();
 
 beforeAll(() => {
@@ -43,6 +46,7 @@ describe('createTemplate', () => {
     expect(result.statusCode).toEqual(201);
     expect(JSON.parse(result.body)).toEqual({
       id: templateEntity.id,
+      malwareScanStatus: MalwareScanStatus.pending,
       name: templateEntity.name,
       type: templateEntity.type,
     });
