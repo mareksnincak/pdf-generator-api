@@ -4,13 +4,15 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
+import { ErrorMessage } from '../../enums/error.enum';
+import { ConflictError } from '../../errors/conflict.error';
 import { fromUnixTimestamp, toUnixTimestamp } from '../../helpers/date.helper';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { getObject, getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
 import { type Gsi1Key, type PrimaryKey } from '../common/types/entity.type';
 
-import { type MalwareScanStatus, type TemplateType } from './enum';
+import { MalwareScanStatus, type TemplateType } from './enum';
 import { type StoredTemplate, type Template } from './type';
 
 export class TemplateEntity extends BaseEntity {
@@ -126,6 +128,10 @@ export class TemplateEntity extends BaseEntity {
   }
 
   public async getData() {
+    if (this.malwareScanStatus === MalwareScanStatus.infected) {
+      throw new ConflictError({ message: ErrorMessage.templateInfected });
+    }
+
     const bucket = getEnvVariableOrFail('S3_BUCKET');
     const data = await getObject({ bucket, key: this.s3Key });
     return data;
