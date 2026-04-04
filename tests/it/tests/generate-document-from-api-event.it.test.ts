@@ -157,7 +157,7 @@ describe('generateDocument', () => {
     });
   });
 
-  it('should return 409 when malwareScanStatus is infected', async () => {
+  it('should return 422 when malwareScanStatus is infected', async () => {
     mockLogger();
 
     const templateId = randomUUID();
