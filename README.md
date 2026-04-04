@@ -44,6 +44,10 @@ S3 objects are cleaned up through two event-driven flows rather than scheduled j
 
 See [`infra/cdk/stack/dynamo.ts`](infra/cdk/stack/dynamo.ts) and [`infra/cdk/stack/sqs.ts`](infra/cdk/stack/sqs.ts).
 
+### GuardDuty malware scanning for uploaded templates
+
+Uploaded templates are automatically scanned for malware using [AWS GuardDuty Malware Protection for S3](https://docs.aws.amazon.com/guardduty/latest/ug/gdu-malware-protection-s3.html). On every upload, GuardDuty scans the object and emits the result to EventBridge. A Lambda processes the result and updates the template's malware scan status. When template is infected document generation is blocked. Infected files are moved to a quarantined S3 location and expire after 30 days via a lifecycle rule. See [`src/lambdas/process-malware-scan-result/`](src/lambdas/process-malware-scan-result/) and [`infra/cdk/stack/guardduty.ts`](infra/cdk/stack/guardduty.ts).
+
 ### Cognito OAuth2 with custom scopes
 
 Authentication uses Cognito with a custom OAuth2 resource server and fine-grained scopes: `templates:read`, `templates:write`, `documents:generate`, and `admin`. API Gateway enforces scopes per route. See [`infra/cdk/stack/cognito.ts`](infra/cdk/stack/cognito.ts).
