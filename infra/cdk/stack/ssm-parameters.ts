@@ -6,14 +6,21 @@ import { type OpenApiParamsSsmParam } from '../../../src/lambdas/get-open-api/ty
 
 import { type createCognito } from './cognito';
 
-export function getStringParameters(scope: Construct) {
+export function getStringParameters(scope: Construct): { alarmEmail: string; sentryDsn: string } {
   const sentryDsn = StringParameter.fromStringParameterName(
     scope,
     'sentry-dsn-param',
     'pdf-generator-api-sentry-dsn',
   );
 
+  const alarmEmail = StringParameter.fromStringParameterName(
+    scope,
+    'alarm-email-param',
+    'pdf-generator-api-alarm-email',
+  );
+
   return {
+    alarmEmail: alarmEmail.stringValue,
     sentryDsn: sentryDsn.stringValue,
   };
 }

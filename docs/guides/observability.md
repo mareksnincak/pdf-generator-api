@@ -5,6 +5,7 @@ We are using these mechanisms to help with the observability:
 1. Logging using Pino
 2. Tracing using AWS X-Ray
 3. Error tracking using Sentry
+4. Alerting using CloudWatch Alarms
 
 Below are the quick guides how to use each one.
 
@@ -53,3 +54,7 @@ Each event includes:
 - Log breadcrumbs leading up to the error
 
 Use the AWS request ID from Sentry to cross-reference with CloudWatch logs or an X-Ray trace.
+
+## Alerting - CloudWatch Alarms
+
+Sentry covers Lambda errors, but some failure modes produce no exception - a message silently exhausting SQS retries, or a Step Functions execution being throttled before any Lambda runs. CloudWatch Alarms cover these blind spots and send an email notification via SNS when triggered. The destination email is configured via the `pdf-generator-api-alarm-email` SSM parameter via Terraform. Open [CloudWatch Alarms](https://console.aws.amazon.com/cloudwatch/home#alarmsV2) to check current alarm states.

@@ -10,6 +10,7 @@ import { createDynamoDbEventSources, createDynamoDbTable } from './dynamo';
 import { createGuardDutyMalwareProtection } from './guardduty';
 import { createKmsKey } from './kms';
 import { createLambdas, createStateMachineStartupLambdas } from './lambdas';
+import { createAlarms } from './monitoring';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
@@ -36,7 +37,7 @@ export class CdkStack extends Stack {
       ? RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE
       : RemovalPolicy.DESTROY;
 
-    const { sentryDsn } = getStringParameters(this);
+    const { alarmEmail, sentryDsn } = getStringParameters(this);
 
     const dynamoDbTable = createDynamoDbTable({ removalPolicy, scope: this, stackId: id });
     const s3Bucket = createS3Bucket({
@@ -121,6 +122,8 @@ export class CdkStack extends Stack {
       openApiParamsSsmParamName,
       scope: this,
     });
+
+    createAlarms({ alarmEmail, scope: this, sqsQueues, stateMachines });
 
     createOutputs({ api, cognito, scope: this, sqsQueues });
   }
