@@ -1,6 +1,7 @@
 import { DynamoDBClient, type DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 
 import { getEnvVariableOrFail } from '../../../helpers/env.helper';
+import { captureAwsClient } from '../../../helpers/tracing.helper';
 
 let client: DynamoDBClient | undefined;
 let tableName: string;
@@ -20,7 +21,7 @@ export function getDynamoDbClient() {
     config.region = process.env.DYNAMODB_REGION;
   }
 
-  client = new DynamoDBClient(config);
+  client = captureAwsClient(new DynamoDBClient(config));
   return client;
 }
 

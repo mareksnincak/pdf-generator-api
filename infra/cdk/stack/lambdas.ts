@@ -3,7 +3,7 @@ import path from 'node:path';
 import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { type Table } from 'aws-cdk-lib/aws-dynamodb';
 import { type Key } from 'aws-cdk-lib/aws-kms';
-import { Architecture, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { Architecture, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import {
   type BundlingOptions,
   NodejsFunction,
@@ -65,6 +65,7 @@ function getCommonNodeJsFunctionProps({
     memorySize,
     runtime: Runtime.NODEJS_24_X,
     timeout: Duration.seconds(30),
+    tracing: Tracing.ACTIVE,
   } satisfies NodejsFunctionProps;
 }
 

@@ -1,10 +1,12 @@
 import { DecryptCommand, EncryptCommand, KMSClient } from '@aws-sdk/client-kms';
 
+import { captureAwsClient } from './tracing.helper';
+
 let kmsClient: KMSClient | undefined;
 
 export function getKmsClient() {
   if (!kmsClient) {
-    kmsClient = new KMSClient();
+    kmsClient = captureAwsClient(new KMSClient());
   }
 
   return kmsClient;
