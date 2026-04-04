@@ -58,7 +58,7 @@ export function createGuardDutyMalwareProtection({
         's3:PutObjectVersionTagging',
         's3:GetObjectVersionTagging',
       ],
-      resources: [`${s3Bucket.bucketArn}/*/templates/data/*`],
+      resources: [`${s3Bucket.bucketArn}/templates/data/*`],
       sid: 'AllowPostScanTag',
     }),
   );
@@ -90,7 +90,7 @@ export function createGuardDutyMalwareProtection({
   guardDutyRole.addToPolicy(
     new PolicyStatement({
       actions: ['s3:GetObject', 's3:GetObjectVersion'],
-      resources: [`${s3Bucket.bucketArn}/*/templates/data/*`],
+      resources: [`${s3Bucket.bucketArn}/templates/data/*`],
       sid: 'AllowMalwareScan',
     }),
   );
@@ -104,7 +104,7 @@ export function createGuardDutyMalwareProtection({
     protectedResource: {
       s3Bucket: {
         bucketName: s3Bucket.bucketName,
-        objectPrefixes: ['*/templates/data/*'],
+        objectPrefixes: ['templates/data/'],
       },
     },
     role: guardDutyRole.roleArn,

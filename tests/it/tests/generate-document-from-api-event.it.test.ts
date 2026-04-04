@@ -105,7 +105,7 @@ describe('generateDocument', () => {
     });
 
     const expectedUploadBucket = 'pdf-generator-api-test';
-    const expectedUploadS3Key = `${userId}/documents/${documentId}.pdf`;
+    const expectedUploadS3Key = `documents/${userId}/${documentId}.pdf`;
     const s3PutObjectArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3PutObjectArgs).toBeInstanceOf(PutObjectCommand);
     expect(s3PutObjectArgs.input).toEqual({

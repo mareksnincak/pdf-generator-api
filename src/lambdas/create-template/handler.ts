@@ -32,8 +32,8 @@ async function moveTemplateDataToPermanentLocation({
 }) {
   try {
     // TODO validate html
-    const uploadedDataS3Key = `${userId}/templates/uploads/${uploadId}`;
-    const storedDataS3Key = `${userId}/templates/data/${id}`;
+    const uploadedDataS3Key = `templates/uploads/${userId}/${uploadId}`;
+    const storedDataS3Key = `templates/data/${userId}/${id}`;
 
     await moveObject({
       destinationBucket: bucket,

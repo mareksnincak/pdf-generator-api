@@ -18,7 +18,7 @@
         },
         "OldImage": {
           "s3Key": {
-            "S": "f2c1b3c6-65a2-4f0b-9e23-988e40df221c/templates/data/5ea3ef71-91a6-466b-b38c-5b58762b307b"
+            "S": "/templates/data/f2c1b3c6-65a2-4f0b-9e23-988e40df221c/5ea3ef71-91a6-466b-b38c-5b58762b307b"
           },
           "GSI1PK": {
             "S": "TEMPLATE#USER#f2c1b3c6-65a2-4f0b-9e23-988e40df221c"

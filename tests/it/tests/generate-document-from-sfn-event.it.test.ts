@@ -76,7 +76,7 @@ describe('generateDocumentFromSfnEvent', () => {
     const result = await generateDocumentFromSfnEvent(input, context);
 
     const expectedUploadBucket = 'pdf-generator-api-test';
-    const expectedUploadS3Key = `${input.userId}/documents/${documentId}.pdf`;
+    const expectedUploadS3Key = `documents/${input.userId}/${documentId}.pdf`;
 
     expect(result).toEqual({
       ref: input.ref,

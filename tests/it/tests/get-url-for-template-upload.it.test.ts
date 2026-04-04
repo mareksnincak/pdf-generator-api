@@ -63,7 +63,7 @@ describe('getUrlForTemplateUpload', () => {
     });
 
     const userId = event.requestContext.authorizer.claims.sub;
-    const expectedUploadS3Key = `${userId}/templates/uploads/${uploadId}`;
+    const expectedUploadS3Key = `templates/uploads/${userId}/${uploadId}`;
 
     const getSignedUrlArgs = getSignedUrlSpy.mock.lastCall;
     expect(getSignedUrlArgs?.[1].input).toEqual({

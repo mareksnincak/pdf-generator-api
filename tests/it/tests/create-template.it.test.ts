@@ -80,15 +80,15 @@ describe('createTemplate', () => {
     expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
     expect(s3CopyArgs.input).toEqual({
       Bucket: 'pdf-generator-api-test',
-      CopySource: `pdf-generator-api-test/${userId}/templates/uploads/${requestBody.uploadId}`,
-      Key: `${userId}/templates/data/${id}`,
+      CopySource: `pdf-generator-api-test/templates/uploads/${userId}/${requestBody.uploadId}`,
+      Key: `templates/data/${userId}/${id}`,
     });
 
     const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3DeleteArgs.input).toEqual({
       Bucket: 'pdf-generator-api-test',
-      Key: `${userId}/templates/uploads/${requestBody.uploadId}`,
+      Key: `templates/uploads/${userId}/${requestBody.uploadId}`,
     });
 
     const createdTemplate = await templateRepository.getByIdOrFail({ id, userId });
@@ -100,7 +100,7 @@ describe('createTemplate', () => {
       malwareScanStatus: MalwareScanStatus.pending,
       name: requestBody.name,
       PK: `TEMPLATE#USER#${userId}#ID#${id}`,
-      s3Key: `${userId}/templates/data/${requestBody.uploadId}`,
+      s3Key: `templates/data/${userId}/${requestBody.uploadId}`,
       SK: '#',
       type: 'html/handlebars',
       userId,
@@ -159,7 +159,7 @@ describe('createTemplate', () => {
     expect(s3ClientLastCallArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3ClientLastCallArgs?.input).toEqual({
       Bucket: 'pdf-generator-api-test',
-      Key: `${userId}/templates/data/${id}`,
+      Key: `templates/data/${userId}/${id}`,
     });
   });
 
