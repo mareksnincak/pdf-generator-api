@@ -48,6 +48,10 @@ See [`infra/cdk/stack/dynamo.ts`](infra/cdk/stack/dynamo.ts), [`infra/cdk/stack/
 
 Uploaded templates are automatically scanned for malware using [AWS GuardDuty Malware Protection for S3](https://docs.aws.amazon.com/guardduty/latest/ug/gdu-malware-protection-s3.html). On every upload, GuardDuty scans the object and emits the result to EventBridge. A Lambda processes the result and updates the template's malware scan status. When template is infected document generation is blocked. Infected files are moved to a quarantined S3 location and expire after 30 days via a lifecycle rule. See [`src/lambdas/process-malware-scan-result/`](src/lambdas/process-malware-scan-result/), [`infra/cdk/stack/guardduty.ts`](infra/cdk/stack/guardduty.ts) and [ADR: GuardDuty malware scan](docs/architecture-decision-records/007-guardduty-malware-scan.md).
 
+### Observability
+
+Structured logging uses [Pino](https://getpino.io/) with per-request context injection. [Sentry](https://sentry.io/) wraps each Lambda handler to automatically capture errors. [AWS X-Ray](https://aws.amazon.com/xray/) provides distributed tracing across async boundaries - every Lambda invocation is traced and DynamoDB, S3, SQS, SFN, and KMS calls appear as named subsegments, making it possible to follow a request across the full Lambda → SQS → Lambda and Step Functions chains. CloudWatch Alarms cover the failure modes Sentry cannot see: DLQ messages (persistent S3 cleanup failures), and Step Functions batch execution failures and throttles. See [`src/helpers/handler.helper.ts`](src/helpers/handler.helper.ts), [`src/helpers/tracing.helper.ts`](src/helpers/tracing.helper.ts), [`infra/cdk/stack/monitoring.ts`](infra/cdk/stack/monitoring.ts), [observability guide](docs/guides/observability.md) and [ADR: Distributed tracing](docs/architecture-decision-records/008-distributed-tracing.md).
+
 ### Cognito OAuth2 with custom scopes
 
 Authentication uses Cognito with a custom OAuth2 resource server and fine-grained scopes: `templates:read`, `templates:write`, `documents:generate`, and `admin`. API Gateway enforces scopes per route. See [`infra/cdk/stack/cognito.ts`](infra/cdk/stack/cognito.ts).
@@ -64,10 +68,6 @@ See [`infra/cdk/`](infra/cdk/), [`infra/terraform/`](infra/terraform/) and [ADR:
 ### Code-first OpenAPI
 
 The API schema is generated from the same Zod schemas used for runtime validation, via [`zod-to-openapi`](https://github.com/asteasolutions/zod-to-openapi). The spec is served live at the `/` endpoint. See [`src/open-api/`](src/open-api/).
-
-### Observability
-
-Structured logging uses [Pino](https://getpino.io/) with per-request context injection. [Sentry](https://sentry.io/) wraps each Lambda handler to automatically capture errors. [AWS X-Ray](https://aws.amazon.com/xray/) provides distributed tracing across async boundaries - every Lambda invocation is traced and DynamoDB, S3, SQS, SFN, and KMS calls appear as named subsegments, making it possible to follow a request across the full Lambda → SQS → Lambda and Step Functions chains. Three CloudWatch Alarms cover the failure modes Sentry cannot see: DLQ messages (persistent S3 cleanup failures), and Step Functions batch execution failures and throttles. See [`src/helpers/handler.helper.ts`](src/helpers/handler.helper.ts), [`src/helpers/tracing.helper.ts`](src/helpers/tracing.helper.ts), [`infra/cdk/stack/monitoring.ts`](infra/cdk/stack/monitoring.ts), [observability guide](docs/guides/observability.md) and [ADR: Distributed tracing](docs/architecture-decision-records/008-distributed-tracing.md).
 
 ### CI/CD pipeline
 
