@@ -4,19 +4,22 @@ import type { AttributeValue } from '@aws-sdk/client-dynamodb';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
 
+import { ErrorMessage } from '../../enums/error.enum';
+import { UnprocessableEntityError } from '../../errors/unprocessable-entity.error';
 import { fromUnixTimestamp, toUnixTimestamp } from '../../helpers/date.helper';
 import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { getObject, getPresignedShareUrl } from '../../helpers/s3.helper';
 import { BaseEntity } from '../base/base.entity';
 import { type Gsi1Key, type PrimaryKey } from '../common/types/entity.type';
 
-import { type TemplateType } from './enum';
+import { MalwareScanStatus, type TemplateType } from './enum';
 import { type StoredTemplate, type Template } from './type';
 
 export class TemplateEntity extends BaseEntity {
   constructor({
     createdAt = new Date(),
     id = randomUUID(),
+    malwareScanStatus,
     name,
     s3Key,
     type,
@@ -31,6 +34,7 @@ export class TemplateEntity extends BaseEntity {
     this.name = name;
     this.type = type;
     this.s3Key = s3Key;
+    this.malwareScanStatus = malwareScanStatus;
     this.userId = userId;
   }
 
@@ -44,6 +48,8 @@ export class TemplateEntity extends BaseEntity {
 
   public s3Key: string;
 
+  public malwareScanStatus: MalwareScanStatus;
+
   public userId: string;
 
   toDynamoItem(): Record<string, AttributeValue> {
@@ -52,6 +58,7 @@ export class TemplateEntity extends BaseEntity {
       ...this.gsi1Key,
       createdAt: toUnixTimestamp(this.createdAt),
       id: this.id,
+      malwareScanStatus: this.malwareScanStatus,
       name: this.name,
       s3Key: this.s3Key,
       type: this.type,
@@ -99,6 +106,7 @@ export class TemplateEntity extends BaseEntity {
   public toPublicJson() {
     return {
       id: this.id,
+      malwareScanStatus: this.malwareScanStatus,
       name: this.name,
       type: this.type,
     };
@@ -121,6 +129,10 @@ export class TemplateEntity extends BaseEntity {
   }
 
   public async getData() {
+    if (this.malwareScanStatus === MalwareScanStatus.infected) {
+      throw new UnprocessableEntityError({ message: ErrorMessage.templateInfected });
+    }
+
     const bucket = getEnvVariableOrFail('S3_BUCKET');
     const data = await getObject({ bucket, key: this.s3Key });
     return data;

@@ -1,7 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import isCi from 'is-ci';
 import request from 'supertest';
 import waitForExpect from 'wait-for-expect';
 
@@ -87,7 +86,7 @@ describe('Documents', () => {
     expect(generateDocumentBatchResponse).toHaveProperty('id', expect.any(String));
     const batchId = generateDocumentBatchResponse.id as string;
 
-    if (!isCi) {
+    if (process.env.IS_LOCAL === 'true') {
       /**
        * As state machine doesn't run locally, we just check if document
        * batch was created and exit

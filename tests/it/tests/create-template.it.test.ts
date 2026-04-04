@@ -6,6 +6,7 @@ import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aw
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { MalwareScanStatus } from '../../../src/db/template/enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
 import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
@@ -49,14 +50,12 @@ describe('createTemplate', () => {
     const mockedDate = new Date();
     jest.useFakeTimers().setSystemTime(mockedDate);
 
-    const dataId = randomUUID();
     const id = randomUUID();
 
-    jest.spyOn(crypto, 'randomUUID').mockReturnValue(dataId);
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
     const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
 
     const requestBody = requestMockFactory.create({
-      id,
       name: 'sample template',
     });
     const event = eventMockFactory.create({
@@ -70,6 +69,7 @@ describe('createTemplate', () => {
     const body = JSON.parse(result.body) as CreateTemplateResponseDto;
     expect(body).toEqual({
       id,
+      malwareScanStatus: MalwareScanStatus.pending,
       name: requestBody.name,
       type: requestBody.type,
     });
@@ -80,15 +80,15 @@ describe('createTemplate', () => {
     expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
     expect(s3CopyArgs.input).toEqual({
       Bucket: 'pdf-generator-api-test',
-      CopySource: `pdf-generator-api-test/${userId}/templates/uploads/${requestBody.uploadId}`,
-      Key: `${userId}/templates/data/${dataId}`,
+      CopySource: `pdf-generator-api-test/templates/uploads/${userId}/${requestBody.uploadId}`,
+      Key: `templates/data/${userId}/${id}`,
     });
 
     const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3DeleteArgs.input).toEqual({
       Bucket: 'pdf-generator-api-test',
-      Key: `${userId}/templates/uploads/${requestBody.uploadId}`,
+      Key: `templates/uploads/${userId}/${requestBody.uploadId}`,
     });
 
     const createdTemplate = await templateRepository.getByIdOrFail({ id, userId });
@@ -97,9 +97,10 @@ describe('createTemplate', () => {
       GSI1PK: `TEMPLATE#USER#${userId}`,
       GSI1SK: `NAME#${requestBody.name}`,
       id,
+      malwareScanStatus: MalwareScanStatus.pending,
       name: requestBody.name,
       PK: `TEMPLATE#USER#${userId}#ID#${id}`,
-      s3Key: `${userId}/templates/data/${requestBody.uploadId}`,
+      s3Key: `templates/data/${userId}/${requestBody.uploadId}`,
       SK: '#',
       type: 'html/handlebars',
       userId,
@@ -130,14 +131,11 @@ describe('createTemplate', () => {
     mockLogger();
 
     const id = randomUUID();
-    const dataId = randomUUID();
 
-    jest.spyOn(crypto, 'randomUUID').mockReturnValue(dataId);
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
     const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
 
-    const requestBody = requestMockFactory.create({
-      id,
-    });
+    const requestBody = requestMockFactory.create();
     const event = eventMockFactory.create({
       body: JSON.stringify(requestBody),
     });
@@ -161,7 +159,7 @@ describe('createTemplate', () => {
     expect(s3ClientLastCallArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3ClientLastCallArgs?.input).toEqual({
       Bucket: 'pdf-generator-api-test',
-      Key: `${userId}/templates/data/${dataId}`,
+      Key: `templates/data/${userId}/${id}`,
     });
   });
 
@@ -169,14 +167,11 @@ describe('createTemplate', () => {
     mockLogger();
 
     const id = randomUUID();
-    const dataId = randomUUID();
 
-    jest.spyOn(crypto, 'randomUUID').mockReturnValue(dataId);
+    jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
     jest.spyOn(S3Client.prototype, 'send').mockImplementation();
 
-    const requestBody = requestMockFactory.create({
-      id,
-    });
+    const requestBody = requestMockFactory.create();
     const event = eventMockFactory.create({
       body: JSON.stringify(requestBody),
     });

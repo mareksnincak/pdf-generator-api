@@ -13,11 +13,14 @@ const createTemplateRequestMockFactory = new CreateTemplateRequestMockFactory();
 export async function createTemplateE2e({
   accessToken,
   baseUrl,
+  templateData: templateDataOverride,
 }: {
   accessToken: string;
   baseUrl: string;
+  templateData?: Buffer;
 }) {
-  const templateData = await readFile(path.join(mocksPath, 'document.mock.html'));
+  const templateData =
+    templateDataOverride ?? (await readFile(path.join(mocksPath, 'document.mock.html')));
 
   // Get url for template upload
   const { body: getUrlForTemplateUploadResponse } = await request(baseUrl)

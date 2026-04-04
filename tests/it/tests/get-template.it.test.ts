@@ -6,6 +6,7 @@ import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { MalwareScanStatus } from '../../../src/db/template/enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
 import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
@@ -69,6 +70,7 @@ describe('getTemplate', () => {
     expect(JSON.parse(result.body)).toEqual({
       dataUrl: mockedUrl,
       id,
+      malwareScanStatus: MalwareScanStatus.clean,
       name: templateEntity.name,
       type: templateEntity.type,
     });

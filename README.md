@@ -21,19 +21,19 @@ The API accepts requests authenticated via Cognito, generates PDFs inside Lambda
 
 ### Serverless PDF generation
 
-PDF rendering runs inside AWS Lambda using [Puppeteer](https://pptr.dev/). HTML templates are rendered via [Handlebars](https://handlebarsjs.com/). See [`src/lambdas/generate-document/services/pdf.service.ts`](src/lambdas/generate-document/services/pdf.service.ts).
+PDF rendering runs inside AWS Lambda using [Puppeteer](https://pptr.dev/). HTML templates are rendered via [Handlebars](https://handlebarsjs.com/). See [`src/lambdas/generate-document/services/pdf.service.ts`](src/lambdas/generate-document/services/pdf.service.ts) and [ADR: Serverless architecture](docs/architecture-decision-records/001-serverless-architecture.md).
 
 ### KMS-encrypted pagination tokens
 
-DynamoDB's `LastEvaluatedKey` is encrypted with KMS before being returned to clients as a pagination token, preventing cursor tampering and leakage of internal table structure. See [`src/db/common/helpers/pagination.helper.ts`](src/db/common/helpers/pagination.helper.ts).
+DynamoDB's `LastEvaluatedKey` is encrypted with KMS before being returned to clients as a pagination token, preventing cursor tampering and leakage of internal table structure. See [`src/db/common/helpers/pagination.helper.ts`](src/db/common/helpers/pagination.helper.ts) and [ADR: KMS-encrypted pagination tokens](docs/architecture-decision-records/004-kms-encrypted-pagination-tokens.md).
 
 ### DynamoDB single-table design
 
-Data is stored using [single table design pattern](https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/) - entities share one DynamoDB table using prefixed composite keys (`TEMPLATE#USER#{userId}#ID#{id}`) with a GSI for secondary access patterns. See [`src/db/`](src/db/).
+Data is stored using [single table design pattern](https://aws.amazon.com/blogs/compute/creating-a-single-table-design-with-amazon-dynamodb/) - entities share one DynamoDB table using prefixed composite keys (`TEMPLATE#USER#{userId}#ID#{id}`) with a GSI for secondary access patterns. See [`src/db/`](src/db/) and [ADR: Single-table DynamoDB design](docs/architecture-decision-records/003-single-table-dynamodb-design.md).
 
 ### AWS Step Functions batch orchestration
 
-Batch document generation is orchestrated by a [Step Functions state machine](https://aws.amazon.com/step-functions/) that maps over documents in parallel, invoking a Lambda for each one. See [`infra/cdk/stack/sfn.ts`](infra/cdk/stack/sfn.ts).
+Batch document generation is orchestrated by a [Step Functions state machine](https://aws.amazon.com/step-functions/) that maps over documents in parallel, invoking a Lambda for each one. See [`infra/cdk/stack/sfn.ts`](infra/cdk/stack/sfn.ts) and [ADR: Step Functions for batch orchestration](docs/architecture-decision-records/005-step-functions-for-batch-orchestration.md).
 
 ### Event-driven S3 cleanup
 
@@ -42,7 +42,11 @@ S3 objects are cleaned up through two event-driven flows rather than scheduled j
 1. When a DynamoDB record is deleted (template or document batch, via explicit delete or TTL expiry), a stream event triggers a Lambda that deletes the corresponding S3 objects.
 2. Temporary S3 objects (generated PDFs, unused template uploads) are deleted after a configurable delay via a delayed SQS message - scheduled at the time the object is created, timed to expire shortly after the presigned URL does.
 
-See [`infra/cdk/stack/dynamo.ts`](infra/cdk/stack/dynamo.ts) and [`infra/cdk/stack/sqs.ts`](infra/cdk/stack/sqs.ts).
+See [`infra/cdk/stack/dynamo.ts`](infra/cdk/stack/dynamo.ts), [`infra/cdk/stack/sqs.ts`](infra/cdk/stack/sqs.ts) and [ADR: Event-driven S3 cleanup](docs/architecture-decision-records/006-event-driven-s3-cleanup.md).
+
+### GuardDuty malware scanning for uploaded templates
+
+Uploaded templates are automatically scanned for malware using [AWS GuardDuty Malware Protection for S3](https://docs.aws.amazon.com/guardduty/latest/ug/gdu-malware-protection-s3.html). On every upload, GuardDuty scans the object and emits the result to EventBridge. A Lambda processes the result and updates the template's malware scan status. When template is infected document generation is blocked. Infected files are moved to a quarantined S3 location and expire after 30 days via a lifecycle rule. See [`src/lambdas/process-malware-scan-result/`](src/lambdas/process-malware-scan-result/), [`infra/cdk/stack/guardduty.ts`](infra/cdk/stack/guardduty.ts) and [ADR: GuardDuty malware scan](docs/architecture-decision-records/007-guardduty-malware-scan.md).
 
 ### Cognito OAuth2 with custom scopes
 
@@ -55,7 +59,7 @@ Infrastructure is split across two tools by responsibility:
 1. Terraform bootstraps environment configuration (SSM parameters) that must exist before the app is deployed - keeps values out of CDK and independently manageable.
 2. CDK deploys all application resources (Lambdas, API Gateway, DynamoDB, Step Functions, Cognito, KMS, SQS, S3) and reads config from SSM at deploy time.
 
-See [`infra/cdk/`](infra/cdk/) and [`infra/terraform/`](infra/terraform/).
+See [`infra/cdk/`](infra/cdk/), [`infra/terraform/`](infra/terraform/) and [ADR: IaC tooling](docs/architecture-decision-records/002-iac-tooling.md).
 
 ### Code-first OpenAPI
 

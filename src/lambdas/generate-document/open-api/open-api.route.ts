@@ -43,6 +43,14 @@ export const generateDocumentRoute: RouteConfig = {
       },
       description: ErrorMessage.templateNotFound,
     },
+    422: {
+      content: {
+        'application/json': {
+          schema: httpErrorDto,
+        },
+      },
+      description: ErrorMessage.templateInfected,
+    },
   },
   summary: 'Generate document',
   tags: ['documents'],

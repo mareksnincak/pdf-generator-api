@@ -36,7 +36,7 @@ async function handler(
     const pdf = await generateDocument({ data, templateId, userId });
 
     const documentId = randomUUID();
-    const s3Key = `${userId}/documents/${documentId}.pdf`;
+    const s3Key = `documents/${userId}/${documentId}.pdf`;
     await putObject({
       bucket,
       data: pdf,

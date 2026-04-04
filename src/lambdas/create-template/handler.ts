@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { S3ServiceException } from '@aws-sdk/client-s3';
 import type { APIGatewayProxyWithCognitoAuthorizerEvent } from 'aws-lambda';
 
+import { MalwareScanStatus } from '../../db/template/enum';
 import * as templateRepository from '../../db/template/repository';
 import { ErrorMessage } from '../../enums/error.enum';
 import { S3ExceptionName } from '../../enums/s3.enum';
@@ -20,17 +21,19 @@ import { type CreateTemplateResponseDto } from './dtos/response.dto';
 
 async function moveTemplateDataToPermanentLocation({
   bucket,
+  id,
   uploadId,
   userId,
 }: {
   bucket: string;
+  id: string;
   uploadId: string;
   userId: string;
 }) {
   try {
     // TODO validate html
-    const uploadedDataS3Key = `${userId}/templates/uploads/${uploadId}`;
-    const storedDataS3Key = `${userId}/templates/data/${randomUUID()}`;
+    const uploadedDataS3Key = `templates/uploads/${userId}/${uploadId}`;
+    const storedDataS3Key = `templates/data/${userId}/${id}`;
 
     await moveObject({
       destinationBucket: bucket,
@@ -52,7 +55,7 @@ async function moveTemplateDataToPermanentLocation({
 }
 
 export async function createTemplateWithData({
-  requestData: { id, name, type, uploadId },
+  requestData: { name, type, uploadId },
   userId,
 }: {
   requestData: CreateTemplateRequestDto;
@@ -60,10 +63,18 @@ export async function createTemplateWithData({
 }) {
   const bucket = getEnvVariableOrFail('S3_BUCKET');
 
-  const s3Key = await moveTemplateDataToPermanentLocation({ bucket, uploadId, userId });
+  const id = randomUUID();
+  const s3Key = await moveTemplateDataToPermanentLocation({ bucket, id, uploadId, userId });
 
   try {
-    const template = await templateRepository.createOrFail({ id, name, s3Key, type, userId });
+    const template = await templateRepository.createOrFail({
+      id,
+      malwareScanStatus: MalwareScanStatus.pending,
+      name,
+      s3Key,
+      type,
+      userId,
+    });
     return template;
   } catch (error) {
     await deleteObject({ bucket, key: s3Key });

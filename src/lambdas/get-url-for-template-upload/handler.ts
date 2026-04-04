@@ -26,7 +26,7 @@ async function createPresignedUrl({
   const bucket = getEnvVariableOrFail('S3_BUCKET');
   const uploadId = randomUUID();
 
-  const key = `${userId}/templates/uploads/${uploadId}`;
+  const key = `templates/uploads/${userId}/${uploadId}`;
   const [url] = await Promise.all([
     getPresignedUploadUrl({
       bucket,

@@ -68,7 +68,7 @@ async function handler(event: APIGatewayProxyWithCognitoAuthorizerEvent) {
   const url = await getShareableUrl({
     bucket,
     data: pdf,
-    keyPrefix: `${userId}/documents`,
+    keyPrefix: `documents/${userId}`,
   });
 
   const response: GenerateDocumentFromApiEventResponseDto = {
