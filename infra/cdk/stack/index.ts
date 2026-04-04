@@ -10,6 +10,7 @@ import { createDynamoDbEventSources, createDynamoDbTable } from './dynamo';
 import { createGuardDutyMalwareProtection } from './guardduty';
 import { createKmsKey } from './kms';
 import { createLambdas, createStateMachineStartupLambdas } from './lambdas';
+import { createAlarms } from './monitoring';
 import { createOutputs } from './outputs';
 import { grantPermissions } from './permissions';
 import { createS3Bucket } from './s3';
@@ -121,6 +122,8 @@ export class CdkStack extends Stack {
       openApiParamsSsmParamName,
       scope: this,
     });
+
+    createAlarms({ scope: this, sqsQueues, stateMachines });
 
     createOutputs({ api, cognito, scope: this, sqsQueues });
   }
