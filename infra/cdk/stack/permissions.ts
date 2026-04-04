@@ -43,6 +43,7 @@ export function grantPermissions({
   s3Bucket.grantReadWrite(lambdas.generateDocumentFromApiEvent);
   s3Bucket.grantReadWrite(lambdas.generateDocumentFromSfnEvent);
   s3Bucket.grantReadWrite(lambdas.getDocumentBatchResult);
+  s3Bucket.grantReadWrite(lambdas.processMalwareScanResult);
 
   // We are using inline policy instead of ssmParam.grantRead() to not create circular dependency
   lambdas.getOpenApi.addToRolePolicy(
@@ -61,6 +62,7 @@ export function grantPermissions({
   dynamoDbTable.grantReadData(lambdas.getDocumentBatchResult);
   dynamoDbTable.grantWriteData(lambdas.storeDocumentBatchResult);
   dynamoDbTable.grantWriteData(stateMachineStartupLambdas.startDocumentBatchGeneration);
+  dynamoDbTable.grantWriteData(lambdas.processMalwareScanResult);
 
   cognito.defaultUsersCredentialsSecret.grantRead(lambdas.setDefaultUserPassword);
   cognito.userPool.grant(lambdas.setDefaultUserPassword, 'cognito-idp:AdminSetUserPassword');

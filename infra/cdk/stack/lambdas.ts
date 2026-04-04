@@ -318,6 +318,22 @@ export function createLambdas({
     handler: 'deleteOrphanedS3Objects',
   });
 
+  const processMalwareScanResult = new NodejsFunction(scope, Lambda.processMalwareScanResult, {
+    ...getCommonNodeJsFunctionProps({
+      cdkEnvVars,
+      lambda: Lambda.processMalwareScanResult,
+      retainStatefulResources,
+      scope,
+    }),
+    environment: {
+      ...commonEnvVars,
+      DYNAMODB_TABLE_NAME: dynamoDbTable.tableName,
+      S3_BUCKET: s3BucketName,
+      ...envVars.get(Lambda.processMalwareScanResult),
+    },
+    handler: 'processMalwareScanResult',
+  });
+
   return {
     createTemplate,
     deleteExpiredS3Objects,
@@ -330,6 +346,7 @@ export function createLambdas({
     getTemplate,
     getTemplates,
     getUrlForTemplateUpload,
+    processMalwareScanResult,
     setDefaultUserPassword,
     storeDocumentBatchResult,
   };

@@ -4,6 +4,7 @@ import {
   GetItemCommand,
   PutItemCommand,
   QueryCommand,
+  UpdateItemCommand,
 } from '@aws-sdk/client-dynamodb';
 import { marshall } from '@aws-sdk/util-dynamodb';
 import { type SetOptional } from 'type-fest';
@@ -20,6 +21,7 @@ import {
 } from '../common/helpers/pagination.helper';
 
 import { TemplateEntity } from './entity';
+import { type MalwareScanStatus } from './enum';
 import { type Template } from './type';
 
 export async function createOrFail(template: SetOptional<Template, 'createdAt' | 'id'>) {
@@ -128,6 +130,25 @@ export async function getMany({
     nextPaginationToken,
     templates,
   };
+}
+
+export async function updateMalwareScanStatus(
+  { id, userId }: { id: string; userId: string },
+  malwareScanStatus: MalwareScanStatus,
+) {
+  logger.info({ id, malwareScanStatus, userId }, 'templateRepository.updateMalwareScanStatus');
+
+  const command = new UpdateItemCommand({
+    ConditionExpression: 'attribute_exists(PK)',
+    ExpressionAttributeValues: marshall({ ':malwareScanStatus': malwareScanStatus }),
+    Key: TemplateEntity.getDynamoPrimaryKey({ id, userId }),
+    TableName: getTableName(),
+    UpdateExpression: 'SET malwareScanStatus = :malwareScanStatus',
+  });
+
+  await getDynamoDbClient().send(command);
+
+  logger.info('templateRepository.updateMalwareScanStatus.success');
 }
 
 export async function deleteByIdOrFail(params: { id: string; userId: string }) {

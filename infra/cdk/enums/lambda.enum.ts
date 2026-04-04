@@ -12,5 +12,6 @@ export enum Lambda {
   getUrlForTemplateUpload = 'get-url-for-template-upload',
   setDefaultUserPassword = 'set-default-user-password',
   startDocumentBatchGeneration = 'start-document-batch-generation',
+  processMalwareScanResult = 'process-malware-scan-result',
   storeDocumentBatchResult = 'store-document-batch-result',
 }

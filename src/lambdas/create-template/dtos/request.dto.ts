@@ -6,7 +6,6 @@ import { templateDto } from '../../../dtos/template.dto';
 extendZodWithOpenApi(z);
 
 export const createTemplateRequestDto = z.object({
-  id: templateDto.shape.id.optional(),
   name: templateDto.shape.name,
   type: templateDto.shape.type,
   uploadId: z.uuid().openapi({ description: 'Upload id from GET /templates/upload-url api call.' }),

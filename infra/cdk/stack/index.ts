@@ -7,6 +7,7 @@ import { type CdkEnvVarsDto } from '../dtos/cdk-env-vars.dto';
 import { createApi } from './api';
 import { createCognito } from './cognito';
 import { createDynamoDbEventSources, createDynamoDbTable } from './dynamo';
+import { createGuardDutyMalwareProtection } from './guardduty';
 import { createKmsKey } from './kms';
 import { createLambdas, createStateMachineStartupLambdas } from './lambdas';
 import { createOutputs } from './outputs';
@@ -89,6 +90,15 @@ export class CdkStack extends Stack {
     createDynamoDbEventSources({
       dynamoDbTable,
       lambdas,
+    });
+
+    createGuardDutyMalwareProtection({
+      account: this.account,
+      processMalwareScanResultLambda: lambdas.processMalwareScanResult,
+      region: this.region,
+      s3Bucket,
+      scope: this,
+      sqsQueues,
     });
 
     grantPermissions({

@@ -1,10 +1,11 @@
 import { type PrimaryKey } from '../common/types/entity.type';
 
-import { type TemplateType } from './enum';
+import { type MalwareScanStatus, type TemplateType } from './enum';
 
 export type Template = {
   createdAt: Date;
   id: string;
+  malwareScanStatus: MalwareScanStatus;
   name: string;
   s3Key: string;
   type: TemplateType;
