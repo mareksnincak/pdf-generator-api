@@ -10,6 +10,7 @@ import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import { MalwareScanStatus } from '../../../src/db/template/enum';
 import { TemplateEntityMockFactory } from '../../../src/db/template/mock-factory';
 import * as templateRepository from '../../../src/db/template/repository';
 import { ErrorMessage } from '../../../src/enums/error.enum';
@@ -154,5 +155,28 @@ describe('generateDocument', () => {
     expect(JSON.parse(result.body)).toEqual({
       message: ErrorMessage.templateNotFound,
     });
+  });
+
+  it('should return 409 when malwareScanStatus is infected', async () => {
+    mockLogger();
+
+    const templateId = randomUUID();
+    const event = eventMockFactory.create({
+      body: JSON.stringify(requestMockFactory.create({ templateId })),
+    });
+
+    const userId = event.requestContext.authorizer.claims.sub;
+    const template = templateEntityMockFactory.create({
+      id: templateId,
+      malwareScanStatus: MalwareScanStatus.infected,
+      userId,
+    });
+
+    await templateRepository.createOrFail(template);
+
+    const result = await generateDocumentFromApiEvent(event, context);
+
+    expect(result.statusCode).toEqual(409);
+    expect(JSON.parse(result.body)).toEqual({ message: ErrorMessage.templateInfected });
   });
 });
