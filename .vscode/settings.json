@@ -7,6 +7,7 @@
     "Ciphertext",
     "dtos",
     "dynamodblocal",
+    "EICAR",
     "healthcheck",
     "linebreak",
     "metafile",
