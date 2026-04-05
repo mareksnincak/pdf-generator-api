@@ -95,7 +95,7 @@ export function createGuardDutyMalwareProtection({
     }),
   );
 
-  new CfnMalwareProtectionPlan(scope, 'malware-protection-plan', {
+  const malwareProtectionPlan = new CfnMalwareProtectionPlan(scope, 'malware-protection-plan', {
     actions: {
       tagging: {
         status: 'ENABLED',
@@ -109,6 +109,14 @@ export function createGuardDutyMalwareProtection({
     },
     role: guardDutyRole.roleArn,
   });
+
+  /*
+   * GuardDuty validates the role's permissions when creating the plan. Without this,
+   * CloudFormation only waits for the Role before creating the plan — the DefaultPolicy
+   * (AWS::IAM::Policy with all addToPolicy statements) is a separate resource that may
+   * not be attached yet, causing validation failures on fresh deploys.
+   */
+  malwareProtectionPlan.node.addDependency(guardDutyRole.node.findChild('DefaultPolicy'));
 
   new Rule(scope, 'malware-scan-result-rule', {
     eventPattern: {
