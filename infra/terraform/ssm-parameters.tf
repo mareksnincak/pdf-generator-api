@@ -1,9 +1,5 @@
-variable "aws_region" {
-  type = string
-}
-
 variable "sentry_dsn" {
-  type = string
+  type      = string
   sensitive = true
 }
 
@@ -12,12 +8,12 @@ variable "alarm_email" {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = "eu-central-1"
 }
 
 resource "aws_ssm_parameter" "sentry_dsn" {
-  name = "pdf-generator-api-sentry-dsn"
-  type = "String"
+  name  = "pdf-generator-api-sentry-dsn"
+  type  = "String"
   value = var.sentry_dsn
 
   lifecycle {

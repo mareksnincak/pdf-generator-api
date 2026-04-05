@@ -4,6 +4,7 @@
     "esbenp.prettier-vscode",
     "streetsidesoftware.code-spell-checker",
     "firsttris.vscode-jest-runner",
-    "github.vscode-github-actions"
+    "github.vscode-github-actions",
+    "hashicorp.terraform"
   ]
 }

@@ -14,6 +14,10 @@ To do the deploy to new env follow these steps:
    ```sh
    aws sso login --profile <profile>
    ```
+1. Bootstrap the CDK - only needed on first deploy
+   ```sh
+   cd ./infra/cdk && AWS_PROFILE=<profile> npx cdk bootstrap
+   ```
 1. Apply the terraform and fill in the values - only needed on the first deploy or when adding new value
    ```sh
    cd ./infra/terraform && AWS_PROFILE=<profile> terraform apply
