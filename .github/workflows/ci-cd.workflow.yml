@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   pull_request:
   push:
-    branches: main
+    branches: feat/oidc-gh-actions-aws
 env:
   PUPPETEER_SKIP_DOWNLOAD: true
 jobs:
@@ -35,7 +35,7 @@ jobs:
       - run: npm ci
       - run: npm run test:it
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && github.ref == 'refs/heads/feat/oidc-gh-actions-aws'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
