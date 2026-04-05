@@ -3,7 +3,7 @@ variable "aws_region" {
 }
 
 variable "sentry_dsn" {
-  type = string
+  type      = string
   sensitive = true
 }
 
@@ -16,8 +16,8 @@ provider "aws" {
 }
 
 resource "aws_ssm_parameter" "sentry_dsn" {
-  name = "pdf-generator-api-sentry-dsn"
-  type = "String"
+  name  = "pdf-generator-api-sentry-dsn"
+  type  = "String"
   value = var.sentry_dsn
 
   lifecycle {
