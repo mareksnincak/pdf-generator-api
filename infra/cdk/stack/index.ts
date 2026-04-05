@@ -44,7 +44,6 @@ export class CdkStack extends Stack {
       autoDeleteObjects: !retainStatefulResources,
       removalPolicy,
       scope: this,
-      stackId: id,
     });
     const kmsKey = createKmsKey({ removalPolicy, scope: this, stackId: id });
 
