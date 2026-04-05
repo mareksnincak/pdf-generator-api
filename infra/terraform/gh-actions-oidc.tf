@@ -19,9 +19,9 @@ resource "aws_iam_role" "github_actions_deploy" {
       Principal = { Federated = aws_iam_openid_connect_provider.github.arn }
       Action    = "sts:AssumeRoleWithWebIdentity"
       Condition = {
-        StringLike = {
+        StringEquals = {
           "token.actions.githubusercontent.com:aud" = "sts.amazonaws.com"
-          "token.actions.githubusercontent.com:sub" = "repo:mareksnincak/pdf-generator-api:ref:refs/heads/*"
+          "token.actions.githubusercontent.com:sub" = "repo:mareksnincak/pdf-generator-api:ref:refs/heads/main"
         }
       }
     }]
