@@ -1,11 +1,18 @@
 name: CI/CD
+
 on:
   workflow_dispatch:
   pull_request:
   push:
     branches: main
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
 env:
   PUPPETEER_SKIP_DOWNLOAD: true
+
 jobs:
   lint:
     runs-on: ubuntu-latest
