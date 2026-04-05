@@ -1,7 +1,3 @@
-variable "aws_region" {
-  type = string
-}
-
 variable "sentry_dsn" {
   type      = string
   sensitive = true
@@ -12,7 +8,7 @@ variable "alarm_email" {
 }
 
 provider "aws" {
-  region = var.aws_region
+  region = "eu-central-1"
 }
 
 resource "aws_ssm_parameter" "sentry_dsn" {
