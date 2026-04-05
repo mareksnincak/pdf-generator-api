@@ -1,7 +1,13 @@
 import * as crypto from 'node:crypto';
 import { randomUUID } from 'node:crypto';
 
-import { CopyObjectCommand, DeleteObjectCommand, NoSuchKey, S3Client } from '@aws-sdk/client-s3';
+import {
+  CopyObjectCommand,
+  DeleteObjectCommand,
+  GetObjectCommand,
+  NoSuchKey,
+  S3Client,
+} from '@aws-sdk/client-s3';
 
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
@@ -53,7 +59,16 @@ describe('createTemplate', () => {
     const id = randomUUID();
 
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
-    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation((command) => {
+      if (command instanceof GetObjectCommand) {
+        return {
+          Body: {
+            transformToByteArray: () =>
+              Promise.resolve(new Uint8Array(Buffer.from('<html>{{name}}</html>'))),
+          },
+        } as unknown as Awaited<ReturnType<typeof S3Client.prototype.send>>;
+      }
+    });
 
     const requestBody = requestMockFactory.create({
       name: 'sample template',
@@ -76,7 +91,7 @@ describe('createTemplate', () => {
 
     const userId = event.requestContext.authorizer.claims.sub;
 
-    const s3CopyArgs = s3ClientSpy.mock.calls[0]?.[0];
+    const s3CopyArgs = s3ClientSpy.mock.calls[1]?.[0];
     expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
     expect(s3CopyArgs.input).toEqual({
       Bucket: 'pdf-generator-api-test',
@@ -84,7 +99,7 @@ describe('createTemplate', () => {
       Key: `templates/data/${userId}/${id}`,
     });
 
-    const s3DeleteArgs = s3ClientSpy.mock.calls[1]?.[0];
+    const s3DeleteArgs = s3ClientSpy.mock.calls[2]?.[0];
     expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
     expect(s3DeleteArgs.input).toEqual({
       Bucket: 'pdf-generator-api-test',
@@ -133,7 +148,16 @@ describe('createTemplate', () => {
     const id = randomUUID();
 
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
-    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation((command) => {
+      if (command instanceof GetObjectCommand) {
+        return {
+          Body: {
+            transformToByteArray: () =>
+              Promise.resolve(new Uint8Array(Buffer.from('<html>{{name}}</html>'))),
+          },
+        } as unknown as Awaited<ReturnType<typeof S3Client.prototype.send>>;
+      }
+    });
 
     const requestBody = requestMockFactory.create();
     const event = eventMockFactory.create({
@@ -169,7 +193,16 @@ describe('createTemplate', () => {
     const id = randomUUID();
 
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
-    jest.spyOn(S3Client.prototype, 'send').mockImplementation();
+    jest.spyOn(S3Client.prototype, 'send').mockImplementation((command) => {
+      if (command instanceof GetObjectCommand) {
+        return {
+          Body: {
+            transformToByteArray: () =>
+              Promise.resolve(new Uint8Array(Buffer.from('<html>{{name}}</html>'))),
+          },
+        } as unknown as Awaited<ReturnType<typeof S3Client.prototype.send>>;
+      }
+    });
 
     const requestBody = requestMockFactory.create();
     const event = eventMockFactory.create({

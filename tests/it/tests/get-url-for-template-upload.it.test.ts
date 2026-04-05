@@ -69,6 +69,7 @@ describe('getUrlForTemplateUpload', () => {
     expect(getSignedUrlArgs?.[1].input).toEqual({
       Bucket: 'pdf-generator-api-test',
       ContentLength: 1024,
+      ContentType: 'text/html',
       Key: expectedUploadS3Key,
     });
 

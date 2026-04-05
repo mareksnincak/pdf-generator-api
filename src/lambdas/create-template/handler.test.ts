@@ -33,6 +33,7 @@ afterEach(() => {
 
 describe('createTemplate', () => {
   it('should create template', async () => {
+    jest.spyOn(s3Helper, 'getObject').mockResolvedValue(Buffer.from('<html>{{name}}</html>'));
     jest.spyOn(s3Helper, 'moveObject').mockImplementation();
     jest.spyOn(templateRepository, 'createOrFail').mockResolvedValue(templateEntity);
 
@@ -54,7 +55,7 @@ describe('createTemplate', () => {
 
   it('should return 404 when template data does not exist', async () => {
     mockLogger();
-    jest.spyOn(s3Helper, 'moveObject').mockImplementation(() => {
+    jest.spyOn(s3Helper, 'getObject').mockImplementation(() => {
       throw new NoSuchKey({ $metadata: {}, message: 'No such key' });
     });
 
@@ -71,8 +72,26 @@ describe('createTemplate', () => {
     });
   });
 
+  it('should return 400 when template content is invalid', async () => {
+    mockLogger();
+    jest.spyOn(s3Helper, 'getObject').mockResolvedValue(Buffer.from('{{ invalid'));
+
+    const requestBody = requestMockFactory.create();
+    const event = eventMockFactory.create({
+      body: JSON.stringify(requestBody),
+    });
+
+    const result = await createTemplate(event, context);
+
+    expect(result.statusCode).toEqual(400);
+    expect(JSON.parse(result.body)).toEqual({
+      message: ErrorMessage.invalidTemplateContent,
+    });
+  });
+
   it('should return 409 and delete s3 data when template already exists', async () => {
     mockLogger();
+    jest.spyOn(s3Helper, 'getObject').mockResolvedValue(Buffer.from('<html>{{name}}</html>'));
     jest.spyOn(s3Helper, 'moveObject').mockImplementation();
     const deleteObjectSpy = jest.spyOn(s3Helper, 'deleteObject').mockImplementation();
     jest.spyOn(templateRepository, 'createOrFail').mockRejectedValue(

@@ -30,6 +30,7 @@ async function createPresignedUrl({
   const [url] = await Promise.all([
     getPresignedUploadUrl({
       bucket,
+      contentType: 'text/html',
       expiresInSeconds,
       fileSizeBytes,
       key,
