@@ -155,11 +155,13 @@ export async function getPresignedShareUrl({
 
 export async function getPresignedUploadUrl({
   bucket,
+  contentType,
   expiresInSeconds = 3600,
   fileSizeBytes,
   key,
 }: {
   bucket: string;
+  contentType?: string;
   expiresInSeconds?: number;
   fileSizeBytes: number;
   key: string;
@@ -169,6 +171,7 @@ export async function getPresignedUploadUrl({
   const command = new PutObjectCommand({
     Bucket: bucket,
     ContentLength: fileSizeBytes,
+    ContentType: contentType,
     Key: key,
   });
 

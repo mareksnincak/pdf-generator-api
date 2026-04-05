@@ -5,6 +5,7 @@ import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
+import * as s3Helper from '../../helpers/s3.helper';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../mock-factories/context.mock-factory';
 import * as scheduleDeletionHelper from '../delete-expired-s3-objects/helpers/schedule-deletion.helper';
@@ -46,6 +47,7 @@ describe('getUrlForTemplateUpload', () => {
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(uploadId);
     jest.spyOn(s3RequestPresigner, 'getSignedUrl').mockResolvedValue(presignedUrl);
     jest.spyOn(scheduleDeletionHelper, 'scheduleObjectDeletion').mockResolvedValue();
+    const getPresignedUploadUrlSpy = jest.spyOn(s3Helper, 'getPresignedUploadUrl');
 
     const queryStringParameters = requestMockFactory.create();
     const event = eventMockFactory.create({
@@ -59,5 +61,9 @@ describe('getUrlForTemplateUpload', () => {
       uploadId,
       url: presignedUrl,
     });
+
+    expect(getPresignedUploadUrlSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ contentType: 'text/html' }),
+    );
   });
 });
