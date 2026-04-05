@@ -6,16 +6,13 @@ export function createS3Bucket({
   autoDeleteObjects,
   removalPolicy,
   scope,
-  stackId,
 }: {
   autoDeleteObjects: boolean;
   removalPolicy: RemovalPolicy;
   scope: Construct;
-  stackId: string;
 }) {
   const bucket = new Bucket(scope, 's3-bucket', {
     autoDeleteObjects,
-    bucketName: stackId,
     enforceSSL: true,
     removalPolicy,
   });
