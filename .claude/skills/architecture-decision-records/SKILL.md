@@ -1,29 +1,28 @@
 ---
 name: architecture-decision-records
-description: Create a new Architecture Decision Record (ADR) for this project.
+description: Creates Architecture Decision Records (ADRs) documenting key design choices with context, alternatives, and consequences. Use when the user asks to write, create, or add an ADR, architectural decision record, or architecture decision. Do not trigger when the user only wants to read, list, or discuss existing ADRs.
 ---
 
-Create a new Architecture Decision Record (ADR) for this project.
+# Architecture Decision Records
 
-TRIGGER when: the user asks to write/create/add an ADR, architectural decision record, or architecture decision.
-DO NOT TRIGGER when: the user asks to read, list, or discuss existing ADRs without creating a new one.
+## Quick start
 
-## Steps
+Infer the topic from the conversation context, then follow the workflow below to create the ADR and register it.
 
-1. Read `docs/architecture-decision-records/README.md` to find the next ADR number (count existing entries and increment by 1).
+## Workflow
 
-2. Read `002-iac-tooling.md` and `003-single-table-dynamodb-design.md` to match the writing style and structure.
+1. Read `docs/architecture-decision-records/README.md` to determine the next ADR number (count existing entries + 1).
 
-3. Create the ADR file at `docs/architecture-decision-records/<NNN>-<kebab-case-title>.md` using this structure:
-   - `# <Title>` - short, noun-phrase title matching the filename
-   - `## Context` - what situation or problem prompted this decision; include relevant constraints, prior state, and why the status quo was insufficient
-   - `## Decision` - what was decided and why; focus on the reasoning and intent, not implementation details or references to specific files, code, or configuration
-   - `## Alternatives considered` - one `###` subsection per alternative; each must explain why it was rejected, not just what it is
-   - `## Consequences` - bullet list of concrete outcomes (good and bad), things that change, and operational implications
+2. Read `002-iac-tooling.md` and `003-single-table-dynamodb-design.md` to match the writing style.
 
-4. Add an entry to `docs/architecture-decision-records/README.md`:
+3. Create `docs/architecture-decision-records/<NNN>-<kebab-case-title>.md`:
+   - `# <Title>` - short noun-phrase matching the filename
+   - `## Context` - the situation or problem; include constraints, prior state, and why the status quo was insufficient
+   - `## Decision` - what was decided and why; focus on reasoning and intent, not file paths or implementation details
+   - `## Alternatives considered` - one `###` subsection per alternative, each explaining why it was rejected
+   - `## Consequences` - bullet list of concrete outcomes (positive and negative), things that change, and operational implications
+
+4. Append to the README index:
    ```
    <N>. [<Title>](./<NNN>-<kebab-case-title>.md)
    ```
-
-The topic/subject for the ADR is inferred from the conversation context.
