@@ -2,7 +2,7 @@ name: pdf-generator-api
 services:
   dynamodb-local:
     command: '-jar DynamoDBLocal.jar -sharedDb -dbPath ./data'
-    image: 'amazon/dynamodb-local:latest'
+    image: amazon/dynamodb-local@sha256:d89f8fcc6b1a39cb35976c248ed42a28c66ae00dc043099210f5571e42648ab4 # v3.3.0
     ports:
       - '8000:8000'
     volumes:
@@ -18,7 +18,7 @@ services:
       timeout: 3s
       retries: 10
   dynamodb-admin:
-    image: aaronshaf/dynamodb-admin
+    image: aaronshaf/dynamodb-admin@sha256:46d9c7f5234688481a807987113ab068acaa11fd7057c9bb84ef181f492a0194 # v5.1.3
     ports:
       - '8001:8001'
     environment:
