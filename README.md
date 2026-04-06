@@ -100,10 +100,6 @@ npm run open-api:generate
    cp config/values/local.config.example.json config/values/local.config.json
    # update values in config/values/local.config.json
    ```
-1. [set up AWS credentials](https://docs.aws.amazon.com/sdk-for-javascript/v3/developer-guide/setting-credentials-node.html) that can be used by the app. Suggested setups:
-   1. use AWS SSO and setup default credentials in `~/.aws/config`
-   1. use AWS SSO with custom profile and export profile name in `AWS_PROFILE` environment variable
-   1. use aws-vault to expose credentials in CLI
 1. run infrastructure
    ```bash
    npm run infra:up

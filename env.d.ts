@@ -16,7 +16,10 @@ declare namespace NodeJS {
     OPEN_API_SSM_PARAM_NAME?: string;
     PRESIGNED_URL_EXPIRATION_SECONDS?: string;
     S3_BUCKET?: string;
+    S3_ENDPOINT?: string;
+    S3_PRESIGNED_URL_ENDPOINT?: string;
     SENTRY_DSN?: string;
+    SQS_ENDPOINT?: string;
     STATE_MACHINE_ARN?: string;
   };
 }
