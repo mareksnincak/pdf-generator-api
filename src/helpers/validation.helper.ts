@@ -2,6 +2,7 @@ import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { type z, type ZodType } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 
+import { ErrorMessage } from '../enums/error.enum';
 import { BadRequestError } from '../errors/bad-request.error';
 
 export function validate<T extends ZodType>(data: unknown, dto: T): z.infer<T> {
@@ -38,7 +39,7 @@ export function validateBody<T extends ZodType>(
     return validate(data, dto);
   } catch (error) {
     if (error instanceof SyntaxError) {
-      throw new BadRequestError({ message: 'Invalid JSON' });
+      throw new BadRequestError({ message: ErrorMessage.invalidJson });
     }
 
     throw error;

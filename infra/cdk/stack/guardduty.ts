@@ -112,7 +112,7 @@ export function createGuardDutyMalwareProtection({
 
   /*
    * GuardDuty validates the role's permissions when creating the plan. Without this,
-   * CloudFormation only waits for the Role before creating the plan — the DefaultPolicy
+   * CloudFormation only waits for the Role before creating the plan - the DefaultPolicy
    * (AWS::IAM::Policy with all addToPolicy statements) is a separate resource that may
    * not be attached yet, causing validation failures on fresh deploys.
    */

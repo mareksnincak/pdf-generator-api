@@ -10,3 +10,4 @@ Key design decisions made during development of this project, including context,
 6. [Event-driven S3 cleanup](./006-event-driven-s3-cleanup.md)
 7. [GuardDuty malware scan](./007-guardduty-malware-scan.md)
 8. [Distributed tracing](./008-distributed-tracing.md)
+9. [Pin CI dependencies by hash](./009-pin-ci-dependencies-by-hash.md)

@@ -46,5 +46,5 @@ Complete control over action code with no dependency on upstream maintainers. We
 
 - Supply-chain attacks that move a tag to malicious code have no effect on the pipeline.
 - Pipeline executions are fully reproducible - the same SHA runs every time.
-- Updating an action or image requires an intentional, reviewable commit — there are no silent upgrades.
+- Updating an action or image requires an intentional, reviewable commit - there are no silent upgrades.
 - The human-readable tag comment preserves readability and makes it easy to assess whether an update is needed.

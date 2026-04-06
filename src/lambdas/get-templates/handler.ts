@@ -14,7 +14,7 @@ async function handler(event: APIGatewayProxyWithCognitoAuthorizerEvent) {
   logger.info('getTemplates.starting');
 
   const validatedQueryParams = validateQueryParams(event, getTemplatesRequestDto);
-  logger.info(validatedQueryParams, 'getUrlForTemplateUpload.validatedQueryParams');
+  logger.info(validatedQueryParams, 'getTemplates.validatedQueryParams');
 
   const userId = getUserIdFromEventOrFail(event);
   const { limit, paginationToken } = validatedQueryParams;
