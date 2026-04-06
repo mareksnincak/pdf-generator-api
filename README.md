@@ -1,4 +1,6 @@
-# PDF generator API
+# PDF Generator API
+
+[![CI/CD](https://github.com/mareksnincak/pdf-generator-api/actions/workflows/ci-cd.workflow.yml/badge.svg?branch=main)](https://github.com/mareksnincak/pdf-generator-api/actions/workflows/ci-cd.workflow.yml)
 
 API for generating dynamic PDF documents using serverless stack.
 
