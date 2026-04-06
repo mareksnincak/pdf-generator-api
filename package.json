@@ -17,7 +17,7 @@
     "invoke:debug": "npm run invoke -- -d 9229",
     "it-infra:down": "docker compose -f ./infra/local/docker-compose-it.yml down --rmi \"local\" --volumes",
     "it-infra:up": "docker compose -f ./infra/local/docker-compose-it.yml up --wait -d --build --force-recreate",
-    "lint": "npx tsc --noEmit && npx sort-package-json --check && prettier . --list-different && eslint .",
+    "lint": "npx sort-package-json --check && prettier . --list-different && eslint .",
     "open-api:generate": "npx tsx ./src/open-api/generate-open-api.script.ts",
     "prepare": "husky",
     "sort-package-json": "npx sort-package-json",
@@ -29,7 +29,8 @@
     "synth:watch": "chokidar src/** package-lock.json config/values/local.config.json -c 'npm run synth'",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.unit.config.ts",
     "test:e2e": "NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.e2e.config.ts",
-    "test:it": "npm run it-infra:up && NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down"
+    "test:it": "npm run it-infra:up && NODE_OPTIONS=--experimental-vm-modules jest --config ./.jest/jest.it.config.ts --runInBand && npm run it-infra:down",
+    "typecheck": "npx tsc --noEmit"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^8.5.0",

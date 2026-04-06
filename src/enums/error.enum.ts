@@ -1,6 +1,7 @@
 export enum ErrorMessage {
   documentBatchNotFound = 'Document batch not found.',
   internalServerError = 'Internal server error.',
+  invalidJson = 'Invalid JSON',
   invalidPaginationToken = 'Invalid pagination token.',
   invalidTemplateContent = 'Template content is invalid.',
   templateAlreadyExists = 'Template already exists.',
