@@ -2,7 +2,7 @@ name: pdf-generator-api-it
 services:
   dynamodb-local-it:
     command: '-jar DynamoDBLocal.jar -sharedDb'
-    image: 'amazon/dynamodb-local@sha256:d89f8fcc6b1a39cb35976c248ed42a28c66ae00dc043099210f5571e42648ab4' # v3.3.0
+    image: amazon/dynamodb-local@sha256:d89f8fcc6b1a39cb35976c248ed42a28c66ae00dc043099210f5571e42648ab4 # v3.3.0
     ports:
       - '7999:8000'
     healthcheck:
