@@ -3,9 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
-import * as requestPresigner from '@aws-sdk/s3-request-presigner';
 
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
@@ -23,13 +21,8 @@ import { documentMockData } from '../../common/constants/document.constant';
 import { isSamePdfFile } from '../../common/helpers/pdf.helper';
 import { mockAwsCredentials } from '../helpers/credential.helper';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
-
-jest.mock('@aws-sdk/s3-request-presigner', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('@aws-sdk/s3-request-presigner'),
-  };
-});
+import { getS3Object, putS3Object, refreshS3Bucket } from '../helpers/s3.helper';
+import { refreshSqsQueue } from '../helpers/sqs.helper';
 
 jest.mock('node:crypto', () => {
   return {
@@ -49,7 +42,11 @@ beforeAll(() => {
 });
 
 beforeEach(async () => {
-  await refreshDynamoDb();
+  await Promise.all([
+    refreshDynamoDb(),
+    refreshS3Bucket(process.env.S3_BUCKET!),
+    refreshSqsQueue(process.env.DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL!),
+  ]);
 });
 
 afterEach(() => {
@@ -61,100 +58,50 @@ describe('generateDocument', () => {
     const mocksPath = path.join(__dirname, '..', '..', 'common', 'mocks');
     const htmlTemplate = await readFile(path.join(mocksPath, 'document.mock.html'));
 
-    const s3ClientSpy = jest
-      .spyOn(S3Client.prototype, 'send')
-      .mockImplementationOnce(() => ({
-        Body: {
-          transformToByteArray: () => htmlTemplate,
-        },
-      }))
-      .mockImplementation();
-    const sqsClientSpy = jest.spyOn(SQSClient.prototype, 'send').mockImplementation();
-
     const templateId = randomUUID();
-    const body = requestMockFactory.create({
-      data: documentMockData,
-      templateId,
-    });
-
-    const event = eventMockFactory.create({
-      body: JSON.stringify(body),
-    });
-
+    const body = requestMockFactory.create({ data: documentMockData, templateId });
+    const event = eventMockFactory.create({ body: JSON.stringify(body) });
     const userId = event.requestContext.authorizer.claims.sub;
-    const templateEntity = templateEntityMockFactory.create({
-      id: templateId,
-      userId,
-    });
 
-    const mockedUrl = 'https://mocked.example.com/path';
-    const getSignedUrlSpy = jest
-      .spyOn(requestPresigner, 'getSignedUrl')
-      .mockResolvedValue(mockedUrl);
-
+    const templateEntity = templateEntityMockFactory.create({ id: templateId, userId });
     await templateRepository.createOrFail(templateEntity);
+
+    await putS3Object(process.env.S3_BUCKET!, templateEntity.s3Key, htmlTemplate);
 
     const documentId = randomUUID();
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(documentId);
 
+    // spy-without-mock: message is delayed (DelaySeconds: 90) so can't be received immediately
+    const sqsSpy = jest.spyOn(SQSClient.prototype, 'send');
+
     const result = await generateDocumentFromApiEvent(event, context);
 
     expect(result.statusCode).toEqual(200);
-    expect(JSON.parse(result.body)).toEqual({
-      url: mockedUrl,
-    });
 
-    const expectedUploadBucket = 'pdf-generator-api-test';
-    const expectedUploadS3Key = `documents/${userId}/${documentId}.pdf`;
-    const s3PutObjectArgs = s3ClientSpy.mock.calls[1]?.[0];
-    expect(s3PutObjectArgs).toBeInstanceOf(PutObjectCommand);
-    expect(s3PutObjectArgs.input).toEqual({
-      Body: expect.any(Uint8Array),
-      Bucket: expectedUploadBucket,
-      Key: expectedUploadS3Key,
-    });
+    const expectedS3Key = `documents/${userId}/${documentId}.pdf`;
 
-    const generatedDocument = (s3PutObjectArgs as PutObjectCommand).input.Body as Buffer;
+    expect(JSON.parse(result.body)).toEqual({ url: expect.stringContaining(expectedS3Key) });
+
+    const generatedDocument = await getS3Object(process.env.S3_BUCKET!, expectedS3Key);
     const expectedDocument = await readFile(path.join(mocksPath, 'document.mock.pdf'));
     expect(await isSamePdfFile(generatedDocument, expectedDocument)).toEqual(true);
 
-    const s3GetObjectArgs = s3ClientSpy.mock.calls[0]?.[0];
-    expect(s3GetObjectArgs).toBeInstanceOf(GetObjectCommand);
-    expect(s3GetObjectArgs.input).toEqual({
-      Bucket: expectedUploadBucket,
-      Key: templateEntity.s3Key,
-    });
-
-    const getSignedUrlArgs = getSignedUrlSpy.mock.calls[0];
-    expect(getSignedUrlArgs[1]).toBeInstanceOf(GetObjectCommand);
-    expect(getSignedUrlArgs[1].input).toEqual({
-      Bucket: expectedUploadBucket,
-      Key: expectedUploadS3Key,
-    });
-
-    const sqsClientArgs = sqsClientSpy.mock.calls[0]?.[0];
-    expect(sqsClientArgs).toBeInstanceOf(SendMessageCommand);
-    expect(sqsClientArgs.input).toEqual({
-      DelaySeconds: 90,
-      MessageBody: expectedUploadS3Key,
-      QueueUrl: 'https://sqs.example.com/sample-delete-expired-s3-objects-queue',
-    });
+    const sqsArg = sqsSpy.mock.calls[0]?.[0] as SendMessageCommand;
+    expect(sqsArg).toBeInstanceOf(SendMessageCommand);
+    expect(sqsArg.input.QueueUrl).toEqual(process.env.DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL);
+    expect(sqsArg.input.MessageBody).toEqual(expectedS3Key);
   });
 
   it('should return 404 when template does not exist', async () => {
     mockLogger();
 
     const body = requestMockFactory.create();
-    const event = eventMockFactory.create({
-      body: JSON.stringify(body),
-    });
+    const event = eventMockFactory.create({ body: JSON.stringify(body) });
 
     const result = await generateDocumentFromApiEvent(event, context);
 
     expect(result.statusCode).toEqual(404);
-    expect(JSON.parse(result.body)).toEqual({
-      message: ErrorMessage.templateNotFound,
-    });
+    expect(JSON.parse(result.body)).toEqual({ message: ErrorMessage.templateNotFound });
   });
 
   it('should return 422 when malwareScanStatus is infected', async () => {

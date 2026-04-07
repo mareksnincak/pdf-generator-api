@@ -20,6 +20,7 @@ declare namespace NodeJS {
     S3_PRESIGNED_URL_ENDPOINT?: string;
     SENTRY_DSN?: string;
     SQS_ENDPOINT?: string;
+    SSM_ENDPOINT?: string;
     STATE_MACHINE_ARN?: string;
   };
 }

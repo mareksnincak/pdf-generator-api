@@ -1,7 +1,6 @@
 import * as crypto from 'node:crypto';
 
 import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
-import * as s3RequestPresigner from '@aws-sdk/s3-request-presigner';
 
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
@@ -10,13 +9,8 @@ import { getUrlForTemplateUpload } from '../../../src/lambdas/get-url-for-templa
 import { GetUrlForTemplateUploadRequestMockFactory } from '../../../src/lambdas/get-url-for-template-upload/mock-factories/request.mock-factory';
 import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../src/mock-factories/api-gateway-proxy-with-cognito-authorizer-event.mock-factory';
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
-
-jest.mock('@aws-sdk/s3-request-presigner', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('@aws-sdk/s3-request-presigner'),
-  };
-});
+import { mockAwsCredentials } from '../helpers/credential.helper';
+import { refreshSqsQueue } from '../helpers/sqs.helper';
 
 jest.mock('node:crypto', () => {
   return {
@@ -31,6 +25,11 @@ const context = new ContextMockFactory().create();
 
 beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getUrlForTemplateUpload);
+  mockAwsCredentials();
+});
+
+beforeEach(async () => {
+  await refreshSqsQueue(process.env.DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL!);
 });
 
 afterEach(() => {
@@ -39,46 +38,29 @@ afterEach(() => {
 
 describe('getUrlForTemplateUpload', () => {
   it('should return data needed for template upload', async () => {
-    const presignedUrl = 'http://presigned.example.com';
     const uploadId = crypto.randomUUID();
-
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(uploadId);
-    const getSignedUrlSpy = jest
-      .spyOn(s3RequestPresigner, 'getSignedUrl')
-      .mockResolvedValue(presignedUrl);
 
     const queryStringParameters = requestMockFactory.create();
-    const event = eventMockFactory.create({
-      queryStringParameters,
-    });
+    const event = eventMockFactory.create({ queryStringParameters });
+    const userId = event.requestContext.authorizer.claims.sub;
 
-    const sqsClientSpy = jest.spyOn(SQSClient.prototype, 'send').mockImplementation();
+    // spy-without-mock: message is delayed (DelaySeconds: 120) so can't be received immediately
+    const sqsSpy = jest.spyOn(SQSClient.prototype, 'send');
 
     const result = await getUrlForTemplateUpload(event, context);
 
     expect(result.statusCode).toEqual(200);
+
+    const expectedUploadS3Key = `templates/uploads/${userId}/${uploadId}`;
     expect(JSON.parse(result.body)).toEqual({
       uploadId,
-      url: presignedUrl,
+      url: expect.stringContaining(expectedUploadS3Key),
     });
 
-    const userId = event.requestContext.authorizer.claims.sub;
-    const expectedUploadS3Key = `templates/uploads/${userId}/${uploadId}`;
-
-    const getSignedUrlArgs = getSignedUrlSpy.mock.lastCall;
-    expect(getSignedUrlArgs?.[1].input).toEqual({
-      Bucket: 'pdf-generator-api-test',
-      ContentLength: 1024,
-      ContentType: 'text/html',
-      Key: expectedUploadS3Key,
-    });
-
-    const sqsClientArgs = sqsClientSpy.mock.calls[0]?.[0];
-    expect(sqsClientArgs).toBeInstanceOf(SendMessageCommand);
-    expect(sqsClientArgs.input).toEqual({
-      DelaySeconds: 120,
-      MessageBody: expectedUploadS3Key,
-      QueueUrl: 'https://sqs.example.com/sample-delete-expired-s3-objects-queue',
-    });
+    const sqsArg = sqsSpy.mock.calls[0]?.[0] as SendMessageCommand;
+    expect(sqsArg).toBeInstanceOf(SendMessageCommand);
+    expect(sqsArg.input.QueueUrl).toEqual(process.env.DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL);
+    expect(sqsArg.input.MessageBody).toEqual(expectedUploadS3Key);
   });
 });

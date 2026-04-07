@@ -1,4 +1,4 @@
-import { GetParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
+import { GetParameterCommand, SSMClient, type SSMClientConfig } from '@aws-sdk/client-ssm';
 
 import { logger } from './logger.helper';
 
@@ -6,7 +6,11 @@ let ssmClient: SSMClient | undefined;
 
 export function getSsmClient() {
   if (!ssmClient) {
-    ssmClient = new SSMClient();
+    const config: SSMClientConfig = {};
+    if (process.env.SSM_ENDPOINT) {
+      config.endpoint = process.env.SSM_ENDPOINT;
+    }
+    ssmClient = new SSMClient(config);
   }
 
   return ssmClient;

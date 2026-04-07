@@ -5,6 +5,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { BucketAlreadyOwnedByYou, CreateBucketCommand, S3Client } from '@aws-sdk/client-s3';
 import { CreateQueueCommand, QueueNameExists, SQSClient } from '@aws-sdk/client-sqs';
+import { ParameterAlreadyExists, PutParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
 
 const FLOCI_ENDPOINT = 'http://localhost:4566';
 const REGION = 'eu-central-1';
@@ -18,6 +19,7 @@ const s3 = new S3Client({
   region: REGION,
 });
 const sqs = new SQSClient({ credentials: CREDENTIALS, endpoint: FLOCI_ENDPOINT, region: REGION });
+const ssm = new SSMClient({ credentials: CREDENTIALS, endpoint: FLOCI_ENDPOINT, region: REGION });
 
 async function createTable() {
   try {
@@ -83,9 +85,28 @@ async function createQueue(name: string) {
   }
 }
 
+async function createOpenApiSsmParam() {
+  const name = 'pdf-generator-api-local-open-api-params';
+  const value = JSON.stringify({
+    apiUrl: 'http://localhost:3000',
+    authUrl: 'http://localhost:3000/oauth2/authorize',
+  });
+  try {
+    await ssm.send(new PutParameterCommand({ Name: name, Type: 'String', Value: value }));
+    console.log(`ssm parameter created: ${name}`);
+  } catch (error) {
+    if (error instanceof ParameterAlreadyExists) {
+      console.log(`ssm parameter already exists: ${name}`);
+      return;
+    }
+    throw error;
+  }
+}
+
 await Promise.all([
   createTable(),
   createBucket('pdf-generator-api-local'),
   createQueue('pdf-generator-api-local-dead-letter-queue'),
   createQueue('pdf-generator-api-local-delete-expired-s3-objects-queue'),
+  createOpenApiSsmParam(),
 ]);
