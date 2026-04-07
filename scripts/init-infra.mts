@@ -11,7 +11,11 @@ const FLOCI_ENDPOINT = 'http://localhost:4566';
 const REGION = 'eu-central-1';
 const CREDENTIALS = { accessKeyId: 'local', secretAccessKey: 'local' };
 
-const dynamodb = new DynamoDBClient({ endpoint: 'http://localhost:8000', region: 'local' });
+const dynamodb = new DynamoDBClient({
+  credentials: CREDENTIALS,
+  endpoint: 'http://localhost:8000',
+  region: 'local',
+});
 const s3 = new S3Client({
   credentials: CREDENTIALS,
   endpoint: FLOCI_ENDPOINT,
