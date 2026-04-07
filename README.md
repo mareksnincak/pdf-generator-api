@@ -143,7 +143,7 @@ npm run test
 ### Integration tests
 
 Contain tests related to module as a whole - e.g. all lambda logic not just single file.
-They run against real database. External services such as 3rd party APIs are mocked.
+They run against real local database and local aws services (Floci). Other external services such as 3rd party APIs are mocked.
 They are located in `tests/it` folder and use `.it.test.ts` suffix.
 
 To run:
