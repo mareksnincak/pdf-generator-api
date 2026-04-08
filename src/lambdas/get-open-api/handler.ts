@@ -1,6 +1,6 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 
-import { getEnvVariableOrFail, isLocal } from '../../helpers/env.helper';
+import { getEnvVariableOrFail } from '../../helpers/env.helper';
 import { ErrorFormat } from '../../helpers/error.helper';
 import { wrapHandler } from '../../helpers/handler.helper';
 import { logger } from '../../helpers/logger.helper';
@@ -12,10 +12,6 @@ import { type OpenApiParamsSsmParam } from './types/input.type';
 let openApiDocument: ReturnType<typeof generateOpenApi> | undefined;
 
 async function getOpenApiParams() {
-  if (isLocal()) {
-    return;
-  }
-
   const ssmParamName = getEnvVariableOrFail('OPEN_API_SSM_PARAM_NAME');
   const value = await getSsmParam(ssmParamName);
 

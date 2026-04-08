@@ -23,6 +23,7 @@ npm run open-api:generate # regenerate OpenAPI spec from Zod schemas
 - Fix lint and type issues, don't disable or relax the rules
 - No `any` — use proper types or `unknown` with narrowing
 - After every code change, run `npm run typecheck && npm run lint && npm run test && npm run test:it` and fix all errors before considering the task done
+- Pin all Docker images and GitHub Actions by their immutable hash, never by mutable tag. Keep the human-readable tag as a comment. Docker: `image: org/name@sha256:<digest> # vX.Y.Z`. GitHub Actions: `uses: actions/name@<commit-sha> # vX.Y.Z`.
 
 ## Philosophy
 
@@ -58,8 +59,8 @@ logger.info(params, 'templateRepository.getById');
 
 Cover application functionality with tests - three tiers — pick the right one for what you are testing:
 
-| Tier        | File suffix    | What it tests                          | How to run         |
-| ----------- | -------------- | -------------------------------------- | ------------------ |
-| Unit        | `.test.ts`     | Business logic, mocks all I/O          | `npm test`         |
-| Integration | `.it.test.ts`  | Repository layer against real DynamoDB | `npm run test:it`  |
-| E2E         | `.e2e.test.ts` | Full API against deployed or local SAM | `npm run test:e2e` |
+| Tier        | File suffix    | What it tests                                           | How to run         |
+| ----------- | -------------- | ------------------------------------------------------- | ------------------ |
+| Unit        | `.test.ts`     | Business logic, mocks all I/O                           | `npm test`         |
+| Integration | `.it.test.ts`  | Lambda handlers against real AWS infrastructure (floci) | `npm run test:it`  |
+| E2E         | `.e2e.test.ts` | Full API against deployed or local SAM                  | `npm run test:e2e` |

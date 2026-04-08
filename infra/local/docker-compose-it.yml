@@ -14,3 +14,16 @@ services:
       interval: 1s
       timeout: 3s
       retries: 10
+  floci-it:
+    image: hectorvent/floci@sha256:11a6cbf733b147700b0b9fcf71d3e6491a33302be453a96f52918cbad68551ee # v1.3.0
+    ports:
+      - '4567:4566'
+    environment:
+      AWS_DEFAULT_REGION: 'eu-central-1'
+      AWS_ACCESS_KEY_ID: local
+      AWS_SECRET_ACCESS_KEY: local
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -sf http://localhost:4566/_floci/health || exit 1']
+      interval: 1s
+      timeout: 3s
+      retries: 10

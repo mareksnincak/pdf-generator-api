@@ -6,6 +6,7 @@ import {
   type ObjectIdentifier,
   PutObjectCommand,
   S3Client,
+  type S3ClientConfig,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
@@ -13,13 +14,37 @@ import { logger } from './logger.helper';
 import { captureAwsClient } from './tracing.helper';
 
 let s3Client: S3Client | undefined;
+let presignedUrlS3Client: S3Client | undefined;
+
+function createS3Client(endpoint?: string): S3Client {
+  const config: S3ClientConfig = {};
+  if (endpoint) {
+    config.endpoint = endpoint;
+    // path-style URLs required when using a local endpoint (e.g. http://localhost:4566/bucket/key)
+    config.forcePathStyle = true;
+  }
+  return captureAwsClient(new S3Client(config));
+}
 
 export function getS3Client() {
   if (!s3Client) {
-    s3Client = captureAwsClient(new S3Client());
+    s3Client = createS3Client(process.env.S3_ENDPOINT);
   }
 
   return s3Client;
+}
+
+// Presigned URLs are returned to callers (browsers) so their host must be reachable
+// from outside the Lambda container - S3_PRESIGNED_URL_ENDPOINT allows overriding the
+// host independently of S3_ENDPOINT (e.g. localhost:4566 vs host.docker.internal:4566)
+function getPresignedUrlS3Client() {
+  if (!presignedUrlS3Client) {
+    presignedUrlS3Client = createS3Client(
+      process.env.S3_PRESIGNED_URL_ENDPOINT ?? process.env.S3_ENDPOINT,
+    );
+  }
+
+  return presignedUrlS3Client;
 }
 
 export async function getObject({ bucket, key }: { bucket: string; key: string }) {
@@ -143,7 +168,7 @@ export async function getPresignedShareUrl({
   expiresInSeconds?: number;
   key: string;
 }) {
-  const client = getS3Client();
+  const client = getPresignedUrlS3Client();
 
   const command = new GetObjectCommand({
     Bucket: bucket,
@@ -166,7 +191,7 @@ export async function getPresignedUploadUrl({
   fileSizeBytes: number;
   key: string;
 }) {
-  const client = getS3Client();
+  const client = getPresignedUrlS3Client();
 
   const command = new PutObjectCommand({
     Bucket: bucket,

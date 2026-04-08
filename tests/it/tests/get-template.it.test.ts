@@ -1,8 +1,5 @@
 import { randomUUID } from 'node:crypto';
 
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import * as requestPresigner from '@aws-sdk/s3-request-presigner';
-
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
@@ -23,13 +20,6 @@ const eventMockFactory = new ApiGatewayProxyWithCognitoAuthorizerEventMockFactor
 const templateEntityMockFactory = new TemplateEntityMockFactory();
 const context = new ContextMockFactory().create();
 
-jest.mock('@aws-sdk/s3-request-presigner', () => {
-  return {
-    __esModule: true,
-    ...jest.requireActual('@aws-sdk/s3-request-presigner'),
-  };
-});
-
 beforeAll(() => {
   setEnvVarsFromConfig(EnvironmentName.localTest, Lambda.getTemplate);
   mockAwsCredentials();
@@ -45,22 +35,12 @@ afterEach(() => {
 
 describe('getTemplate', () => {
   it('should return template', async () => {
-    const mockedUrl = 'http://mocked.example.com/path';
-    const getSignedUrlSpy = jest
-      .spyOn(requestPresigner, 'getSignedUrl')
-      .mockResolvedValue(mockedUrl);
-
     const id = randomUUID();
     const pathParameters = requestMockFactory.create({ id });
-    const event = eventMockFactory.create({
-      pathParameters,
-    });
+    const event = eventMockFactory.create({ pathParameters });
 
     const userId = event.requestContext.authorizer.claims.sub;
-    const templateEntity = templateEntityMockFactory.create({
-      id,
-      userId,
-    });
+    const templateEntity = templateEntityMockFactory.create({ id, userId });
 
     await templateRepository.createOrFail(templateEntity);
 
@@ -68,18 +48,11 @@ describe('getTemplate', () => {
 
     expect(result.statusCode).toEqual(200);
     expect(JSON.parse(result.body)).toEqual({
-      dataUrl: mockedUrl,
+      dataUrl: expect.stringContaining(templateEntity.s3Key),
       id,
       malwareScanStatus: MalwareScanStatus.clean,
       name: templateEntity.name,
       type: templateEntity.type,
-    });
-
-    const getSignedUrlArgs = getSignedUrlSpy.mock.calls[0];
-    expect(getSignedUrlArgs[1]).toBeInstanceOf(GetObjectCommand);
-    expect(getSignedUrlArgs[1].input).toEqual({
-      Bucket: 'pdf-generator-api-test',
-      Key: templateEntity.s3Key,
     });
   });
 
@@ -87,15 +60,11 @@ describe('getTemplate', () => {
     mockLogger();
 
     const pathParameters = requestMockFactory.create();
-    const event = eventMockFactory.create({
-      pathParameters,
-    });
+    const event = eventMockFactory.create({ pathParameters });
 
     const result = await getTemplate(event, context);
 
     expect(result.statusCode).toEqual(404);
-    expect(JSON.parse(result.body)).toEqual({
-      message: ErrorMessage.templateNotFound,
-    });
+    expect(JSON.parse(result.body)).toEqual({ message: ErrorMessage.templateNotFound });
   });
 });

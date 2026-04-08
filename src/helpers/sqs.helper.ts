@@ -1,4 +1,4 @@
-import { SendMessageCommand, SQSClient } from '@aws-sdk/client-sqs';
+import { SendMessageCommand, SQSClient, type SQSClientConfig } from '@aws-sdk/client-sqs';
 
 import { logger } from './logger.helper';
 import { captureAwsClient } from './tracing.helper';
@@ -7,7 +7,11 @@ let sqsClient: SQSClient | undefined;
 
 export function getSqsClient() {
   if (!sqsClient) {
-    sqsClient = captureAwsClient(new SQSClient());
+    const config: SQSClientConfig = {};
+    if (process.env.SQS_ENDPOINT) {
+      config.endpoint = process.env.SQS_ENDPOINT;
+    }
+    sqsClient = captureAwsClient(new SQSClient(config));
   }
 
   return sqsClient;
