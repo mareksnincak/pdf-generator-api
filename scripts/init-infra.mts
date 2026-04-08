@@ -3,6 +3,12 @@ import {
   DynamoDBClient,
   ResourceInUseException,
 } from '@aws-sdk/client-dynamodb';
+import {
+  CreateAliasCommand,
+  CreateKeyCommand,
+  KMSClient,
+  ListAliasesCommand,
+} from '@aws-sdk/client-kms';
 import { BucketAlreadyOwnedByYou, CreateBucketCommand, S3Client } from '@aws-sdk/client-s3';
 import { CreateQueueCommand, QueueNameExists, SQSClient } from '@aws-sdk/client-sqs';
 import { ParameterAlreadyExists, PutParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
@@ -24,6 +30,7 @@ const s3 = new S3Client({
 });
 const sqs = new SQSClient({ credentials: CREDENTIALS, endpoint: FLOCI_ENDPOINT, region: REGION });
 const ssm = new SSMClient({ credentials: CREDENTIALS, endpoint: FLOCI_ENDPOINT, region: REGION });
+const kms = new KMSClient({ credentials: CREDENTIALS, endpoint: FLOCI_ENDPOINT, region: REGION });
 
 async function createTable() {
   try {
@@ -107,10 +114,37 @@ async function createOpenApiSsmParam() {
   }
 }
 
+async function createKmsKey(aliasName: string) {
+  if (!aliasName.startsWith('alias/')) {
+    throw new Error("Alias must start with 'alias/'");
+  }
+
+  const aliases = await kms.send(new ListAliasesCommand());
+
+  const existingAlias = aliases.Aliases?.find((alias) => alias.AliasName === aliasName);
+
+  if (existingAlias?.TargetKeyId) {
+    console.log(`kms key already exists: ${aliasName}`);
+    return existingAlias.TargetKeyId;
+  }
+
+  const key = await kms.send(new CreateKeyCommand());
+
+  await kms.send(
+    new CreateAliasCommand({
+      AliasName: aliasName,
+      TargetKeyId: key.KeyMetadata?.KeyId,
+    }),
+  );
+
+  console.log(`kms key created: ${aliasName}`);
+}
+
 await Promise.all([
   createTable(),
   createBucket('pdf-generator-api-local'),
   createQueue('pdf-generator-api-local-dead-letter-queue'),
   createQueue('pdf-generator-api-local-delete-expired-s3-objects-queue'),
+  createKmsKey('alias/pdf-generator-api-local'),
   createOpenApiSsmParam(),
 ]);

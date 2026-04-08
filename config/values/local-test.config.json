@@ -22,7 +22,8 @@
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
-      "KMS_KEY_ID": "sample-kms-key-id"
+      "KMS_ENDPOINT": "http://localhost:4567",
+      "KMS_KEY_ID": "alias/pdf-generator-api-test"
     },
     "delete-template": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",

@@ -11,6 +11,7 @@ declare namespace NodeJS {
     DYNAMODB_REGION?: string;
     DYNAMODB_TABLE_NAME?: string;
     IS_LOCAL?: string;
+    KMS_ENDPOINT?: string;
     KMS_KEY_ID?: string;
     LOG_LEVEL?: string;
     OPEN_API_SSM_PARAM_NAME?: string;

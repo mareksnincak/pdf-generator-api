@@ -59,8 +59,8 @@ logger.info(params, 'templateRepository.getById');
 
 Cover application functionality with tests - three tiers — pick the right one for what you are testing:
 
-| Tier        | File suffix    | What it tests                                               | How to run         |
-| ----------- | -------------- | ----------------------------------------------------------- | ------------------ |
-| Unit        | `.test.ts`     | Business logic, mocks all I/O                               | `npm test`         |
-| Integration | `.it.test.ts`  | Lambda handlers against real DynamoDB, S3, SQS, SSM (floci) | `npm run test:it`  |
-| E2E         | `.e2e.test.ts` | Full API against deployed or local SAM                      | `npm run test:e2e` |
+| Tier        | File suffix    | What it tests                                           | How to run         |
+| ----------- | -------------- | ------------------------------------------------------- | ------------------ |
+| Unit        | `.test.ts`     | Business logic, mocks all I/O                           | `npm test`         |
+| Integration | `.it.test.ts`  | Lambda handlers against real AWS infrastructure (floci) | `npm run test:it`  |
+| E2E         | `.e2e.test.ts` | Full API against deployed or local SAM                  | `npm run test:e2e` |

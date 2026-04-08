@@ -58,7 +58,8 @@
     "get-templates": {
       "DYNAMODB_ENDPOINT": "http://dynamodb-local:8000",
       "DYNAMODB_TABLE_NAME": "PdfGenerator",
-      "KMS_KEY_ID": "sample-kms-key-id"
+      "KMS_ENDPOINT": "http://floci:4566",
+      "KMS_KEY_ID": "alias/pdf-generator-api-local"
     },
     "get-url-for-template-upload": {
       "DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL": "http://floci:4566/000000000000/pdf-generator-api-local-delete-expired-s3-objects-queue",
