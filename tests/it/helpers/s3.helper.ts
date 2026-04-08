@@ -6,18 +6,10 @@ import {
   HeadObjectCommand,
   ListObjectsV2Command,
   PutObjectCommand,
-  S3Client,
   S3ServiceException,
 } from '@aws-sdk/client-s3';
 
-function getS3Client() {
-  return new S3Client({
-    credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
-    endpoint: process.env.S3_ENDPOINT,
-    forcePathStyle: true,
-    region: 'eu-central-1',
-  });
-}
+import { getS3Client } from '../../../src/helpers/s3.helper';
 
 export async function refreshS3Bucket(bucketName: string) {
   const client = getS3Client();

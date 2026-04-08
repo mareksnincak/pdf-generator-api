@@ -3,16 +3,9 @@ import {
   DeleteQueueCommand,
   QueueDoesNotExist,
   ReceiveMessageCommand,
-  SQSClient,
 } from '@aws-sdk/client-sqs';
 
-function getSqsClient() {
-  return new SQSClient({
-    credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
-    endpoint: process.env.SQS_ENDPOINT,
-    region: 'eu-central-1',
-  });
-}
+import { getSqsClient } from '../../../src/helpers/sqs.helper';
 
 export async function refreshSqsQueue(queueUrl: string) {
   const client = getSqsClient();

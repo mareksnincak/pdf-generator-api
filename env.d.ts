@@ -1,6 +1,7 @@
 declare namespace NodeJS {
   type ProcessEnv = {
     AWS_ACCESS_KEY_ID?: string;
+    AWS_REGION?: string;
     AWS_SECRET_ACCESS_KEY?: string;
     AWS_XRAY_DAEMON_ADDRESS?: string;
     CHROMIUM_LOCAL_EXECUTABLE_PATH?: string;

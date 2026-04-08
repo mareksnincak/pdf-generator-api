@@ -1,17 +1,6 @@
-import {
-  CreateAliasCommand,
-  CreateKeyCommand,
-  KMSClient,
-  ListAliasesCommand,
-} from '@aws-sdk/client-kms';
+import { CreateAliasCommand, CreateKeyCommand, ListAliasesCommand } from '@aws-sdk/client-kms';
 
-function getKmsClient() {
-  return new KMSClient({
-    credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
-    endpoint: process.env.KMS_ENDPOINT,
-    region: 'eu-central-1',
-  });
-}
+import { getKmsClient } from '../../../src/helpers/kms.helper';
 
 export async function createKmsKey(aliasName: string) {
   if (!aliasName.startsWith('alias/')) {

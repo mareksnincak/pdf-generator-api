@@ -1,12 +1,6 @@
-import { PutParameterCommand, SSMClient } from '@aws-sdk/client-ssm';
+import { PutParameterCommand } from '@aws-sdk/client-ssm';
 
-function getSsmClient() {
-  return new SSMClient({
-    credentials: { accessKeyId: 'local', secretAccessKey: 'local' },
-    endpoint: process.env.SSM_ENDPOINT,
-    region: 'eu-central-1',
-  });
-}
+import { getSsmClient } from '../../../src/helpers/ssm.helper';
 
 export async function putSsmParameter(name: string, value: string) {
   await getSsmClient().send(
