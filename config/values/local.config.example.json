@@ -76,7 +76,9 @@
       "S3_BUCKET": "pdf-generator-api-local",
       "S3_ENDPOINT": "http://floci:4566"
     },
-    "set-default-user-password": {},
+    "set-default-user-password": {
+      "SECRETS_MANAGER_ENDPOINT": "http://localhost:4567"
+    },
     "start-document-batch-generation": {
       "DOCUMENT_BATCH_TTL_HOURS": "1",
       "DYNAMODB_ENDPOINT": "http://dynamodb-local:8000",

@@ -19,6 +19,7 @@ declare namespace NodeJS {
     S3_BUCKET?: string;
     S3_ENDPOINT?: string;
     S3_PRESIGNED_URL_ENDPOINT?: string;
+    SECRETS_MANAGER_ENDPOINT?: string;
     SENTRY_DSN?: string;
     SQS_ENDPOINT?: string;
     SSM_ENDPOINT?: string;

@@ -42,7 +42,9 @@
       "DELETE_UPLOADED_OBJECT_IN_SECONDS": "120",
       "DELETE_EXPIRED_S3_OBJECTS_QUEUE_URL": "http://localhost:4567/000000000000/pdf-generator-api-test-delete-expired-s3-objects-queue"
     },
-    "set-default-user-password": {},
+    "set-default-user-password": {
+      "SECRETS_MANAGER_ENDPOINT": "http://localhost:4567"
+    },
     "generate-document-from-api-event": {
       "DYNAMODB_ENDPOINT": "http://localhost:7999",
       "DYNAMODB_REGION": "local",
