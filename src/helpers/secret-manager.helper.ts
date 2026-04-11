@@ -1,4 +1,8 @@
-import { GetSecretValueCommand, SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import {
+  GetSecretValueCommand,
+  SecretsManagerClient,
+  type SecretsManagerClientConfig,
+} from '@aws-sdk/client-secrets-manager';
 
 import { logger } from './logger.helper';
 
@@ -6,7 +10,11 @@ let secretManagerClient: SecretsManagerClient | undefined;
 
 export function getSecretManagerClient() {
   if (!secretManagerClient) {
-    secretManagerClient = new SecretsManagerClient();
+    const config: SecretsManagerClientConfig = {};
+    if (process.env.SECRETS_MANAGER_ENDPOINT) {
+      config.endpoint = process.env.SECRETS_MANAGER_ENDPOINT;
+    }
+    secretManagerClient = new SecretsManagerClient(config);
   }
 
   return secretManagerClient;

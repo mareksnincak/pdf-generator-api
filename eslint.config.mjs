@@ -53,7 +53,7 @@ export default defineConfig(
       importPlugin.flatConfigs.typescript,
     ],
 
-    files: ['**/*.ts'],
+    files: ['**/*.ts', '**/*.mts'],
 
     languageOptions: {
       globals: globals.node,

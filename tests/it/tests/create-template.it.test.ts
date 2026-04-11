@@ -1,14 +1,6 @@
 import * as crypto from 'node:crypto';
 import { randomUUID } from 'node:crypto';
 
-import {
-  CopyObjectCommand,
-  DeleteObjectCommand,
-  GetObjectCommand,
-  NoSuchKey,
-  S3Client,
-} from '@aws-sdk/client-s3';
-
 import { EnvironmentName } from '../../../config/enums/config.enum';
 import { setEnvVarsFromConfig } from '../../../config/helpers/config.helper';
 import { Lambda } from '../../../infra/cdk/enums/lambda.enum';
@@ -24,6 +16,7 @@ import { ApiGatewayProxyWithCognitoAuthorizerEventMockFactory } from '../../../s
 import { ContextMockFactory } from '../../../src/mock-factories/context.mock-factory';
 import { mockAwsCredentials } from '../helpers/credential.helper';
 import { refreshDynamoDb } from '../helpers/dynamo-db.helper';
+import { getS3Object, putS3Object, refreshS3Bucket, s3ObjectExists } from '../helpers/s3.helper';
 
 jest.mock('node:crypto', () => {
   return {
@@ -44,7 +37,7 @@ beforeAll(() => {
 
 beforeEach(async () => {
   jest.useRealTimers();
-  await refreshDynamoDb();
+  await Promise.all([refreshDynamoDb(), refreshS3Bucket(process.env.S3_BUCKET!)]);
 });
 
 afterEach(() => {
@@ -57,25 +50,18 @@ describe('createTemplate', () => {
     jest.useFakeTimers().setSystemTime(mockedDate);
 
     const id = randomUUID();
-
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
-    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation((command) => {
-      if (command instanceof GetObjectCommand) {
-        return {
-          Body: {
-            transformToByteArray: () =>
-              Promise.resolve(new Uint8Array(Buffer.from('<html>{{name}}</html>'))),
-          },
-        } as unknown as Awaited<ReturnType<typeof S3Client.prototype.send>>;
-      }
-    });
 
-    const requestBody = requestMockFactory.create({
-      name: 'sample template',
-    });
-    const event = eventMockFactory.create({
-      body: JSON.stringify(requestBody),
-    });
+    const requestBody = requestMockFactory.create({ name: 'sample template' });
+    const event = eventMockFactory.create({ body: JSON.stringify(requestBody) });
+    const userId = event.requestContext.authorizer.claims.sub;
+
+    const uploadedObjectContent = Buffer.from('<html>{{name}}</html>');
+    await putS3Object(
+      process.env.S3_BUCKET!,
+      `templates/uploads/${userId}/${requestBody.uploadId}`,
+      uploadedObjectContent,
+    );
 
     const result = await createTemplate(event, context);
 
@@ -89,22 +75,13 @@ describe('createTemplate', () => {
       type: requestBody.type,
     });
 
-    const userId = event.requestContext.authorizer.claims.sub;
+    const [movedS3Object, oldUploadedS3ObjectExists] = await Promise.all([
+      getS3Object(process.env.S3_BUCKET!, `templates/data/${userId}/${id}`),
+      s3ObjectExists(process.env.S3_BUCKET!, `templates/uploads/${userId}/${requestBody.uploadId}`),
+    ]);
 
-    const s3CopyArgs = s3ClientSpy.mock.calls[1]?.[0];
-    expect(s3CopyArgs).toBeInstanceOf(CopyObjectCommand);
-    expect(s3CopyArgs.input).toEqual({
-      Bucket: 'pdf-generator-api-test',
-      CopySource: `pdf-generator-api-test/templates/uploads/${userId}/${requestBody.uploadId}`,
-      Key: `templates/data/${userId}/${id}`,
-    });
-
-    const s3DeleteArgs = s3ClientSpy.mock.calls[2]?.[0];
-    expect(s3DeleteArgs).toBeInstanceOf(DeleteObjectCommand);
-    expect(s3DeleteArgs.input).toEqual({
-      Bucket: 'pdf-generator-api-test',
-      Key: `templates/uploads/${userId}/${requestBody.uploadId}`,
-    });
+    expect(movedS3Object).toEqual(uploadedObjectContent);
+    expect(oldUploadedS3ObjectExists).toBe(false);
 
     const createdTemplate = await templateRepository.getByIdOrFail({ id, userId });
     expect(createdTemplate).toEqual({
@@ -125,95 +102,61 @@ describe('createTemplate', () => {
   it('should return 404 when template data does not exist', async () => {
     mockLogger();
 
-    jest.spyOn(S3Client.prototype, 'send').mockImplementation(() => {
-      throw new NoSuchKey({ $metadata: {}, message: 'No such key' });
-    });
-
     const requestBody = requestMockFactory.create();
-    const event = eventMockFactory.create({
-      body: JSON.stringify(requestBody),
-    });
+    const event = eventMockFactory.create({ body: JSON.stringify(requestBody) });
 
     const result = await createTemplate(event, context);
 
     expect(result.statusCode).toEqual(404);
-    expect(JSON.parse(result.body)).toEqual({
-      message: ErrorMessage.templateDataNotFound,
-    });
+    expect(JSON.parse(result.body)).toEqual({ message: ErrorMessage.templateDataNotFound });
   });
 
   it('should return 409 and delete s3 data when template already exists', async () => {
     mockLogger();
 
     const id = randomUUID();
-
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
-    const s3ClientSpy = jest.spyOn(S3Client.prototype, 'send').mockImplementation((command) => {
-      if (command instanceof GetObjectCommand) {
-        return {
-          Body: {
-            transformToByteArray: () =>
-              Promise.resolve(new Uint8Array(Buffer.from('<html>{{name}}</html>'))),
-          },
-        } as unknown as Awaited<ReturnType<typeof S3Client.prototype.send>>;
-      }
-    });
 
     const requestBody = requestMockFactory.create();
-    const event = eventMockFactory.create({
-      body: JSON.stringify(requestBody),
-    });
-
+    const event = eventMockFactory.create({ body: JSON.stringify(requestBody) });
     const userId = event.requestContext.authorizer.claims.sub;
-    const templateEntity = templateEntityMockFactory.create({
-      id,
-      userId,
-    });
 
+    await putS3Object(
+      process.env.S3_BUCKET!,
+      `templates/uploads/${userId}/${requestBody.uploadId}`,
+      Buffer.from('<html>{{name}}</html>'),
+    );
+
+    const templateEntity = templateEntityMockFactory.create({ id, userId });
     await templateRepository.createOrFail(templateEntity);
 
     const result = await createTemplate(event, context);
 
     expect(result.statusCode).toEqual(409);
-    expect(JSON.parse(result.body)).toEqual({
-      message: ErrorMessage.templateAlreadyExists,
-    });
+    expect(JSON.parse(result.body)).toEqual({ message: ErrorMessage.templateAlreadyExists });
 
-    const s3ClientLastCallArgs = s3ClientSpy.mock.lastCall?.[0];
-    expect(s3ClientLastCallArgs).toBeInstanceOf(DeleteObjectCommand);
-    expect(s3ClientLastCallArgs?.input).toEqual({
-      Bucket: 'pdf-generator-api-test',
-      Key: `templates/data/${userId}/${id}`,
-    });
+    expect(await s3ObjectExists(process.env.S3_BUCKET!, `templates/data/${userId}/${id}`)).toBe(
+      false,
+    );
   });
 
   it('should not return 409 when id exists under other user', async () => {
     mockLogger();
 
     const id = randomUUID();
-
     jest.spyOn(crypto, 'randomUUID').mockReturnValue(id);
-    jest.spyOn(S3Client.prototype, 'send').mockImplementation((command) => {
-      if (command instanceof GetObjectCommand) {
-        return {
-          Body: {
-            transformToByteArray: () =>
-              Promise.resolve(new Uint8Array(Buffer.from('<html>{{name}}</html>'))),
-          },
-        } as unknown as Awaited<ReturnType<typeof S3Client.prototype.send>>;
-      }
-    });
 
     const requestBody = requestMockFactory.create();
-    const event = eventMockFactory.create({
-      body: JSON.stringify(requestBody),
-    });
+    const event = eventMockFactory.create({ body: JSON.stringify(requestBody) });
+    const userId = event.requestContext.authorizer.claims.sub;
 
-    const templateEntity = templateEntityMockFactory.create({
-      id,
-      userId: 'other-user-id',
-    });
+    await putS3Object(
+      process.env.S3_BUCKET!,
+      `templates/uploads/${userId}/${requestBody.uploadId}`,
+      Buffer.from('<html>{{name}}</html>'),
+    );
 
+    const templateEntity = templateEntityMockFactory.create({ id, userId: 'other-user-id' });
     await templateRepository.createOrFail(templateEntity);
 
     const result = await createTemplate(event, context);
